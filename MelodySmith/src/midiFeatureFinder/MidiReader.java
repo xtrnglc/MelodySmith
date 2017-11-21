@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Hashtable;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
@@ -18,7 +20,8 @@ public class MidiReader {
     public static final int NOTE_ON = 0x90;
     public static final int NOTE_OFF = 0x80;
     public static final String[] NOTES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-	
+    public static final String[] KEYS = {"Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"};
+    
 	Sequence currentSequence;
 	private PrintWriter writer;
 	
@@ -30,6 +33,7 @@ public class MidiReader {
 			writer = new PrintWriter(fw);
 			int trackNum = 1;
 			currentSequence = MidiSystem.getSequence(midiFile);
+			double microToTickRatio = ((double) currentSequence.getMicrosecondLength()) / currentSequence.getTickLength();
 			for (Track track : currentSequence.getTracks()) {
 				writer.println("Track Number: " +  trackNum + " size: " + track.size() );
 				for (int i = 0; i < track.size(); i++) {
@@ -66,7 +70,7 @@ public class MidiReader {
 						}
 					}
 					else {
-						writer.println("Other message: " + message.getClass());
+						writer.println(processMetaMessage((MetaMessage) message, microToTickRatio));
 					}
 				}
 				trackNum++;
@@ -89,6 +93,7 @@ public class MidiReader {
 			writer = new PrintWriter(fw);
 			int trackNum = 1;
 			currentSequence = MidiSystem.getSequence(midiFile);
+			double microToTickRatio = ((double) currentSequence.getMicrosecondLength()) / currentSequence.getTickLength();
 			for (Track track : currentSequence.getTracks()) {
 				writer.println("Track Number: " +  trackNum + " size: " + track.size() );
 				for (int i = 0; i < track.size(); i++) {
@@ -100,7 +105,7 @@ public class MidiReader {
 						processShortMessage((ShortMessage) message);
 					}
 					else {
-						writer.println("Other message: " + message.getClass());
+						writer.println(processMetaMessage((MetaMessage) message, microToTickRatio));
 					}
 				}
 				trackNum++;
@@ -144,5 +149,38 @@ public class MidiReader {
 		int octave = (key / 12) - 1;
 		
 		writer.println("Key: " + key + ", Note: " + NOTES[note] + ", Octave: " + octave + ", Velocity: " + velocity);
+	}
+	
+	private String processMetaMessage(MetaMessage message, double microToTickRatio) {
+		String r =  "Other message: " + message.getType();
+		byte[] temp = message.getData();
+		// MIDI Reference : http://www.somascape.org/midi/tech/mfile.html#meta
+		if (message.getType() == 0x59) {
+			int key = temp[0];
+			if (temp[1] == 1) {
+				r = ("Key Signature: " + KEYS[key + 7] + " minor");
+			}
+			else {
+				r = ("Key Signature: " + KEYS[key + 7] + " major");
+			}
+		}
+		else if (message.getType() == 0x58) {
+			int num = temp[0];
+			int den = (int) Math.pow(2, temp[1]);
+			int met = temp[2] / ( 24 / (temp[1] - 1));
+			
+			r = ("Time Signature: " + num + "/" + den +  " Metronome: Every " + met + " 1/" + den + " notes");
+		}
+		else if (message.getType() == 0x51) {
+			int t = ((temp[0] & 0xff) << 16) | ((temp[1] & 0xff) << 8) | (temp[2] & 0xff);
+			r = ("Tempo: " + t / microToTickRatio);
+		}
+		else if (message.getType() == 0x2F) {
+			r = ("End of Track");
+		}
+		else if (message.getType() == 0x04) {
+			r = ("Instrument: " + Arrays.toString(message.getData()));
+		}
+		return r;
 	}
 }

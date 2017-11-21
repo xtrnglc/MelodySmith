@@ -1,12 +1,12 @@
 Track Number: 1 size: 5
-0, Other message: class javax.sound.midi.MetaMessage
-0, Other message: class javax.sound.midi.MetaMessage
-0, Other message: class javax.sound.midi.MetaMessage
-0, Other message: class javax.sound.midi.MetaMessage
-0, Other message: class javax.sound.midi.Track$ImmutableEndOfTrack
+0, Other message: 3
+0, Other message: 2
+0, Time Signature: 4/4 Metronome: Every 1 1/4 notes
+0, Key Signature: F minor
+0, End of Track
 Track Number: 2 size: 2
-0, Other message: class javax.sound.midi.MetaMessage
-0, Other message: class javax.sound.midi.Track$ImmutableEndOfTrack
+0, Tempo: 50.08704
+0, End of Track
 Track Number: 3 size: 2478
 0, Channel 9, Command: 176
 0, Channel 9, Command: 176
@@ -2485,7 +2485,7 @@ Track Number: 3 size: 2478
 55248, Channel 9, Off, Key: 46, Note: A#, Octave: 2, Velocity: 64
 55248, Channel 9, Off, Key: 36, Note: C, Octave: 2, Velocity: 64
 55248, Channel 9, Off, Key: 40, Note: E, Octave: 2, Velocity: 64
-55248, Other message: class javax.sound.midi.Track$ImmutableEndOfTrack
+55248, End of Track
 Track Number: 4 size: 1600
 0, Channel 0, Command: 176
 0, Channel 0, Command: 176
@@ -4086,7 +4086,7 @@ Track Number: 4 size: 1600
 58320, Channel 0, Off, Key: 65, Note: F, Octave: 4, Velocity: 0
 58320, Channel 0, On, Key: 67, Note: G, Octave: 4, Velocity: 88
 58368, Channel 0, Off, Key: 67, Note: G, Octave: 4, Velocity: 0
-58368, Other message: class javax.sound.midi.Track$ImmutableEndOfTrack
+58368, End of Track
 Track Number: 5 size: 2358
 0, Channel 1, Command: 176
 0, Channel 1, Command: 176
@@ -6408,4 +6408,9 @@ Track Number: 5 size: 2358
 54432, Channel 1, On, Key: 50, Note: D, Octave: 3, Velocity: 78
 54432, Channel 1, On, Key: 57, Note: A, Octave: 3, Velocity: 78
 54528, Channel 1, Off, Key: 57, Note: A, Octave: 3, Velocity: 0
-54528, Channel 1, Off, Key: 50,
+54528, Channel 1, Off, Key: 50, Note: D, Octave: 3, Velocity: 0
+54528, Channel 1, On, Key: 57, Note: A, Octave: 3, Velocity: 76
+54528, Channel 1, On, Key: 50, Note: D, Octave: 3, Velocity: 76
+54624, Channel 1, Off, Key: 50, Note: D, Octave: 3, Velocity: 0
+54624, Channel 1, Off, Key: 57, Note: A, Octave: 3, Velocity: 0
+54624, Channel 1, On, Key: 50, Note: D
