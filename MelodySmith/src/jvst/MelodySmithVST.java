@@ -1,36 +1,19 @@
-/* 
- * jVSTwRapper - The Java way into VST world!
- * 
- * jVSTwRapper is an easy and reliable Java Wrapper for the Steinberg VST interface. 
- * It enables you to develop VST 2.3 compatible audio plugins and virtual instruments 
- * plus user interfaces with the Java Programming Language. 3 Demo Plugins(+src) are included!
- * 
- * Copyright (C) 2006  Daniel Martin [daniel309@users.sourceforge.net] 
- * 					   and many others, see CREDITS.txt
- *
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+/*
+ * References:
+ * http://jvstwrapper.sourceforge.net/
  */
 
 package jvst;
 
+/**
+ *
+ * @author Team AudioMIDIum, University of Utah Senior Project 2017-2018
+ */
 
 import jvst.wrapper.*;
 
 
-public class JayDLay extends VSTPluginAdapter {
+public class MelodySmithVST extends VSTPluginAdapter {
   public final static int PARAM_ID_DELAY = 0;
   public final static int PARAM_ID_FEEDBACK = 1;
   public final static int PARAM_ID_OUT = 2;
@@ -46,12 +29,12 @@ public class JayDLay extends VSTPluginAdapter {
   private int cursor;
   private int currentProgram;
 
-  JayDLayGUI gui = null; //reference to gui
+  MelodySmithVSTGUI gui = null; //reference to gui
   
   
-  public JayDLay(long wrapper) {
+  public MelodySmithVST(long wrapper) {
     super(wrapper);
-    log("Construktor JayDLay() START!");
+    log("Constructor MelodySmithVST() START!");
 
     this.size = 44100;
     this.cursor = 0;
@@ -79,7 +62,7 @@ public class JayDLay extends VSTPluginAdapter {
 
     this.canMono(true); 
 
-    log("Construktor JayDLay() INVOKED!");
+    log("Constructor MelodySmithVST() INVOKED!");
   }
 
 
@@ -94,12 +77,12 @@ public class JayDLay extends VSTPluginAdapter {
 
   public int canDo(String feature) {
 	//the host asks us here what we are able to do
-    int ret = JayDLay.CANDO_NO;
+    int ret = MelodySmithVST.CANDO_NO;
 
     //if (feature.equals(JayDLay.CANDO_PLUG_1_IN_2_OUT)) ret = JayDLay.CANDO_YES;
-    if (feature.equals(JayDLay.CANDO_PLUG_1_IN_1_OUT)) ret = JayDLay.CANDO_YES;
-    if (feature.equals(JayDLay.CANDO_PLUG_PLUG_AS_CHANNEL_INSERT)) ret = JayDLay.CANDO_YES;
-    if (feature.equals(JayDLay.CANDO_PLUG_PLUG_AS_SEND)) ret = JayDLay.CANDO_YES;
+    if (feature.equals(MelodySmithVST.CANDO_PLUG_1_IN_1_OUT)) ret = MelodySmithVST.CANDO_YES;
+    if (feature.equals(MelodySmithVST.CANDO_PLUG_PLUG_AS_CHANNEL_INSERT)) ret = MelodySmithVST.CANDO_YES;
+    if (feature.equals(MelodySmithVST.CANDO_PLUG_PLUG_AS_SEND)) ret = MelodySmithVST.CANDO_YES;
 
     log("canDo: " + feature + " = " + ret);
     return ret;
@@ -126,7 +109,7 @@ public class JayDLay extends VSTPluginAdapter {
     return ret;
   }
 
-  public String getVendorString() { return "jVSTwRapper"; }
+  public String getVendorString() { return "Team AudioMIDIum"; }
 
   public int getPlugCategory() {
     log("getPlugCategory");
@@ -187,7 +170,7 @@ public class JayDLay extends VSTPluginAdapter {
   }
 
   public String getProductString() {
-    return "MSmith";
+    return "MelodySmith";
   }
 
   public void setProgram(int index) {
@@ -227,7 +210,7 @@ public class JayDLay extends VSTPluginAdapter {
   }
 
   public String getEffectName() {
-    return "MelodyS";
+    return "MelodySmith Effect";
   }
 
   public String getParameterLabel(int index) {
@@ -375,23 +358,23 @@ public class JayDLay extends VSTPluginAdapter {
  * @author dm
  * @version 1.0
  */
-class DelayProgram {
-  private String name = "Init";
-  private float delay = 0.5F;
-  private float feedback = 0.5F;
-  private float out = 1F;
-
-
-
-  public String getName() { return this.name; }
-  public void setName(String name) { this.name = name; }
-
-  public float getDelay() { return this.delay; }
-  public void setDelay(float delay) { this.delay = delay; }
-
-  public float getFeedback() { return this.feedback; }
-  public void setFeedback(float feedback) { this.feedback = feedback; }
-
-  public float getOut() { return this.out; }
-  public void setOut(float out) { this.out = out; }
-}
+//class DelayProgram {
+//  private String name = "Init";
+//  private float delay = 0.5F;
+//  private float feedback = 0.5F;
+//  private float out = 1F;
+//
+//
+//
+//  public String getName() { return this.name; }
+//  public void setName(String name) { this.name = name; }
+//
+//  public float getDelay() { return this.delay; }
+//  public void setDelay(float delay) { this.delay = delay; }
+//
+//  public float getFeedback() { return this.feedback; }
+//  public void setFeedback(float feedback) { this.feedback = feedback; }
+//
+//  public float getOut() { return this.out; }
+//  public void setOut(float out) { this.out = out; }
+//}
