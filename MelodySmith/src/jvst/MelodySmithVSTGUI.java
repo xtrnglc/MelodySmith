@@ -18,6 +18,14 @@ import jvst.wrapper.*;
 import static jvst.wrapper.VSTPluginGUIAdapter.RUNNING_MAC_X;
 import jvst.wrapper.gui.VSTPluginGUIRunner;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeListener {
 
@@ -49,7 +57,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
 //    SwingUtilities.updateComponentTreeUI(this);
     
     this.setTitle("MelodySmith v1.0");
-    this.setSize(200, 200);
+    this.setSize(1920, 1080);
     this.setResizable(false);
     
     this.pPlugin = plug;
@@ -84,6 +92,10 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
 	    this.VolumeText = new JTextField(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_OUT));
 	    this.FeedbackText = new JTextField(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_FEEDBACK));
 	    this.DelayText = new JTextField(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_DELAY));
+            
+            Dimension d = this.VolumeText.getPreferredSize();
+            d.height = 100;
+            this.VolumeText.setPreferredSize(d);
 	}
     else {
 	    this.VolumeText = new JTextField("0");
@@ -95,7 +107,24 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     JLabel FeedbackLabel = new JLabel("Feedback");
     JLabel VolumeLabel = new JLabel("Volume");
 
-    GridLayout grids = new GridLayout(1, 3);
+//    Path currentRelativePath = Paths.get("");
+//    String s = currentRelativePath.toAbsolutePath().toString();
+//    System.out.println("Current relative path is: " + s);
+    ImageIcon backgroundImage = null; 
+    try {
+        BufferedImage img = ImageIO.read(new File("C:\\Users\\Daniel Mattheiss\\Documents\\MelodySmith\\netbeans\\bg.jpg"));
+        ImageIcon icon = new ImageIcon(img);
+        backgroundImage = icon;
+    } catch(Exception e) {
+        System.out.println(e.toString());
+    }
+    JLabel contentPane = new JLabel();
+    contentPane.setIcon( backgroundImage );
+    contentPane.setLayout( new BorderLayout() );
+    this.setContentPane( contentPane );
+    
+    
+    GridLayout grids = new GridLayout(10, 3);
     this.getContentPane().setLayout(grids);
 
     Box VolumeBox = new Box(BoxLayout.Y_AXIS);
@@ -113,6 +142,10 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     DelayBox.add(DelayLabel);
     DelayBox.add(this.DelaySlider);
     DelayBox.add(this.DelayText);
+
+    this.getContentPane().add(new JButton("Anvil"));
+    this.getContentPane().add(new JButton("Forge"));
+    this.getContentPane().add(new JButton("Guild"));
 
     this.getContentPane().add(DelayBox);
     this.getContentPane().add(FeedbackBox);
