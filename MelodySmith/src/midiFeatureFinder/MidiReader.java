@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
@@ -25,8 +27,9 @@ public class MidiReader {
     public static final String[] NOTES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public static final String[] KEYS = {"Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"};
     public static final float oneMinuteInMicroseconds = 60000000;
+    public static final int maxChannels = 16;
     
-    public Hashtable<Integer, Hashtable<Long, ArrayList<Note>>> orderedNotes;
+    public ArrayList<LinkedHashMap<Long, ArrayList<Note>>> unorderedNotes;
     
 	Sequence currentSequence;
 	private String currentInstrument;
@@ -35,15 +38,33 @@ public class MidiReader {
 	private float currentBPM = 120;
 	private String trackName;
 	
+	public ArrayList<ArrayList<Note>> getOrderedNotes() {
+		
+		ArrayList<ArrayList<Note>> r = new ArrayList<ArrayList<Note>>();
+		for (LinkedHashMap<Long, ArrayList<Note>> channel : unorderedNotes) {
+			ArrayList<Note> temp = new ArrayList<Note>();
+			r.add(temp);
+			
+			for (Map.Entry<Long, ArrayList<Note>> notesByTick : channel.entrySet()) {
+				ArrayList<Note> notes = notesByTick.getValue();
+				
+				for (Note note : notes) {
+					temp.add(note);
+				}
+			}
+		}
+		return r;
+	}
+	
 	public ArrayList<Note> getAllConcurrentNotes(Note note, int channel) {
-		return orderedNotes.get(channel).get(note.startTick);
+		return unorderedNotes.get(channel).get(note.startTick);
 	}
 	
 	
 	public ArrayList<Note> getAllConcurrentNotesAllChannels(Note note) {
 		ArrayList<Note> ret = new ArrayList<Note>();
 		
-		for (Hashtable<Long, ArrayList<Note>> channel : orderedNotes.values()) {
+		for (LinkedHashMap<Long, ArrayList<Note>> channel : unorderedNotes) {
 			ret.addAll(channel.get(note.startTick));
 		}
 		return ret;
@@ -52,11 +73,15 @@ public class MidiReader {
 	public void readSequence(File midiFile) {
 		try {
 			Hashtable<Integer,Note> currentNotes = new Hashtable<Integer, Note>();
-			orderedNotes = new Hashtable<Integer, Hashtable<Long, ArrayList<Note>>>();
+			unorderedNotes = new ArrayList<LinkedHashMap<Long, ArrayList<Note>>>();
+			
+			for (int i = 0; i < maxChannels; i++) {
+				unorderedNotes.add(new LinkedHashMap<Long, ArrayList<Note>>());
+			}
 			
 			currentSequence = MidiSystem.getSequence(midiFile);
 			currentSequence.getDivisionType();
-			long currentTick = 0;
+			long currentTick = -1;
 			for (Track track : currentSequence.getTracks()) {
 				for (int i = 0; i < track.size(); i++) {
 					MidiEvent event = track.get(i);
@@ -65,11 +90,7 @@ public class MidiReader {
 					if (message instanceof ShortMessage) {
 						ShortMessage sMessage = (ShortMessage) message;
 						
-						if (!orderedNotes.containsKey(sMessage.getChannel())) {
-							orderedNotes.put(sMessage.getChannel(), new Hashtable<Long, ArrayList<Note>>());
-						}
-						
-						Hashtable<Long, ArrayList<Note>> notes = orderedNotes.get(sMessage.getChannel());
+						LinkedHashMap<Long, ArrayList<Note>> notes = unorderedNotes.get(sMessage.getChannel());
 						
 						int key = sMessage.getData1();
 						int velocity = sMessage.getData2();
@@ -83,7 +104,7 @@ public class MidiReader {
 							    notes.put(currentTick, new ArrayList<Note>());
 							}
 							
-							notes.get((int) currentTick).add(n);
+							notes.get(currentTick).add(n);
 							 
 						}
 						else if  (sMessage.getCommand() == NOTE_OFF || velocity == 0){
