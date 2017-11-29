@@ -21,6 +21,7 @@ public class Node {
 	String key = "";
 	String pattern = "";
 	String song = "";
+	String artist = "";
 	Node destinationNode = null;
 	Node previousNode = null;
 	ArrayList<Node> concurrentNodes = new ArrayList<Node>();
