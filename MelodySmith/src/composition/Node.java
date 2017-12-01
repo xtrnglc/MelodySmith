@@ -31,9 +31,9 @@ public class Node {
 		concurrentNodes.add(concurrentNode);
 	}
 	
-	void linkNodes(Node otherNode) {
-		Link link = new Link(this, otherNode);
-		Link otherLink = new Link(otherNode, this);
+	void linkNodes(Node otherNode, double weight, double reverseWeight) {
+		Link link = new Link(this, otherNode, weight);
+		Link otherLink = new Link(otherNode, this, reverseWeight);
 		
 		linkedNodes.add(link);
 		otherNode.linkedNodes.add(otherLink);
