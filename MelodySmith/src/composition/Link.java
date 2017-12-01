@@ -11,22 +11,11 @@ public class Link {
 	static HashMap<Integer,Double> calculatedIntervals = new HashMap<Integer,Double>();
 	Node startNode = null;
 	Node endNode = null;
-	int weight = 0;
+	double weight = 0;
 	
-	Link(Node start, Node end){
+	Link(Node start, Node end, double weight){
 		startNode = start;
 		endNode = end;
+		this.weight = weight;
 	}
-	
-	private void calculateWeight() {
-		weight = 0;
-	}
-	
-	/**
-	 *  Weight calculated based on the frequencies of each interval in the network
-	 */
-	private double calculateIntervalWeight() {
-		return 0.0;
-	}
-	
 }
