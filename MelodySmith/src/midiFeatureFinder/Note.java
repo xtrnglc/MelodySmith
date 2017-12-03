@@ -13,9 +13,9 @@ public class Note {
 	public int channel;
 	public float bpm = 120;
 	
-	public double noteDuration;
+	public String noteDuration;
 	
-	public long duration;
+	public long tickDuration;
 	public long startTick;
 	
 	public String noteName;
@@ -58,9 +58,32 @@ public class Note {
 		return this.key - note.key;
 	}
 	
-	public void turnOff(long endTick) {
-		duration = endTick - startTick;
-		noteDuration = duration / bpm;
+	public void turnOff(long endTick, int ticksPerQuarterNote) {
+		tickDuration = endTick - startTick;
+		
+		double ticksPerQuarterNoteDouble = (double) ticksPerQuarterNote;
+		
+		if (ticksPerQuarterNote == 0) {
+			noteDuration = "N/A";
+		}
+		else if ((tickDuration / (long) (ticksPerQuarterNoteDouble * 4)) >= .9) {
+			noteDuration = (int) (Math.round((double)tickDuration / ticksPerQuarterNoteDouble)) + "";
+		}
+		else if ((tickDuration / ticksPerQuarterNoteDouble) < 1.5 && (tickDuration / ticksPerQuarterNoteDouble) >= .75) {
+			noteDuration = "1/4";
+		}
+		else if ((tickDuration / ticksPerQuarterNoteDouble) < 2.5 && (tickDuration / ticksPerQuarterNoteDouble) >= 1.5) {
+			noteDuration = "1/2";
+		}
+		else if ((tickDuration / ticksPerQuarterNoteDouble) < .75 && (tickDuration / ticksPerQuarterNoteDouble) >= .375) {
+			noteDuration = "1/8";
+		}
+		else if ((tickDuration / ticksPerQuarterNoteDouble) < .375 && (tickDuration / ticksPerQuarterNoteDouble) >= .1875) {
+			noteDuration = "1/16";
+		}
+		else if ((tickDuration / ticksPerQuarterNoteDouble) < .1875) {
+			noteDuration = "1/32";
+		}
 	}
 	
 	private int setScaleDegree() {

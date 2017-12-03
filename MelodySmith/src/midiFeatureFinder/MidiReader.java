@@ -37,6 +37,8 @@ public class MidiReader {
 	private String currentTime = "4/4";
 	private float currentBPM = 120;
 	private String trackName;
+	public boolean isPPQ = false;
+	private int ticksPerQuarterNote = 0;
 	
 	public ArrayList<ArrayList<Note>> getOrderedNotes() {
 		
@@ -60,7 +62,6 @@ public class MidiReader {
 		return unorderedNotes.get(channel).get(note.startTick);
 	}
 	
-	
 	public ArrayList<Note> getAllConcurrentNotesAllChannels(Note note) {
 		ArrayList<Note> ret = new ArrayList<Note>();
 		
@@ -80,8 +81,14 @@ public class MidiReader {
 			}
 			
 			currentSequence = MidiSystem.getSequence(midiFile);
-			currentSequence.getDivisionType();
+			
 			long currentTick = -1;
+			
+			if (currentSequence.getDivisionType() == Sequence.PPQ) {
+				isPPQ = true;
+				ticksPerQuarterNote = currentSequence.getResolution();
+			}
+			
 			for (Track track : currentSequence.getTracks()) {
 				for (int i = 0; i < track.size(); i++) {
 					MidiEvent event = track.get(i);
@@ -112,7 +119,7 @@ public class MidiReader {
 							
 							// This may skip some notes
 							if (n != null) {
-								n.turnOff(event.getTick());
+								n.turnOff(event.getTick(), ticksPerQuarterNote);
 							}
 						}
 						else {
@@ -138,8 +145,6 @@ public class MidiReader {
 	
 	public void readSequenceRaw(File midiFile) {
 		try {
-//			FileWriter fw = new FileWriter(outputFile);
-//			writer = new PrintWriter(fw);
 			int trackNum = 1;
 			currentSequence = MidiSystem.getSequence(midiFile);
 

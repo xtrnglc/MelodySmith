@@ -13,6 +13,5 @@ public class Main {
 		ArrayList<ArrayList<Note>> test = r.getOrderedNotes();
 		System.out.println();
 	}
-
 }
 
