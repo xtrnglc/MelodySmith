@@ -8,11 +8,10 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		MidiReader r = new MidiReader();
-		r.readSequenceRaw(new File("midiReaderData/DC.mid"));
-		r.readSequence(new File("midiReaderData/DC.mid"));
+		r.readSequenceRaw(new File("midiReaderData/bwv772.mid"));
+		r.readSequence(new File("midiReaderData/bwv772.mid"));
 		ArrayList<ArrayList<Note>> test = r.getOrderedNotes();
 		System.out.println();
 	}
-
 }
 

@@ -37,6 +37,8 @@ public class MidiReader {
 	private String currentTime = "4/4";
 	private float currentBPM = 120;
 	private String trackName;
+	public boolean isPPQ = false;
+	private int ticksPerQuarterNote = 0;
 	
 	public ArrayList<ArrayList<Note>> getOrderedNotes() {
 		
@@ -60,7 +62,6 @@ public class MidiReader {
 		return unorderedNotes.get(channel).get(note.startTick);
 	}
 	
-	
 	public ArrayList<Note> getAllConcurrentNotesAllChannels(Note note) {
 		ArrayList<Note> ret = new ArrayList<Note>();
 		
@@ -80,8 +81,14 @@ public class MidiReader {
 			}
 			
 			currentSequence = MidiSystem.getSequence(midiFile);
-			currentSequence.getDivisionType();
+			
 			long currentTick = -1;
+			
+			if (currentSequence.getDivisionType() == Sequence.PPQ) {
+				isPPQ = true;
+				ticksPerQuarterNote = currentSequence.getResolution();
+			}
+			
 			for (Track track : currentSequence.getTracks()) {
 				for (int i = 0; i < track.size(); i++) {
 					MidiEvent event = track.get(i);
@@ -96,10 +103,10 @@ public class MidiReader {
 						int velocity = sMessage.getData2();
 						
 						if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
-							Note n = new Note(key, velocity, sMessage.getChannel(), currentTick, trackName, currentInstrument, currentKey, currentTime, currentBPM);
+							Note n = new Note(key, velocity, sMessage.getChannel(),  event.getTick(), trackName, currentInstrument, currentKey, currentTime, currentBPM);
 							currentNotes.put(key,n);
 							
-							if (currentTick != event.getTick()) {
+							if (notes.get(event.getTick()) == null) {
 								currentTick = event.getTick();
 							    notes.put(currentTick, new ArrayList<Note>());
 							}
@@ -112,14 +119,14 @@ public class MidiReader {
 							
 							// This may skip some notes
 							if (n != null) {
-								n.turnOff(currentTick);
+								n.turnOff(event.getTick(), ticksPerQuarterNote);
 							}
 						}
 						else {
 							//writer.println("Command: " + sMessage.getCommand());
 						}
 					}
-					else {
+					else if (message instanceof MetaMessage){
 						processMetaMessage((MetaMessage) message);
 					}
 				}
@@ -138,8 +145,6 @@ public class MidiReader {
 	
 	public void readSequenceRaw(File midiFile) {
 		try {
-//			FileWriter fw = new FileWriter(outputFile);
-//			writer = new PrintWriter(fw);
 			int trackNum = 1;
 			currentSequence = MidiSystem.getSequence(midiFile);
 
@@ -153,7 +158,7 @@ public class MidiReader {
 					if (message instanceof ShortMessage) {
 						processShortMessage((ShortMessage) message);
 					}
-					else {
+					else if (message instanceof MetaMessage){
 						//writer.println(processMetaMessage((MetaMessage) message, microToTickRatio));
 						processMetaMessage((MetaMessage) message);
 					}
