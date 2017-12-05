@@ -106,7 +106,8 @@ public class MidiReader {
 						int velocity = sMessage.getData2();
 						
 						if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
-							if (event.getTick() - lastTickOfChannel[sMessage.getChannel()] < ticksPerQuarterNote) {
+							// Only record half note rests or lower
+							if (event.getTick() - lastTickOfChannel[sMessage.getChannel()] < (ticksPerQuarterNote * 2)) {
 								Note rest = new Note(sMessage.getChannel(),  lastTickOfChannel[sMessage.getChannel()], trackName, currentInstrument, currentKey, currentTime, currentBPM);
 								rest.turnOff(event.getTick(), ticksPerQuarterNote);
 								
