@@ -25,6 +25,7 @@ public class AssociationNetwork {
 			for(ArrayList<Note> channel : song.channels) {
 				int index = 0;
 				ArrayList<Integer> scaleDegrees = song.getScaleDegrees(channel);
+				Node previousNode = null;
 				for(Note note : channel) {
 					Node nodeToAdd = new Node();
 					nodeToAdd.song = song.name;
@@ -33,46 +34,76 @@ public class AssociationNetwork {
 					nodeToAdd.distanceFromTonic = Song.getDistanceFromPreviousTonic(index, scaleDegrees);
 					nodeToAdd.distanceToCadence = Song.getDistanceToNextTonic(index, scaleDegrees);
 					nodeToAdd.key = note.keySignature;
+					nodeToAdd.duration = note.noteDuration;
+					nodeToAdd.velocity = note.velocity;
 					
-					addNode(nodeToAdd);
+					addNode(nodeToAdd, previousNode);
+					previousNode = nodeToAdd;
 					index++;
 				}
 			}
 		}
 	}
 	
-	void addNode(Node newNode) {
+	void addNode(Node newNode, Node previousNode) {
 		for(Node node : network) {
 			int interval =  Math.abs(newNode.scaleDegree-node.scaleDegree);
 			String nextIntervalKey = newNode.scaleDegree + "->" + interval;
-			double normal1 = getNormalizedDistanceFromAverage(node.distanceFromTonic, averageDistanceFromTonic, maxDistanceFromTonic);
-			double normal2 = getNormalizedDistanceFromAverage(node.distanceToCadence, averageDistanceToCadence, maxDistanceToCadence);
-			
+			double scaleWeight = 0;
+			if(newNode.scaleDegree == node.scaleDegree)
+				scaleWeight -= 0.5;
 			
 			double weight = getNormalizedDistanceFromAverage(node.distanceFromTonic, averageDistanceFromTonic, maxDistanceFromTonic)
 							+ getNormalizedDistanceFromAverage(node.distanceToCadence, averageDistanceToCadence, maxDistanceToCadence) 
 							+ getEquivalentValueWeight(node.song == newNode.song)
 							+ getEquivalentValueWeight(node.key == newNode.key)
 							+ intervalProbabilities.get(interval)
-							+ nextIntervalProbabilities.get(nextIntervalKey);
+							+ nextIntervalProbabilities.get(nextIntervalKey)
+							+ scaleWeight;
 			
 			String reverseKey = node.scaleDegree + "->" + interval;
+			if(previousNode == node)
+				scaleWeight += 1;
 			double reverseWeight = getNormalizedDistanceFromAverage(newNode.distanceFromTonic, averageDistanceFromTonic, maxDistanceFromTonic)
 					+ getNormalizedDistanceFromAverage(newNode.distanceToCadence, averageDistanceToCadence, maxDistanceToCadence) 
 					+ getEquivalentValueWeight(node.song == newNode.song)
 					+ getEquivalentValueWeight(node.key == newNode.key)
 					+ intervalProbabilities.get(interval)
-					+ nextIntervalProbabilities.get(reverseKey);
+					+ nextIntervalProbabilities.get(reverseKey)
+					+ scaleWeight;
 			
-			newNode.linkNodes(node, weight, reverseWeight);
+			if(weight > 4.0)
+				newNode.linkNodes(node, weight, reverseWeight);
 		}
 		network.add(newNode);
 	}
 	
-	Node deduceNextNode(Node currentNode) {
+	Node getTonic() {
+		for(Node node : network) {
+			if(node.scaleDegree == 0) {
+				return node;
+			}
+		}
+		return null;
+	}
+	
+	Node getTonic(int i) {
+		for(Node node : network) {
+			if(node.scaleDegree == 0) {
+				i--;
+				if(i <= 0)
+					return node;
+			}
+		}
+		return null;
+	}
+	
+	Node deduceNextNode(Node currentNode, ArrayList<Node> alreadyChosenNodes, ArrayList<Integer> recentScaleDegrees) {
 		Link mostLikelyLink = null;
 		ArrayList<Link> equivalentLinks = new ArrayList<Link>();
 		for(Link link : currentNode.linkedNodes) {
+			if(alreadyChosenNodes.contains(link.endNode) || recentScaleDegrees.contains(link.endNode.scaleDegree))
+				continue;
 			if(mostLikelyLink == null || link.weight > mostLikelyLink.weight) {
 				equivalentLinks.clear();
 				mostLikelyLink = link;

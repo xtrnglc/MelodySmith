@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Node {
 	int scaleDegree = 0;
 	int pitch = 0;
-	int duration = 0;
+	String duration = "";
 	int noteLength = 0;
 	int distanceToCadence = 0;
 	int distanceFromTonic = 0;
