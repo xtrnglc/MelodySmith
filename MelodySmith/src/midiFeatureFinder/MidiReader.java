@@ -73,11 +73,14 @@ public class MidiReader {
 	
 	public void readSequence(File midiFile) {
 		try {
-			Hashtable<Integer,Note> currentNotes = new Hashtable<Integer, Note>();
+			Hashtable<Integer,ArrayList<Note>> currentNotes = new Hashtable<Integer, ArrayList<Note>>();
 			unorderedNotes = new ArrayList<LinkedHashMap<Long, ArrayList<Note>>>();
+			
+			long[] lastTickOfChannel = new long[maxChannels];
 			
 			for (int i = 0; i < maxChannels; i++) {
 				unorderedNotes.add(new LinkedHashMap<Long, ArrayList<Note>>());
+				currentNotes.put(i, new ArrayList<Note>());
 			}
 			
 			currentSequence = MidiSystem.getSequence(midiFile);
@@ -88,7 +91,7 @@ public class MidiReader {
 				isPPQ = true;
 				ticksPerQuarterNote = currentSequence.getResolution();
 			}
-			
+						
 			for (Track track : currentSequence.getTracks()) {
 				for (int i = 0; i < track.size(); i++) {
 					MidiEvent event = track.get(i);
@@ -103,9 +106,25 @@ public class MidiReader {
 						int velocity = sMessage.getData2();
 						
 						if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
-							Note n = new Note(key, velocity, sMessage.getChannel(),  event.getTick(), trackName, currentInstrument, currentKey, currentTime, currentBPM);
-							currentNotes.put(key,n);
+							if (event.getTick() - lastTickOfChannel[sMessage.getChannel()] < ticksPerQuarterNote) {
+								Note rest = new Note(sMessage.getChannel(),  lastTickOfChannel[sMessage.getChannel()], trackName, currentInstrument, currentKey, currentTime, currentBPM);
+								rest.turnOff(event.getTick(), ticksPerQuarterNote);
+								
+								if (notes.get(lastTickOfChannel[sMessage.getChannel()]) == null) {
+								    notes.put(lastTickOfChannel[sMessage.getChannel()], new ArrayList<Note>());
+								}
+								
+								notes.get(lastTickOfChannel[sMessage.getChannel()]).add(rest);
+								
+								lastTickOfChannel[sMessage.getChannel()] = 0;
+							}
 							
+							
+							
+							Note n = new Note(key, velocity, sMessage.getChannel(),  event.getTick(), trackName, currentInstrument, currentKey, currentTime, currentBPM);
+							currentNotes.get(sMessage.getChannel()).add(n);
+							
+
 							if (notes.get(event.getTick()) == null) {
 								currentTick = event.getTick();
 							    notes.put(currentTick, new ArrayList<Note>());
@@ -114,13 +133,28 @@ public class MidiReader {
 							notes.get(currentTick).add(n);
 							 
 						}
-						else if  (sMessage.getCommand() == NOTE_OFF || velocity == 0){
-							Note n = currentNotes.remove(key);
+						else if  (sMessage.getCommand() == NOTE_OFF || velocity == 0){		
+							ArrayList<Note> channelNotes = currentNotes.get(sMessage.getChannel());
+							Note n = null;
 							
-							// This may skip some notes
+							for (int k = 0; k < channelNotes.size(); k++) {
+								if (channelNotes.get(k).key == key) {
+									n = channelNotes.remove(k);
+									
+									if (channelNotes.size() == 0) {
+										lastTickOfChannel[sMessage.getChannel()] = event.getTick();
+									}
+									
+									break;
+								}
+							}
+							
+							
+							// This may skip some notes, but needed to prevent crashes
 							if (n != null) {
 								n.turnOff(event.getTick(), ticksPerQuarterNote);
 							}
+							
 						}
 						else {
 							//writer.println("Command: " + sMessage.getCommand());
