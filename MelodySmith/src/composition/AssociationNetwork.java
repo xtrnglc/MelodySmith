@@ -31,8 +31,8 @@ public class AssociationNetwork {
 					nodeToAdd.song = song.name;
 					nodeToAdd.artist = song.artist;
 					nodeToAdd.scaleDegree = note.scaleDegree;
-					nodeToAdd.distanceFromTonic = Song.getDistanceFromPreviousTonic(index, scaleDegrees);
-					nodeToAdd.distanceToCadence = Song.getDistanceToNextTonic(index, scaleDegrees);
+					nodeToAdd.distanceFromTonic = Composer.getDistanceFromPreviousTonic(index, scaleDegrees);
+					nodeToAdd.distanceToCadence = Composer.getDistanceToNextTonic(index, scaleDegrees);
 					nodeToAdd.key = note.keySignature;
 					nodeToAdd.duration = note.noteDuration;
 					nodeToAdd.velocity = note.velocity;
@@ -59,7 +59,8 @@ public class AssociationNetwork {
 							+ getEquivalentValueWeight(node.key == newNode.key)
 							+ intervalProbabilities.get(interval)
 							+ nextIntervalProbabilities.get(nextIntervalKey)
-							+ scaleWeight;
+							+ scaleWeight
+							+ Composer.getArtistWeight(node.artist);
 			
 			String reverseKey = node.scaleDegree + "->" + interval;
 			if(previousNode == node)
@@ -70,7 +71,8 @@ public class AssociationNetwork {
 					+ getEquivalentValueWeight(node.key == newNode.key)
 					+ intervalProbabilities.get(interval)
 					+ nextIntervalProbabilities.get(reverseKey)
-					+ scaleWeight;
+					+ scaleWeight
+					+ Composer.getArtistWeight(newNode.artist);
 			
 			if(weight > 4.0)
 				newNode.linkNodes(node, weight, reverseWeight);
@@ -98,17 +100,13 @@ public class AssociationNetwork {
 		return null;
 	}
 	
-	Node deduceNextNode(Node currentNode, ArrayList<Node> alreadyChosenNodes, ArrayList<Integer> recentScaleDegrees) {
+	Node deduceNextNode(Node currentNode, ArrayList<Node> alreadyChosenNodes) {
 		Link mostLikelyLink = null;
-		ArrayList<Link> equivalentLinks = new ArrayList<Link>();
 		for(Link link : currentNode.linkedNodes) {
-			if(alreadyChosenNodes.contains(link.endNode) || recentScaleDegrees.contains(link.endNode.scaleDegree))
+			if(alreadyChosenNodes.contains(link.endNode))
 				continue;
 			if(mostLikelyLink == null || link.weight > mostLikelyLink.weight) {
-				equivalentLinks.clear();
 				mostLikelyLink = link;
-			} else if(link.weight == mostLikelyLink.weight) {
-				equivalentLinks.add(link);
 			}
 		}
 		return mostLikelyLink.endNode;
@@ -249,25 +247,9 @@ public class AssociationNetwork {
 	}
 	
 	private double getNormalizedDistanceFromAverage(int value, ArrayList<Integer> list) {
-		double average = getAverage(list);
-		double maxValue = getValueFarthestFromAverage(average, list);
+		double average = Composer.getAverage(list);
+		double maxValue = Composer.getValueFarthestFromAverage(average, list);
 		return getNormalizedDistanceFromAverage(value, average, maxValue);
-	}
-	
-	public static double getValueFarthestFromAverage(double average, ArrayList<Integer> list) {
-		double maxValue = average;
-		for(int i : list) {
-			if(Math.abs(average-i) > Math.abs(average-maxValue))
-				maxValue = i;
-		}
-		return maxValue;
-	}
-	
-	public static double getAverage(ArrayList<Integer> list) {
-		double total = 0;
-		for(int i : list)
-			total += i;
-		return total/list.size();
 	}
 	
 	private double getNormalizedDistanceFromAverage(double value, double average, double maxValue) {
