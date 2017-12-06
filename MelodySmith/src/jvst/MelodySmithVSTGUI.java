@@ -11,6 +11,8 @@ package jvst;
  */
 
 
+
+import composition.Composer;
 import jvst.wrapper.*;
 import static jvst.wrapper.VSTPluginGUIAdapter.RUNNING_MAC_X;
 import jvst.wrapper.gui.VSTPluginGUIRunner;
@@ -38,6 +40,7 @@ import javax.swing.event.*;
 import javax.swing.text.Document;
 
 import org.apache.commons.io.FileUtils;
+
 
 
 public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeListener {
@@ -552,6 +555,8 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
             //Call Alex's composition method
             ArtistGrouping[] currArtistGroupings = artistGroupings;
             boolean currKey = isCMajor;
+            Composer composer = new Composer(currArtistGroupings);
+            composer.composeMelody("file.mid", 200, currKey);
         }
     });
     
