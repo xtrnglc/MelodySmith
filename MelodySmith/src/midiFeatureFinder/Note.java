@@ -5,6 +5,7 @@ public class Note {
     public static final String[] NOTES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public static final String[] SCALEDEGREE = {"C", "D", "E", "F", "G",  "A", "B"};
 
+    // -1 is a rest
     public int key;
 	public int note;
 	public int octave;
@@ -24,12 +25,41 @@ public class Note {
     public String keySignature = "C major";
     public String timeSignature = "4/4";
 	
-	/**
-	 * 
-	 * @param key
-	 * @param velocity
-	 * @param startTick
-	 */
+
+    /**
+     * A Note with no key is a rest
+     * @param channel
+     * @param startTick
+     * @param song
+     * @param instrument
+     * @param keySignature
+     * @param timeSignature
+     * @param bpm
+     */
+    public Note(int channel, long startTick, 
+			String song, String instrument, String keySignature, 
+			String timeSignature, float bpm) {
+    	this.key = -1;
+		note = -1;
+		octave = -1;
+		this.velocity = -1;
+		this.channel = channel;
+		this.startTick = startTick;
+		noteName = "Rest";
+		this.song = song;
+		this.instrument = instrument;
+		if (keySignature != null) {
+			this.keySignature = keySignature;
+		}
+		if (timeSignature != null) {
+			this.timeSignature = timeSignature;
+		}
+		if (bpm != 0) {
+			this.bpm = bpm;
+		}
+		scaleDegree = setScaleDegree();
+    }
+    
 	public Note(int key, int velocity, int channel, long startTick, 
 			String song, String instrument, String keySignature, 
 			String timeSignature, float bpm) {

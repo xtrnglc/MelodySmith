@@ -66,26 +66,26 @@ public class Song {
 	}
 	
 	double getAverageDistanceFromTonic() {
-		return AssociationNetwork.getAverage(getAllDistancesFromTonic());
+		return Composer.getAverage(getAllDistancesFromTonic());
 	}
 	
 	double getAverageDistanceToCadence() {
-		return AssociationNetwork.getAverage(getAllDistancesToCadence());
+		return Composer.getAverage(getAllDistancesToCadence());
 	}
 	
 	double getFurthestDistanceFromTonic() {
-		return AssociationNetwork.getValueFarthestFromAverage(averageDistanceFromTonic, getAllDistancesFromTonic());
+		return Composer.getValueFarthestFromAverage(averageDistanceFromTonic, getAllDistancesFromTonic());
 	}
 	
 	double getFurthestDistanceToCadence() {
-		return AssociationNetwork.getValueFarthestFromAverage(averageDistanceToCadence, getAllDistancesToCadence());
+		return Composer.getValueFarthestFromAverage(averageDistanceToCadence, getAllDistancesToCadence());
 	}
 	
 	private ArrayList<Integer> getAllDistancesFromTonic() {
 		ArrayList<Integer> allDistancesFromTonic = new ArrayList<Integer>();
 		for(ArrayList<Integer> channel : getAllScaleDegrees()) {
 			for(int i = 0; i < channel.size(); i++) {
-				int distanceFromTonic = getDistanceFromPreviousTonic(i, channel);
+				int distanceFromTonic = Composer.getDistanceFromPreviousTonic(i, channel);
 				allDistancesFromTonic.add(distanceFromTonic);
 			}
 		}
@@ -96,36 +96,10 @@ public class Song {
 		ArrayList<Integer> allDistancesToCadence = new ArrayList<Integer>();
 		for(ArrayList<Integer> channel : getAllScaleDegrees()) {
 			for(int i = 0; i < channel.size(); i++) {
-				int distanceToCadence = getDistanceToNextTonic(i, channel);
+				int distanceToCadence = Composer.getDistanceToNextTonic(i, channel);
 				allDistancesToCadence.add(distanceToCadence);
 			}
 		}
 		return allDistancesToCadence;
-	}
-	
-	/**
-	 * Returns the distance in notes from the previously played tonic, or -1 if none exists
-	 */
-	public static int getDistanceFromPreviousTonic(int index, ArrayList<Integer> scaleDegrees) {
-		int i = index, distance = 0;
-		while(i > 0) {
-			if(scaleDegrees.get(i) == 0)
-				return distance;
-			i--; distance++;
-		}
-		return -1;
-	}
-	
-	/**
-	 * Returns the distance in notes from the next played tonic, or -1 if none exists
-	 */
-	public static int getDistanceToNextTonic(int index, ArrayList<Integer> scaleDegrees) {
-		int i = index, distance = 0;
-		while(i < scaleDegrees.size()) {
-			if(scaleDegrees.get(i) == 0)
-				return distance;
-			i++; distance++;
-		}
-		return -1;
 	}
 }
