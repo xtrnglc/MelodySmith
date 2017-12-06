@@ -76,7 +76,8 @@ public class MidiReader {
 			Hashtable<Integer,ArrayList<Note>> currentNotes = new Hashtable<Integer, ArrayList<Note>>();
 			unorderedNotes = new ArrayList<LinkedHashMap<Long, ArrayList<Note>>>();
 			
-			long[] lastTickOfChannel = new long[maxChannels];
+			// Rest Logic
+			//long[] lastTickOfChannel = new long[maxChannels];
 			
 			for (int i = 0; i < maxChannels; i++) {
 				unorderedNotes.add(new LinkedHashMap<Long, ArrayList<Note>>());
@@ -107,18 +108,21 @@ public class MidiReader {
 						
 						if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
 							// Only record half note rests or lower
-							if (event.getTick() - lastTickOfChannel[sMessage.getChannel()] < (ticksPerQuarterNote * 2)) {
-								Note rest = new Note(sMessage.getChannel(),  lastTickOfChannel[sMessage.getChannel()], trackName, currentInstrument, currentKey, currentTime, currentBPM);
-								rest.turnOff(event.getTick(), ticksPerQuarterNote);
-								
-								if (notes.get(lastTickOfChannel[sMessage.getChannel()]) == null) {
-								    notes.put(lastTickOfChannel[sMessage.getChannel()], new ArrayList<Note>());
-								}
-								
-								notes.get(lastTickOfChannel[sMessage.getChannel()]).add(rest);
-								
-								lastTickOfChannel[sMessage.getChannel()] = 0;
-							}
+							// Rest Logic
+//							if (event.getTick() - lastTickOfChannel[sMessage.getChannel()] < (ticksPerQuarterNote * 2)) {
+//								Note rest = new Note(sMessage.getChannel(),  lastTickOfChannel[sMessage.getChannel()], trackName, currentInstrument, currentKey, currentTime, currentBPM);
+//								rest.turnOff(event.getTick(), ticksPerQuarterNote);
+//								
+//								if (notes.get(lastTickOfChannel[sMessage.getChannel()]) == null) {
+//								    notes.put(lastTickOfChannel[sMessage.getChannel()], new ArrayList<Note>());
+//								}
+//								
+//								
+//
+//								//notes.get(lastTickOfChannel[sMessage.getChannel()]).add(rest);
+//								
+//								//lastTickOfChannel[sMessage.getChannel()] = 0;
+//							}
 							
 							
 							
@@ -142,9 +146,10 @@ public class MidiReader {
 								if (channelNotes.get(k).key == key) {
 									n = channelNotes.remove(k);
 									
-									if (channelNotes.size() == 0) {
-										lastTickOfChannel[sMessage.getChannel()] = event.getTick();
-									}
+									// Rest Logic
+//									if (channelNotes.size() == 0) {
+//										lastTickOfChannel[sMessage.getChannel()] = event.getTick();
+//									}
 									
 									break;
 								}
