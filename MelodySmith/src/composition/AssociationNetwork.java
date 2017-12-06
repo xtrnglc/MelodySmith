@@ -37,6 +37,10 @@ public class AssociationNetwork {
 					nodeToAdd.duration = note.noteDuration;
 					nodeToAdd.velocity = note.velocity;
 					
+					if(note.key == -1)
+						nodeToAdd.scaleDegree = -1;
+					
+					
 					addNode(nodeToAdd, previousNode);
 					previousNode = nodeToAdd;
 					index++;
@@ -58,7 +62,7 @@ public class AssociationNetwork {
 							+ getEquivalentValueWeight(node.song == newNode.song)
 							+ getEquivalentValueWeight(node.key == newNode.key)
 							+ intervalProbabilities.get(interval)
-							+ nextIntervalProbabilities.get(nextIntervalKey)
+							+ getNextIntervalProbability(nextIntervalKey)
 							+ scaleWeight
 							+ Composer.getArtistWeight(node.artist);
 			
@@ -70,7 +74,7 @@ public class AssociationNetwork {
 					+ getEquivalentValueWeight(node.song == newNode.song)
 					+ getEquivalentValueWeight(node.key == newNode.key)
 					+ intervalProbabilities.get(interval)
-					+ nextIntervalProbabilities.get(reverseKey)
+					+ getNextIntervalProbability(reverseKey)
 					+ scaleWeight
 					+ Composer.getArtistWeight(newNode.artist);
 			
@@ -117,6 +121,13 @@ public class AssociationNetwork {
 		calculateAllNextIntervalProbabilities();
 		calculateDistanceFromTonicStats();
 		calculateDistanceToCadenceStats();
+	}
+	
+	private double getNextIntervalProbability(String key) {
+		if(nextIntervalProbabilities.containsKey(key))
+			return nextIntervalProbabilities.get(key);
+		else
+			return 0;
 	}
 	
 	private void calculateAllIntervalProbabilities() {

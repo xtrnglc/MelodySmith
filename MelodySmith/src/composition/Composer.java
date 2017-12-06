@@ -2,6 +2,7 @@ package composition;
 
 import java.io.File;
 import java.util.ArrayList;
+import jvst.*;
 
 import midiFeatureFinder.MidiWriter;
 
@@ -14,6 +15,11 @@ public class Composer {
 	public Composer(String folderName) {
 		network = new AssociationNetwork();
 		trainNetwork(folderName, network);
+	}
+	
+	public Composer(ArtistGrouping[] artists) {
+		network = new AssociationNetwork();
+		trainNetwork(artists, network);
 	}
 	
 	public void composeMelody(String outputFilename, int lengthInNotes, boolean major) {
@@ -32,7 +38,8 @@ public class Composer {
 		
 		ArrayList<Node> alreadyChosen = new ArrayList<Node>();	// I maintain a list of previous choices to avoid repetition
 		Node currentNode = startNode;
-		
+		int restDuration = 0;
+		boolean lastWasRest = false;
 		for(int i = 0; i < lengthInNotes; i++) {
 			alreadyChosen.add(currentNode);
 			if(alreadyChosen.size() > 100)
@@ -40,12 +47,28 @@ public class Composer {
 			
 			if(currentNode.linkedNodes.size() > 0) {
 				Node nextNode = network.deduceNextNode(currentNode, alreadyChosen);
+				
+				if(nextNode.scaleDegree == -1) {
+					restDuration += decodeDuration(nextNode.duration);
+					lastWasRest = true;
+					currentNode = nextNode;
+					continue;
+				}
 			
 				int duration = decodeDuration(nextNode.duration);
 				int midiKey = getTransposedScaleDegree(nextNode.scaleDegree+midiOffset, scale);
 				int velocity = smoothVelocity(nextNode.velocity);
 				
-				mw.noteOnOffNow(duration, midiKey, velocity);
+				if(lastWasRest) {
+					lastWasRest = false;
+					mw.noteOn(restDuration, midiKey, velocity);
+					mw.noteOff(duration, midiKey);
+					restDuration = 0;
+				}
+				else
+					mw.noteOnOffNow(duration, midiKey, velocity);
+				
+				
 				currentNode = nextNode;
 			}
 			else {
@@ -64,13 +87,24 @@ public class Composer {
 			
 	}
 	
+	private void trainNetwork(ArtistGrouping[] artists, AssociationNetwork network) {
+		for(ArtistGrouping artist : artists) {
+			for(File file : artist.artistMIDIFiles) {
+				if(file.isFile())
+					network.corpus.add(new Song(file, file.getName(), artist.artistName));
+			}
+		}
+		network.calculateNetworkStatistics();
+		network.addAllNotes();	
+	}
+	
 	private void trainNetwork(String folderName, AssociationNetwork network) {
 		File folder = new File(folderName);
 		File[] midiFiles = folder.listFiles();
 		
 		for(File file : midiFiles) {
 			if(file.isFile())
-				network.corpus.add(new Song(file, file.getName(), "bach"));
+				network.corpus.add(new Song(file, file.getName(), folder.getName()));
 		}
 		
 		network.calculateNetworkStatistics();
@@ -90,6 +124,9 @@ public class Composer {
 	}
 	
 	static int getTransposedScaleDegree(int octavePosition, int[] scale) {
+		if(octavePosition < scale[0])
+			return -1;
+		
 		for(int i : scale) {
 			if(octavePosition == i || octavePosition < i)
 				return i;

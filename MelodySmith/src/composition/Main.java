@@ -11,7 +11,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		Composer composer = new Composer("midiReaderData");
-		composer.composeMelody("bachKaty.mid", 100, true);
+		composer.composeMelody("beatles2.mid", 100, true);
 		System.out.println();
 	}
 

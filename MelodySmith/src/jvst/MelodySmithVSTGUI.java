@@ -1152,17 +1152,6 @@ class TextBubbleBorder extends AbstractBorder {
     }
 }
 
-class ArtistGrouping {
-    public String artistName;
-    public double artistInfluence;
-    public ArrayList<File> artistMIDIFiles = null;
-    public ArtistGrouping(String artistName, double artistInfluence, ArrayList<File> artistMIDIFiles) {
-        this.artistName = artistName;
-        this.artistInfluence = artistInfluence;
-        this.artistMIDIFiles = artistMIDIFiles;
-    }
-}
-
 class Fader
 {
     //  background color when component has focus

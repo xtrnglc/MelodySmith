@@ -368,30 +368,3 @@ public class JayDLay extends VSTPluginAdapter {
   
 }
 
-
-/**
- * Helper Class (VO) for the support of different presets for the plug
- * if you are using no gui (comment PluginUIClass out in jVSTwRapper.ini)
- * @author dm
- * @version 1.0
- */
-class DelayProgram {
-  private String name = "Init";
-  private float delay = 0.5F;
-  private float feedback = 0.5F;
-  private float out = 1F;
-
-
-
-  public String getName() { return this.name; }
-  public void setName(String name) { this.name = name; }
-
-  public float getDelay() { return this.delay; }
-  public void setDelay(float delay) { this.delay = delay; }
-
-  public float getFeedback() { return this.feedback; }
-  public void setFeedback(float feedback) { this.feedback = feedback; }
-
-  public float getOut() { return this.out; }
-  public void setOut(float out) { this.out = out; }
-}
