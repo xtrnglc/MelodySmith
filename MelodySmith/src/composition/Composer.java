@@ -9,15 +9,18 @@ import midiFeatureFinder.MidiWriter;
 public class Composer {
 	static int[] CMAJOR = {60, 62, 64, 65, 67, 69, 71, 72};
 	static int[] AMINOR = {57, 59, 60, 62, 64, 65, 67, 69};
+	static ArtistGrouping[] artists;
 	
 	AssociationNetwork network;
 	
 	public Composer(String folderName) {
 		network = new AssociationNetwork();
 		trainNetwork(folderName, network);
+		artists = null;
 	}
 	
 	public Composer(ArtistGrouping[] artists) {
+		this.artists = artists;
 		network = new AssociationNetwork();
 		trainNetwork(artists, network);
 	}
@@ -184,6 +187,12 @@ public class Composer {
 	}
 	
 	public static double getArtistWeight(String artist) {
+		if(artists != null) {
+			for(ArtistGrouping artistGrouping : artists) {
+				if(artistGrouping.artistName == artist)
+					return artistGrouping.artistInfluence;
+			}
+		}
 		return 0.0;
 	}
 }
