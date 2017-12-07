@@ -69,6 +69,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   
   String newDirectoryName;
   File newDirectory;
+  String currentAbsolutePath;
   
   JPanel secondCol;
   boolean isCMajor = true;
@@ -101,7 +102,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     
     //Get paths and set up directory to write midi files to
     Path currentRelativePath = Paths.get("");
-    String currentAbsolutePath = currentRelativePath.toAbsolutePath().toString();
+    currentAbsolutePath = currentRelativePath.toAbsolutePath().toString();
     log("MelodySmithVSTGUI curr rel path: " + currentAbsolutePath);
     System.out.println("MelodySmithVSTGUI curr rel path: " + currentAbsolutePath);
     this.newDirectoryName = currentAbsolutePath + "//uploaded_training_sets//curr";
@@ -422,22 +423,32 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     
     //Second column
     this.secondCol = new JPanel();
-    secondCol.setBackground(Color.darkGray);
+    secondCol.setBackground(Color.BLACK);
     
-    secondCol.setLayout(new GridLayout(2,1));
+    secondCol.setLayout(new GridLayout(0,1));
+    
+    ImageIcon anvilReforgeIcon = null; 
+    try {
+        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "\\anvil_recast.png"));
+        ImageIcon icon = new ImageIcon(img);
+        anvilReforgeIcon = icon;
+    } catch(Exception e) {
+        System.out.println(e.toString());
+    }
+    
     
     //Add New training set button
-    JPanel secondColNewTrainingSetPanel = new JPanel();
-    secondColNewTrainingSetPanel.setBackground(Color.darkGray);
-    secondColNewTrainingSetPanel.setLayout(new GridLayout(5,3));
-    secondColNewTrainingSetPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.ORANGE));
-    
-    JButton newTrainingSetButton = new JButton("New Training Set");
-    newTrainingSetButton.setFont(newTrainingSetButton.getFont().deriveFont(32.0f));
-    newTrainingSetButton.setBackground(Color.BLACK);
-    newTrainingSetButton.setForeground(Color.WHITE);    
-    newTrainingSetButton.setBorder(new TextBubbleBorder(Color.CYAN,4,16,0, false));
-    
+//    JPanel secondColNewTrainingSetPanel = new JPanel();
+//    secondColNewTrainingSetPanel.setBackground(Color.darkGray);
+//    secondColNewTrainingSetPanel.setLayout(new GridLayout(5,3));
+//    secondColNewTrainingSetPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.ORANGE));
+//    
+//    JButton newTrainingSetButton = new JButton("New Training Set");
+//    newTrainingSetButton.setFont(newTrainingSetButton.getFont().deriveFont(32.0f));
+//    newTrainingSetButton.setBackground(Color.BLACK);
+//    newTrainingSetButton.setForeground(Color.WHITE);    
+//    newTrainingSetButton.setBorder(new TextBubbleBorder(Color.CYAN,4,16,0, false));
+//    
 //    newTrainingSetButton.addActionListener(new ActionListener() {
 //        @Override
 //        public void actionPerformed(ActionEvent e) {
@@ -458,28 +469,25 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
 //            }
 //        }
 //    });  
-       
-    addEmptyLabels(secondColNewTrainingSetPanel,7);
-    secondColNewTrainingSetPanel.add(newTrainingSetButton);
-    addEmptyLabels(secondColNewTrainingSetPanel,7);
+//       
+//    addEmptyLabels(secondColNewTrainingSetPanel,7);
+//    secondColNewTrainingSetPanel.add(newTrainingSetButton);
+//    addEmptyLabels(secondColNewTrainingSetPanel,7);
    
    
-    //Panel for key chooser and melody creation
-    JPanel keyAndForgePanel = new JPanel();
-    keyAndForgePanel.setBackground(Color.darkGray);
-    keyAndForgePanel.setLayout(new GridLayout(1,2));
-    
     //Key Chooser
     JPanel keyPanel = new JPanel();
-    keyPanel.setBackground(Color.darkGray);
+    keyPanel.setBackground(Color.BLACK);
     keyPanel.setLayout(new GridLayout(5,4));
     
-    JButton cMajorButton = new JButton("C Major");
+    JButton cMajorButton = new JButton("C");
     cMajorButton.setBackground(Color.GREEN);
-    cMajorButton.setForeground(Color.WHITE);
-    JButton aMinorButton = new JButton("A Minor");
+    cMajorButton.setForeground(Color.BLACK);
+    cMajorButton.setFont(cMajorButton.getFont().deriveFont(32.0F));
+    JButton aMinorButton = new JButton("a");
+    aMinorButton.setFont(aMinorButton.getFont().deriveFont(32.0F));
     aMinorButton.setBackground(Color.CYAN);
-    aMinorButton.setForeground(Color.WHITE);
+    aMinorButton.setForeground(Color.BLACK);
     
 
     cMajorButton.addActionListener(new ActionListener() {
@@ -687,42 +695,49 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     
     //Forge Panel - TODO
     JPanel forgePanel = new JPanel();
-    forgePanel.setBackground(Color.darkGray);
+    forgePanel.setBackground(Color.BLACK);
     forgePanel.setLayout(new GridLayout(5,3));
     
-    JButton forgeButton = new JButton("Forge");
-    forgeButton.setBackground(Color.ORANGE);
-    forgeButton.setForeground(Color.WHITE);
-    forgeButton.setBorder(new TextBubbleBorder(Color.CYAN,2,16,0, false));
+    ImageIcon fireForgeIcon = null; 
+    try {
+        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "\\forge_fire.png"));
+        ImageIcon icon = new ImageIcon(img);
+        fireForgeIcon = icon;
+    } catch(Exception e) {
+        System.out.println(e.toString());
+    }    
     
-    forgeButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            //Call Alex's composition method
-            for(int i = 0; i < influenceTextFields.length; i++) {
-                artistGroupings[i].artistInfluence = Double.parseDouble(influenceTextFields[i].getText()); 
-            }
-            ArtistGrouping[] currArtistGroupings = artistGroupings;
-            for(ArtistGrouping ag: currArtistGroupings) {
-                System.out.println(ag.artistName + ", " + ag.artistInfluence);
-            }
-            boolean currKey = isCMajor;
-            Composer composer = new Composer(currArtistGroupings);
-            composer.composeMelody("file.mid", 200, currKey);
-        }
-    });
+//    JButton forgeButton = new JButton("Forge");
+//    forgeButton.setBackground(Color.ORANGE);
+//    forgeButton.setForeground(Color.WHITE);
+//    forgeButton.setBorder(new TextBubbleBorder(Color.CYAN,2,16,0, false));
+//    
+//    forgeButton.addActionListener(new ActionListener() {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            //Call Alex's composition method
+//            for(int i = 0; i < influenceTextFields.length; i++) {
+//                artistGroupings[i].artistInfluence = Double.parseDouble(influenceTextFields[i].getText()); 
+//            }
+//            ArtistGrouping[] currArtistGroupings = artistGroupings;
+//            for(ArtistGrouping ag: currArtistGroupings) {
+//                System.out.println(ag.artistName + ", " + ag.artistInfluence);
+//            }
+//            boolean currKey = isCMajor;
+//            Composer composer = new Composer(currArtistGroupings);
+//            composer.composeMelody("file.mid", 200, currKey);
+//        }
+//    });
     
-    addEmptyLabels(forgePanel, 7);
-    forgePanel.add(forgeButton);
-    addEmptyLabels(forgePanel, 7);    
+    //addEmptyLabels(forgePanel, 7);
+    //forgePanel.add(new JLabel(fireForgeIcon));
+    //addEmptyLabels(forgePanel, 7);    
     
     
-    keyAndForgePanel.add(keyPanel);
-    keyAndForgePanel.add(forgePanel);
     
-    
-    secondCol.add(secondColNewTrainingSetPanel);
-    secondCol.add(keyAndForgePanel);
+    secondCol.add(new JLabel(anvilReforgeIcon));
+    secondCol.add(keyPanel);
+    secondCol.add(new JLabel(fireForgeIcon));
     
     
     
