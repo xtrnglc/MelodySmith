@@ -40,6 +40,7 @@ import javax.swing.event.*;
 import javax.swing.text.Document;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 
 
@@ -58,10 +59,10 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   protected static boolean DEBUG = false;
   
   protected static String currDirectoryPathName;
-  final int width = 1920;
-  final int height = 1080;
+  final int width = 1500;
+  final int height = 1800;
   
-  protected File[] currentlyUploadedFiles = null;
+  protected FileAndArtistName[] currentFileAndArtistNames = null;
   public JTextField[] artistNameFields = null;
   public ArtistGrouping[] artistGroupings = null;
   public JTextField[] influenceTextFields = null; 
@@ -71,6 +72,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   
   JPanel secondCol;
   boolean isCMajor = true;
+  boolean isManageTab = true;
 
   public MelodySmithVSTGUI(VSTPluginGUIRunner r, VSTPluginAdapter plug) throws Exception {
 	super(r,plug);
@@ -94,6 +96,8 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     this.pPlugin = plug;
     
     this.currDirectoryPathName = null;
+    this.currentFileAndArtistNames = new FileAndArtistName[0];
+    this.artistGroupings = new ArtistGrouping[0];
     
     //Get paths and set up directory to write midi files to
     Path currentRelativePath = Paths.get("");
@@ -168,12 +172,12 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         
 
     JLabel contentPane = new JLabel();
-    contentPane.setBackground(Color.BLACK);
+    //contentPane.setBackground(Color.BLACK);
     contentPane.setOpaque(true);
     // contentPane.setIcon( backgroundImage );
     contentPane.setLayout( new BorderLayout() );
     this.setContentPane( contentPane );
-    this.getContentPane().setBackground(Color.darkGray);
+    this.getContentPane().setBackground(Color.BLACK);
     
     
     GridLayout grids = new GridLayout(1, 2);
@@ -255,24 +259,165 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     
     //First column
     JPanel firstCol = new JPanel();
-    firstCol.setBackground(Color.darkGray);
+    JPanel trainingsetPanel = new JPanel();
+    firstCol.setBackground(Color.BLACK);
     
+    //Trainings set vertical margin corpus label
     JPanel trainingsetPanelVerticalMargin = new JPanel();
-    trainingsetPanelVerticalMargin.setBackground(Color.darkGray) ;
-    trainingsetPanelVerticalMargin.setPreferredSize(new Dimension(this.width / 2, this.height / 16));
+    trainingsetPanelVerticalMargin.setBackground(Color.BLACK) ;
+    trainingsetPanelVerticalMargin.setPreferredSize(new Dimension(this.width / 2, this.height / 32));
+    trainingsetPanelVerticalMargin.setLayout(new GridLayout(1,1,0,0));
+    
+    JLabel trainingsetPanelMarginLabel = new JLabel("CORPUS");
+    trainingsetPanelMarginLabel.setForeground(Color.WHITE);
+    trainingsetPanelMarginLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    trainingsetPanelMarginLabel.setFont(trainingsetPanelMarginLabel.getFont().deriveFont(32.0f));
+    
+    trainingsetPanelVerticalMargin.add(trainingsetPanelMarginLabel);
     firstCol.add(trainingsetPanelVerticalMargin);
     
+    //Add tabs for Manage,Influences
+    JPanel manageAndInfluencesTabsPanel = new JPanel();
+    manageAndInfluencesTabsPanel.setLayout(new GridLayout(1,2, 0, 0));
+    manageAndInfluencesTabsPanel.setBackground(Color.BLACK);
+    manageAndInfluencesTabsPanel.setPreferredSize(new Dimension(this.width / 2, this.height / 32));
+    firstCol.add(trainingsetPanelVerticalMargin);
+    
+    JButton manageButton = new JButton("Manage");
+    manageButton.setBorder(new TextBubbleBorder(Color.ORANGE,2,0,0, false));
+    manageButton.setFont(manageButton.getFont().deriveFont(20.0f));
+    if(isManageTab) {
+        manageButton.setBackground(Color.ORANGE);
+        manageButton.setForeground(Color.WHITE);
+    }
+    else {
+        manageButton.setBackground(Color.BLACK);
+        manageButton.setForeground(Color.WHITE);
+    }
+    
+    JButton influencesButton = new JButton("Influences");
+    influencesButton.setBorder(new TextBubbleBorder(Color.ORANGE,2,0,0, false));
+    influencesButton.setFont(influencesButton.getFont().deriveFont(20.0f));
+    if(!isManageTab) {
+        influencesButton.setBackground(Color.ORANGE);
+        influencesButton.setForeground(Color.WHITE);
+    }
+    else {
+        influencesButton.setBackground(Color.BLACK);
+        influencesButton.setForeground(Color.WHITE);
+    }
+    
+    manageAndInfluencesTabsPanel.add(manageButton);
+    manageAndInfluencesTabsPanel.add(influencesButton);
+        
+    //Add animations, on clicks for manage and influences buttons
+    manageButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(!isManageTab) {
+                isManageTab = true;
+                
+                manageButton.setBackground(Color.ORANGE);
+                manageButton.setForeground(Color.WHITE);
+                influencesButton.setBackground(Color.BLACK);
+                influencesButton.setForeground(Color.WHITE);
+                manageAndInfluencesTabsPanel.repaint();
+                
+                trainingsetPanel.removeAll();
+                showTrainingSetDataEditing(trainingsetPanel);
+                trainingsetPanel.revalidate();
+                trainingsetPanel.repaint();
+            }
+        }
+    });
+    influencesButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(isManageTab) {
+                isManageTab = false;
+                
+                manageButton.setBackground(Color.BLACK);
+                manageButton.setForeground(Color.WHITE);
+                influencesButton.setBackground(Color.ORANGE);
+                influencesButton.setForeground(Color.WHITE);
+                manageAndInfluencesTabsPanel.repaint();
+                
+
+                //Write Midi files to temporary directory
+                try{
+                    FileUtils.cleanDirectory(newDirectory);
+                } catch(Exception ex) {
+                    System.out.println("Unable to clean training set directory");
+                }
+                boolean success = (newDirectory).mkdirs();
+                if (!success) {
+                    System.out.println("Unabled to create directory to store training sets");
+                }
+
+                currDirectoryPathName = newDirectoryName;
+                for(int i = 0; i < currentFileAndArtistNames.length; i++) {
+                    File f = currentFileAndArtistNames[i].f;
+                    System.out.println("Opening: " + f.getName());
+                    String newFileName = newDirectoryName + "//" + currentFileAndArtistNames[i].f.getName();
+                    try {
+                        FileUtils.copyFile(f, new File(newFileName));
+                    } catch(IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    System.out.println("Wrote MIDI file to " + currDirectoryPathName);
+                }
+
+                //Create artist groupings
+                HashMap<String, ArrayList<File>> artistNameToFiles = new HashMap();
+                for(int i = 0; i < currentFileAndArtistNames.length; i++) {
+                    currentFileAndArtistNames[i].artistName = artistNameFields[i].getText().trim();
+                    String currArtistName = currentFileAndArtistNames[i].artistName;
+                    ArrayList<File> artistFiles = artistNameToFiles.get(currArtistName);
+
+                    if(artistFiles == null) artistFiles = new ArrayList();
+                    artistFiles.add(currentFileAndArtistNames[i].f);
+                    artistNameToFiles.put(currArtistName, artistFiles);
+                }
+
+                artistGroupings = new ArtistGrouping[artistNameToFiles.size()];
+                Iterator it = artistNameToFiles.entrySet().iterator();
+                int i = 0;
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    artistGroupings[i++] = new ArtistGrouping((String) pair.getKey(), 0, (ArrayList<File>) pair.getValue());
+                    it.remove(); // avoids a ConcurrentModificationException
+                }
+
+//                trainingsetPanel.removeAll();
+//                showTrainingSetInfluences(trainingsetPanel);
+//                trainingsetPanel.revalidate();
+//                trainingsetPanel.repaint();                
+                
+                trainingsetPanel.removeAll();
+                showTrainingSetInfluences(trainingsetPanel);
+                trainingsetPanel.revalidate();
+                trainingsetPanel.repaint();               
+            }
+        }
+    });    
+    
+    firstCol.add(manageAndInfluencesTabsPanel);
+    
     //Upload/Modify training set panel
-    JPanel trainingsetPanel = new JPanel();
     int trainingSetPanelWidth = (int) ((this.width/ 2) / 1.25);
     int trainingSetPanelHeight = (int) (this.height / 1.25);
-    AbstractBorder roundedOrangeBorder = new TextBubbleBorder(Color.ORANGE,2,16,0, false);
-    trainingsetPanel.setBorder(roundedOrangeBorder);
+    //AbstractBorder roundedOrangeBorder = new TextBubbleBorder(Color.ORANGE,2,16,0, false);
+    //trainingsetPanel.setBorder(roundedOrangeBorder);
     trainingsetPanel.setBackground(Color.BLACK);
     trainingsetPanel.setPreferredSize(new Dimension(trainingSetPanelWidth,trainingSetPanelHeight));
+    GridLayout trainingsetGridLayout = new GridLayout(0,1);
+    trainingsetGridLayout.setVgap(0);
+    trainingsetPanel.setLayout(new GridLayout(0, 1, 0, 0));
     
-    this.showUploadTrainingSet(trainingsetPanel);
- 
+
+    this.addManageInfluencesTabs(trainingsetPanel);
+    this.showTrainingSetDataEditing(trainingsetPanel);
     firstCol.add(trainingsetPanel);
     
     //Second column
@@ -293,26 +438,26 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     newTrainingSetButton.setForeground(Color.WHITE);    
     newTrainingSetButton.setBorder(new TextBubbleBorder(Color.CYAN,4,16,0, false));
     
-    newTrainingSetButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            final JFileChooser fc = new JFileChooser();
-            fc.setMultiSelectionEnabled(true);
-            int returnVal = fc.showOpenDialog(trainingsetPanel);
-
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                currentlyUploadedFiles = fc.getSelectedFiles();
-                
-                trainingsetPanel.removeAll();
-                showTrainingSetDataEditing(trainingsetPanel);
-                trainingsetPanel.revalidate();
-                trainingsetPanel.repaint();
-
-            } else {
-                System.out.println("Nothing selected");
-            }
-        }
-    });  
+//    newTrainingSetButton.addActionListener(new ActionListener() {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            final JFileChooser fc = new JFileChooser();
+//            fc.setMultiSelectionEnabled(true);
+//            int returnVal = fc.showOpenDialog(trainingsetPanel);
+//
+//            if (returnVal == JFileChooser.APPROVE_OPTION) {
+//                currentFileAndArtistNames = fc.getSelectedFiles();
+//                
+//                trainingsetPanel.removeAll();
+//                showTrainingSetDataEditing(trainingsetPanel);
+//                trainingsetPanel.revalidate();
+//                trainingsetPanel.repaint();
+//
+//            } else {
+//                System.out.println("Nothing selected");
+//            }
+//        }
+//    });  
        
     addEmptyLabels(secondColNewTrainingSetPanel,7);
     secondColNewTrainingSetPanel.add(newTrainingSetButton);
@@ -330,10 +475,10 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     keyPanel.setLayout(new GridLayout(5,4));
     
     JButton cMajorButton = new JButton("C Major");
-    cMajorButton.setBackground(Color.lightGray);
+    cMajorButton.setBackground(Color.GREEN);
     cMajorButton.setForeground(Color.WHITE);
     JButton aMinorButton = new JButton("A Minor");
-    aMinorButton.setBackground(Color.BLACK);
+    aMinorButton.setBackground(Color.CYAN);
     aMinorButton.setForeground(Color.WHITE);
     
 
@@ -345,7 +490,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
                 final Timer timer1 = new Timer(2, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
-                        final Color targetColor = Color.lightGray;
+                        final Color targetColor = Color.GREEN;
                         final int changingSpeed = 5;
 
                         final Color currentColor = cMajorButton.getBackground();
@@ -389,7 +534,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
                 final Timer timer2 = new Timer(2, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
-                        final Color targetColor = Color.BLACK;
+                        final Color targetColor = Color.CYAN;
                         final int changingSpeed = 5;
 
                         final Color currentColor = aMinorButton.getBackground();
@@ -444,7 +589,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
                 final Timer timer1 = new Timer(2, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
-                        final Color targetColor = Color.lightGray;
+                        final Color targetColor = Color.GREEN;
                         final int changingSpeed = 5;
 
                         final Color currentColor = aMinorButton.getBackground();
@@ -488,7 +633,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
                 final Timer timer2 = new Timer(2, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
-                        final Color targetColor = Color.BLACK;
+                        final Color targetColor = Color.CYAN;
                         final int changingSpeed = 5;
 
                         final Color currentColor = cMajorButton.getBackground();
@@ -805,46 +950,46 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     gui.show();
   }
   
-  private void showUploadTrainingSet(JPanel trainingsetPanel) {
-    //Upload Training Data button
-    trainingsetPanel.setLayout(new FlowLayout());
-    int trainingSetPanelWidth = trainingsetPanel.getPreferredSize().width;
-    int trainingSetPanelHeight = trainingsetPanel.getPreferredSize().height;
-    
-    JButton uploadTrainingDataButton = new JButton("Upload MIDI Files");
-    int uploadTrainingDataButtonWidth = (int) (trainingSetPanelWidth / 1.5);
-    int uploadTrainingDataButtonHeight = (int) (trainingSetPanelHeight / 10);
-    uploadTrainingDataButton.setPreferredSize(new Dimension(uploadTrainingDataButtonWidth, uploadTrainingDataButtonHeight));
-    uploadTrainingDataButton.setFont(uploadTrainingDataButton.getFont().deriveFont(32.0f));
-    uploadTrainingDataButton.setBackground(Color.CYAN);
-    
-    uploadTrainingDataButton.setBorder(new TextBubbleBorder(Color.BLUE,4,16,0, false));
-
-    //Process uploading files
-   
-    uploadTrainingDataButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            final JFileChooser fc = new JFileChooser();
-            fc.setMultiSelectionEnabled(true);
-            int returnVal = fc.showOpenDialog(trainingsetPanel);
-
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                currentlyUploadedFiles = fc.getSelectedFiles();
-                
-                trainingsetPanel.removeAll();
-                showTrainingSetDataEditing(trainingsetPanel);
-                trainingsetPanel.revalidate();
-                trainingsetPanel.repaint();
-
-            } else {
-                System.out.println("Nothing selected");
-            }
-        }
-    });  
-
-    trainingsetPanel.add(uploadTrainingDataButton);
-  }
+//  private void showUploadTrainingSet(JPanel trainingsetPanel) {
+//    //Upload Training Data button
+//    trainingsetPanel.setLayout(new FlowLayout());
+//    int trainingSetPanelWidth = trainingsetPanel.getPreferredSize().width;
+//    int trainingSetPanelHeight = trainingsetPanel.getPreferredSize().height;
+//    
+//    JButton uploadTrainingDataButton = new JButton("Upload MIDI Files");
+//    int uploadTrainingDataButtonWidth = (int) (trainingSetPanelWidth / 1.5);
+//    int uploadTrainingDataButtonHeight = (int) (trainingSetPanelHeight / 10);
+//    uploadTrainingDataButton.setPreferredSize(new Dimension(uploadTrainingDataButtonWidth, uploadTrainingDataButtonHeight));
+//    uploadTrainingDataButton.setFont(uploadTrainingDataButton.getFont().deriveFont(32.0f));
+//    uploadTrainingDataButton.setBackground(Color.CYAN);
+//    
+//    uploadTrainingDataButton.setBorder(new TextBubbleBorder(Color.BLUE,4,16,0, false));
+//
+//    //Process uploading files
+//   
+//    uploadTrainingDataButton.addActionListener(new ActionListener() {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            final JFileChooser fc = new JFileChooser();
+//            fc.setMultiSelectionEnabled(true);
+//            int returnVal = fc.showOpenDialog(trainingsetPanel);
+//
+//            if (returnVal == JFileChooser.APPROVE_OPTION) {
+//                currentFileAndArtistNames = fc.getSelectedFiles();
+//                
+//                trainingsetPanel.removeAll();
+//                showTrainingSetDataEditing(trainingsetPanel);
+//                trainingsetPanel.revalidate();
+//                trainingsetPanel.repaint();
+//
+//            } else {
+//                System.out.println("Nothing selected");
+//            }
+//        }
+//    });  
+//
+//    trainingsetPanel.add(uploadTrainingDataButton);
+//  }
   
   private void showTrainingSetInfluences(JPanel trainingsetPanel) {
       trainingsetPanel.setLayout(new GridLayout(0,3));
@@ -936,13 +1081,39 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   
   private void showTrainingSetDataEditing(JPanel trainingsetPanel) {
     //Training set edit corpus data
-    trainingsetPanel.setLayout(new GridLayout(0,2));
-    this.artistNameFields = new JTextField[this.currentlyUploadedFiles.length];
-    for(int i = 0; i < this.currentlyUploadedFiles.length; i++) {
-        JLabel midiFname = new JLabel(this.currentlyUploadedFiles[i].getName());
+    trainingsetPanel.setLayout(new GridLayout(0,1));
+    
+    //Add artist, song headers
+    JPanel artistAndSongHeaderPanel = new JPanel();
+    artistAndSongHeaderPanel.setLayout(new GridLayout(1,2));
+    artistAndSongHeaderPanel.setBackground(Color.BLACK);
+    
+    JLabel artistHeader = new JLabel("ARTIST");
+    artistHeader.setForeground(Color.WHITE);
+    artistHeader.setFont(artistHeader.getFont().deriveFont(20.0f));
+    
+    JLabel songHeader = new JLabel("SONG");
+    songHeader.setForeground(Color.WHITE);
+    songHeader.setFont(songHeader.getFont().deriveFont(20.0f));
+    songHeader.setHorizontalAlignment(SwingConstants.RIGHT);
+    
+    artistAndSongHeaderPanel.add(artistHeader);
+    artistAndSongHeaderPanel.add(songHeader);
+    
+    trainingsetPanel.add(artistAndSongHeaderPanel);
+    
+    artistNameFields = new JTextField[currentFileAndArtistNames.length];
+    for(int i = 0; i < this.currentFileAndArtistNames.length; i++) {
+        JPanel currentArtistEditPanel = new JPanel();
+        currentArtistEditPanel.setLayout(new GridLayout(1,2));
+        currentArtistEditPanel.setBackground(Color.BLACK);
+        
+        JLabel midiFname = new JLabel(this.currentFileAndArtistNames[i].f.getName());
         midiFname.setForeground(Color.lightGray);
         midiFname.setFont(midiFname.getFont().deriveFont(20.0f));
-        JTextField midiArtistname = new JTextField("Artist Name");
+        midiFname.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        JTextField midiArtistname = new JTextField(this.currentFileAndArtistNames[i].artistName);
         midiArtistname.setFont(midiArtistname.getFont().deriveFont(20.0f));
         midiArtistname.setForeground(Color.GRAY);
         
@@ -962,79 +1133,59 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
                 }
             }
             });
+
         artistNameFields[i] = midiArtistname;
-        
-        trainingsetPanel.add(midiFname);
-        trainingsetPanel.add(midiArtistname);
-        addEmptyLabels(trainingsetPanel, 2);
+        currentArtistEditPanel.add(midiArtistname);        
+        currentArtistEditPanel.add(midiFname);
+        trainingsetPanel.add(currentArtistEditPanel);
+        addEmptyLabels(trainingsetPanel, 1);
     }   
     
-    //Next button for training corpus data editing
+    //If len(currentlyUploadedFiles) < 10, add rows so that our add songs button works
+    for(int i = currentFileAndArtistNames.length; i < 10; i++) {
+        addEmptyLabels(trainingsetPanel, 2);
+    }
+    //Add songs for training corpus data editing
     addEmptyLabels(trainingsetPanel, 1);
-    JButton nextEditTrainingSetButton = new JButton("Next");
+    JButton nextEditTrainingSetButton = new JButton("Add Songs");
     nextEditTrainingSetButton.setFont(nextEditTrainingSetButton.getFont().deriveFont(32.0f));
     nextEditTrainingSetButton.setBackground(Color.CYAN);
-    nextEditTrainingSetButton.setBorder(new TextBubbleBorder(Color.BLUE,4,64,0, false));
+    //nextEditTrainingSetButton.setBorder(new TextBubbleBorder(Color.BLUE,4,64,0, false));
+    
     
     nextEditTrainingSetButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            final JFileChooser fc = new JFileChooser();
+            fc.setMultiSelectionEnabled(true);
+            int returnVal = fc.showOpenDialog(trainingsetPanel);
 
-            //Write Midi files to temporary directory
-            try{
-                FileUtils.cleanDirectory(newDirectory);
-            } catch(Exception ex) {
-                System.out.println("Unable to clean training set directory");
-            }
-            boolean success = (newDirectory).mkdirs();
-            if (!success) {
-                System.out.println("Unabled to create directory to store training sets");
-            }
-
-            currDirectoryPathName = newDirectoryName;
-            for(int i = 0; i < currentlyUploadedFiles.length; i++) {
-                File f = currentlyUploadedFiles[i];
-                System.out.println("Opening: " + f.getName());
-                String newFileName = newDirectoryName + "//" + currentlyUploadedFiles[i].getName();
-                try {
-                    FileUtils.copyFile(f, new File(newFileName));
-                } catch(IOException ex) {
-                    ex.printStackTrace();
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File[] newCurrentlyUploadedFiles = fc.getSelectedFiles();
+                FileAndArtistName[] newCurrFileAndArtistNames = new FileAndArtistName[newCurrentlyUploadedFiles.length];
+                for(int i = 0; i < newCurrentlyUploadedFiles.length; i++) {
+                    newCurrFileAndArtistNames[i] = new FileAndArtistName(newCurrentlyUploadedFiles[i], "Artist Name");
                 }
-
-                System.out.println("Wrote MIDI file to " + currDirectoryPathName);
-            }
-            
-            //Create artist groupings
-            HashMap<String, ArrayList<File>> artistNameToFiles = new HashMap();
-            for(int i = 0; i < currentlyUploadedFiles.length; i++) {
-                String currArtistName = artistNameFields[i].getText().trim();
-                ArrayList<File> artistFiles = artistNameToFiles.get(currArtistName);
+                currentFileAndArtistNames = (FileAndArtistName[])ArrayUtils.addAll(currentFileAndArtistNames, newCurrFileAndArtistNames);
                 
-                if(artistFiles == null) artistFiles = new ArrayList();
-                artistFiles.add(currentlyUploadedFiles[i]);
-                artistNameToFiles.put(currArtistName, artistFiles);
+                trainingsetPanel.removeAll();
+                showTrainingSetDataEditing(trainingsetPanel);
+                addManageInfluencesTabs(trainingsetPanel);
+                trainingsetPanel.revalidate();
+                trainingsetPanel.repaint();
+
+            } else {
+                System.out.println("Nothing selected");
             }
-            
-            artistGroupings = new ArtistGrouping[artistNameToFiles.size()];
-            Iterator it = artistNameToFiles.entrySet().iterator();
-            int i = 0;
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                artistGroupings[i++] = new ArtistGrouping((String) pair.getKey(), 0, (ArrayList<File>) pair.getValue());
-                it.remove(); // avoids a ConcurrentModificationException
-            }
-            
-            trainingsetPanel.removeAll();
-            showTrainingSetInfluences(trainingsetPanel);
-            trainingsetPanel.revalidate();
-            trainingsetPanel.repaint();
         }
-    });
+    }); 
     
     trainingsetPanel.add(nextEditTrainingSetButton);
   }
   
+  public void addManageInfluencesTabs(JPanel trainingsetPanel) {
+      
+  }
 }
 
 class TextBubbleBorder extends AbstractBorder {
@@ -1161,159 +1312,6 @@ class TextBubbleBorder extends AbstractBorder {
         g2.setColor(color);
         g2.setStroke(stroke);
         g2.draw(area);
-    }
-}
-
-class Fader
-{
-    //  background color when component has focus
-    private Color fadeColor;
-
-    //  steps to fade from original background to fade background
-    private int steps;
-
-    //  apply transition colors at this time interval
-    private int interval;
-
-    //  store transition colors from orginal background to fade background
-    private Hashtable backgroundColors = new Hashtable();
-
-    /*
-     *  Fade from a background color to the specified color using
-     *  the default of 10 steps at a 50 millisecond interval.
-     *
-     *  @param fadeColor the temporary background color
-     */
-    public Fader(Color fadeColor)
-    {
-        this(fadeColor, 10, 50);
-    }
-
-    /*
-     *  Fade from a background color to the specified color in the
-     *  specified number of steps at the default 5 millisecond interval.
-     *
-     *  @param fadeColor the temporary background color
-     *  @param steps     the number of steps to fade in the color
-     */
-    public Fader(Color fadeColor, int steps)
-    {
-        this(fadeColor, steps, 50);
-    }
-
-    /*
-     *  Fade from a background color to the specified color in the
-     *  specified number of steps at the specified time interval.
-     *
-     *  @param fadeColor the temporary background color
-     *  @param steps     the number of steps to fade in the color
-     *  @param intevral  the interval to apply color fading
-     */
-    public Fader(Color fadeColor, int steps, int interval)
-    {
-        this.fadeColor = fadeColor;
-        this.steps = steps;
-        this.interval = interval;
-    }
-
-    /*
-     *  Add a component to this fader.
-     *
-     *  The fade color will be applied when the component gains focus.
-     *  The background color will be restored when the component loses focus.
-     *
-     *  @param component apply fading to this component
-    */
-    public Fader add(JComponent component)
-    {
-        //  Get colors to be used for fading
-
-        ArrayList colors = getColors( component.getBackground() );
-
-        //  FaderTimer will apply colors to the component
-
-        new FaderTimer( colors, component, interval );
-
-        return this;
-    }
-
-    /*
-    **  Get the colors used to fade this background
-    */
-    private ArrayList getColors(Color background)
-    {
-        //  Check if the color ArrayList already exists
-
-        Object o = backgroundColors.get( background );
-
-        if (o != null)
-        {
-            return (ArrayList)o;
-        }
-
-        //  Doesn't exist, create fader colors for this background
-
-        ArrayList colors = new ArrayList( steps + 1 );
-        colors.add( background );
-
-        int rDelta = ( background.getRed() - fadeColor.getRed() ) / steps;
-        int gDelta = ( background.getGreen() - fadeColor.getGreen() ) / steps;
-        int bDelta = ( background.getBlue() - fadeColor.getBlue() ) / steps;
-
-        for (int i = 1; i < steps; i++)
-        {
-            int rValue = background.getRed() - (i * rDelta);
-            int gValue = background.getGreen() - (i * gDelta);
-            int bValue = background.getBlue() - (i * bDelta);
-
-            colors.add( new Color(rValue, gValue, bValue) );
-        }
-
-        colors.add( fadeColor );
-        backgroundColors.put(background, colors);
-
-        return colors;
-    }
-
-    class FaderTimer implements FocusListener, ActionListener
-    {
-        private ArrayList colors;
-        private JComponent component;
-        private Timer timer;
-        private int alpha;
-        private int increment;
-
-        FaderTimer(ArrayList colors, JComponent component, int interval)
-        {
-            this.colors = colors;
-            this.component = component;
-            component.addFocusListener( this );
-            timer = new Timer(interval, this);
-        }
-
-        public void focusGained(FocusEvent e)
-        {
-            alpha = 0;
-            increment = 1;
-            timer.start();
-        }
-
-        public void focusLost(FocusEvent e)
-        {
-            alpha = steps;
-            increment = -1;
-            timer.start();
-        }
-
-        public void actionPerformed(ActionEvent e)
-        {
-            alpha += increment;
-
-            component.setBackground( (Color)colors.get(alpha) );
-
-            if (alpha == steps || alpha == 0)
-                timer.stop();
-        }
     }
 }
 
@@ -1508,3 +1506,12 @@ class Fader
 //
 //    }
 //}
+
+class FileAndArtistName{
+    File f;
+    String artistName;
+    public FileAndArtistName(File f, String artistName) {
+        this.f = f;
+        this.artistName = artistName;
+    }
+}
