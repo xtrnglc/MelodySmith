@@ -79,6 +79,8 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   JPanel secondCol;
   boolean isCMajor = true;
   boolean isManageTab = true;
+  
+  int fileCounter = 0;
 
   public MelodySmithVSTGUI(VSTPluginGUIRunner r, VSTPluginAdapter plug) throws Exception {
 	super(r,plug);
@@ -97,7 +99,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     
     this.setTitle("MelodySmith v1.0");
     this.setSize(width, height);
-    this.setResizable(false);
+    this.setResizable(true);
     
     this.plugin = plug;
     
@@ -842,7 +844,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
             }
             boolean currKey = isCMajor;
             Composer composer = new Composer(currArtistGroupings);
-            composer.composeMelody("file.mid", 200, currKey);
+            composer.composeMelody(currentAbsolutePath + "//generated_files//file" + (fileCounter++) + ".mid", 200, currKey);
         }
 
     });
@@ -1285,6 +1287,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         @Override
         public void actionPerformed(ActionEvent e) {
             final JFileChooser fc = new JFileChooser();
+            fc.setCurrentDirectory(new File(currentAbsolutePath));
             fc.setMultiSelectionEnabled(true);
             int returnVal = fc.showOpenDialog(trainingsetPanel);
 
