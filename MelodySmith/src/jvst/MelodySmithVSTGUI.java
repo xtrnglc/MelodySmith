@@ -756,6 +756,11 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
             influencesButton.setBackground(Color.BLACK);
             influencesButton.setForeground(Color.WHITE);
             manageAndInfluencesTabsPanel.repaint();
+            
+            artistNameFields = null;
+            influenceTextFields = null; 
+            currentFileAndArtistNames = new FileAndArtistName[0];
+            artistGroupings = new ArtistGrouping[0];
 
             trainingsetPanel.removeAll();
             showTrainingSetDataEditing(trainingsetPanel);
@@ -765,7 +770,9 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         }  
     });
     
-    secondCol.add(new JLabel(anvilReforgeIcon));
+    
+    
+    secondCol.add(anvilReforgeLabel);
     secondCol.add(keyPanel);
     secondCol.add(new JLabel(fireForgeIcon));
     
