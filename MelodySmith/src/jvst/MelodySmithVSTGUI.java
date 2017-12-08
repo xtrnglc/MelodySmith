@@ -48,18 +48,18 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
 
   private static final long serialVersionUID = -8641024370578430211L;
 
-  JSlider DelaySlider;
-  JSlider FeedbackSlider;
-  JSlider VolumeSlider;
-  JTextField DelayText;
-  JTextField FeedbackText;
-  JTextField VolumeText;
+//  JSlider DelaySlider;
+//  JSlider FeedbackSlider;
+//  JSlider VolumeSlider;
+//  JTextField DelayText;
+//  JTextField FeedbackText;
+//  JTextField VolumeText;
 
-  private VSTPluginAdapter pPlugin;
+  private VSTPluginAdapter plugin;
   protected static boolean DEBUG = false;
   
   protected static String currDirectoryPathName;
-  final int width = 700;
+  final int width = 750;
   final int height = 700;
   
   protected FileAndArtistName[] currentFileAndArtistNames = null;
@@ -71,13 +71,13 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   File newDirectory;
   String currentAbsolutePath;
   
+  ImageIcon fireForgeIcon = null;
+  ImageIcon fireForgeIconHover = null;
+  ImageIcon anvilReforgeIcon = null; 
+  
   JPanel secondCol;
   boolean isCMajor = true;
   boolean isManageTab = true;
-  
-  ImageIcon anvilReforgeIcon = null; 
-  ImageIcon fireForgeIcon = null; 
-
 
   public MelodySmithVSTGUI(VSTPluginGUIRunner r, VSTPluginAdapter plug) throws Exception {
 	super(r,plug);
@@ -98,7 +98,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     this.setSize(width, height);
     this.setResizable(false);
     
-    this.pPlugin = plug;
+    this.plugin = plug;
     
     this.currDirectoryPathName = null;
     this.currentFileAndArtistNames = new FileAndArtistName[0];
@@ -118,9 +118,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //this is needed on the mac only, 
     //java guis are handled there in a pretty different way than on win/linux
     //XXX
-    if (RUNNING_MAC_X) {
-    	this.show();
-    }
+    if (RUNNING_MAC_X) this.show();
   }
   
   private void addEmptyLabels(JPanel curr, int num) {
@@ -130,8 +128,12 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   } 
 
 
-  public void init() {    
-      //((MelodySmithVST)plugin).gui=this;
+  public void init() {   
+      
+      System.out.println("Made it here, congrats");
+      if (!DEBUG) {
+        ((MelodySmithVST)plugin).gui=this;          
+      }
 //    if (!DEBUG) {
 //    	((MelodySmithVST)plugin).gui=this; //tell the plug that it has a gui!
 //    	
@@ -287,7 +289,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     JPanel manageAndInfluencesTabsPanel = new JPanel();
     manageAndInfluencesTabsPanel.setLayout(new GridLayout(1,2, 0, 0));
     manageAndInfluencesTabsPanel.setBackground(Color.BLACK);
-    manageAndInfluencesTabsPanel.setPreferredSize(new Dimension(700 / 2, 700 / 32));
+    manageAndInfluencesTabsPanel.setPreferredSize(new Dimension(this.width / 2, this.height / 32));
     firstCol.add(trainingsetPanelVerticalMargin);
     
     JButton manageButton = new JButton("Manage");
@@ -430,8 +432,10 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //Second column
     this.secondCol = new JPanel();
     secondCol.setBackground(Color.BLACK);
-    
     secondCol.setLayout(new GridLayout(0,1));
+    
+    //JLabel anvilReforgeLabel = new JLabel();
+    //JLabel fireForgeLabel = new JLabel();
     
     try {
         BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/anvil_recast.png"));
@@ -484,12 +488,6 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     JPanel keyPanel = new JPanel();
     keyPanel.setBackground(Color.BLACK);
     keyPanel.setLayout(new GridLayout(5,4));
-    
-    JLabel keySignatureLabel = new JLabel("KEY");
-    keySignatureLabel.setFont(keySignatureLabel.getFont().deriveFont(32.0f));
-    keySignatureLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    keySignatureLabel.setForeground(Color.WHITE);
-    keyPanel.add(keySignatureLabel);
     
     JButton cMajorButton = new JButton("C");
     cMajorButton.setBackground(Color.GREEN);
@@ -699,7 +697,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         }
     });
     
-    addEmptyLabels(keyPanel, 9);
+    addEmptyLabels(keyPanel,4);
     keyPanel.add(cMajorButton);
     keyPanel.add(aMinorButton);
     addEmptyLabels(keyPanel, 9);
@@ -709,21 +707,80 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     forgePanel.setBackground(Color.BLACK);
     forgePanel.setLayout(new GridLayout(5,3));
     
+ 
     try {
-        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/forge_fire.png"));
-       
+        Image img = ImageIO.read(new File(currentAbsolutePath + "/forge_fire2.png"));
         ImageIcon icon = new ImageIcon(img);
         fireForgeIcon = icon;
     } catch(Exception e) {
         System.out.println(e.toString());
-    }    
+    }  
     
+    try {
+        Image img = ImageIO.read(new File(currentAbsolutePath + "/forge_fire_hover.png"));
+        ImageIcon icon = new ImageIcon(img);
+        fireForgeIconHover = icon;
+    } catch(Exception e) {
+        System.out.println(e.toString());
+    }  
+    
+//    JButton forgeButton = new JButton("Forge");
+//    forgeButton.setBackground(Color.ORANGE);
+//    forgeButton.setForeground(Color.WHITE);
+//    forgeButton.setBorder(new TextBubbleBorder(Color.CYAN,2,16,0, false));
+//    
+//    forgeButton.addActionListener(new ActionListener() {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            //Call Alex's composition method
+//            for(int i = 0; i < influenceTextFields.length; i++) {
+//                artistGroupings[i].artistInfluence = Double.parseDouble(influenceTextFields[i].getText()); 
+//            }
+//            ArtistGrouping[] currArtistGroupings = artistGroupings;
+//            for(ArtistGrouping ag: currArtistGroupings) {
+//                System.out.println(ag.artistName + ", " + ag.artistInfluence);
+//            }
+//            boolean currKey = isCMajor;
+//            Composer composer = new Composer(currArtistGroupings);
+//            composer.composeMelody("file.mid", 200, currKey);
+//        }
+//    });
+    
+    //addEmptyLabels(forgePanel, 7);
+    //forgePanel.add(new JLabel(fireForgeIcon));
+    //addEmptyLabels(forgePanel, 7);    
+    
+    //Image resizedImage = 
+    //img.getScaledInstance(lblDisPic.getWidth(), lblDisPic.getHeight(), null);
+    
+    JLabel anvilReforgeLabel = new JLabel(anvilReforgeIcon);
+    anvilReforgeLabel.addMouseListener(new MouseAdapter()  
+    {  
+        public void mouseClicked(MouseEvent e)  
+        {  
+           // you can open a new frame here as
+           // i have assumed you have declared "frame" as instance variable
+            isManageTab = true;
+
+            manageButton.setBackground(Color.ORANGE);
+            manageButton.setForeground(Color.WHITE);
+            influencesButton.setBackground(Color.BLACK);
+            influencesButton.setForeground(Color.WHITE);
+            manageAndInfluencesTabsPanel.repaint();
+
+            trainingsetPanel.removeAll();
+            showTrainingSetDataEditing(trainingsetPanel);
+            trainingsetPanel.revalidate();
+            trainingsetPanel.repaint();
+
+        }  
+    });
     
     JLabel fireForgedLabel = new JLabel(fireForgeIcon);
     fireForgedLabel.addMouseListener(new MouseAdapter() {
     	 @Override
          public void mouseEntered(MouseEvent e) {
-    		 fireForgedLabel.setIcon(anvilReforgeIcon);
+    		 fireForgedLabel.setIcon(fireForgeIconHover);
          }
          @Override
          public void mouseExited(MouseEvent e) {
@@ -746,14 +803,8 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         }
 
     });
-    //secondCol.add(forgeButton);
-    //addEmptyLabels(forgePanel, 7);
-    //forgePanel.add(new JLabel(fireForgeIcon));
-    //addEmptyLabels(forgePanel, 7);    
     
-    
-    
-    secondCol.add(new JLabel(anvilReforgeIcon));
+    secondCol.add(anvilReforgeLabel);
     secondCol.add(keyPanel);
     secondCol.add(fireForgedLabel);
     
@@ -953,30 +1004,30 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
    *  Slider value has changed...
    */
   public void stateChanged(ChangeEvent e) {
-    JSlider sl = (JSlider)e.getSource();
-    
-    if (!DEBUG) {
-	    if (sl == this.VolumeSlider) {
-	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_OUT, (float)((float)sl.getValue() / 100F));
-	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_OUT, (float)((float)sl.getValue() / 100F));
-	      this.VolumeText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_OUT));
-	    }
-	    else if (sl == this.FeedbackSlider) {
-	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_FEEDBACK, (float)((float)sl.getValue() / 100F));
-	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_FEEDBACK, (float)((float)sl.getValue() / 100F));
-	      this.FeedbackText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_FEEDBACK));
-	    }
-	    else if (sl == this.DelaySlider) {
-	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_DELAY, (float)((float)sl.getValue() / 100F));
-	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_DELAY, (float)((float)sl.getValue() / 100F));
-	      this.DelayText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_DELAY));
-	    }
-    }
+//    JSlider sl = (JSlider)e.getSource();
+//    
+//    if (!DEBUG) {
+//	    if (sl == this.VolumeSlider) {
+//	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_OUT, (float)((float)sl.getValue() / 100F));
+//	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_OUT, (float)((float)sl.getValue() / 100F));
+//	      this.VolumeText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_OUT));
+//	    }
+//	    else if (sl == this.FeedbackSlider) {
+//	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_FEEDBACK, (float)((float)sl.getValue() / 100F));
+//	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_FEEDBACK, (float)((float)sl.getValue() / 100F));
+//	      this.FeedbackText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_FEEDBACK));
+//	    }
+//	    else if (sl == this.DelaySlider) {
+//	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_DELAY, (float)((float)sl.getValue() / 100F));
+//	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_DELAY, (float)((float)sl.getValue() / 100F));
+//	      this.DelayText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_DELAY));
+//	    }
+//    }
   }
 
   
   public static void main(String[] args) throws Throwable {
-	DEBUG=true;
+      DEBUG=true;
 	
     MelodySmithVSTGUI gui = new MelodySmithVSTGUI(null,null);
     gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -1037,26 +1088,23 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
       //Influence title
       addEmptyLabels(trainingsetPanel, 1);
       JLabel influencesLabel = new JLabel("Influences");
-      influencesLabel.setFont(influencesLabel.getFont().deriveFont(15.0f));
+      influencesLabel.setFont(influencesLabel.getFont().deriveFont(20.0f));
       influencesLabel.setForeground(Color.WHITE);
       trainingsetPanel.add(influencesLabel);
       addEmptyLabels(trainingsetPanel, 1);
-      
-      
       
       this.influenceTextFields = new JTextField[this.artistGroupings.length];
       for(int i = 0; i < this.artistGroupings.length; i++) {
           
           JLabel artistLabel = new JLabel(artistGroupings[i].artistName);
-          artistLabel.setFont(artistLabel.getFont().deriveFont(10.0f));
+          artistLabel.setFont(artistLabel.getFont().deriveFont(20.0f));
           artistLabel.setForeground(Color.lightGray);
 
           JSlider influenceSlider = new JSlider(0,100,0);
-          influenceSlider.setForeground(Color.WHITE);
+          influenceSlider.setBackground(Color.BLACK);
           influenceSlider.setPaintTicks(true);
           influenceSlider.setPaintLabels(true);
           influenceSlider.setMinorTickSpacing(10);
-          //influenceSlider.setMajorTickSpacing(25);
           //influenceSlider.setBackground(new Color(0,0,0,64));
           //firstCol.add(influenceSlider);
 
@@ -1075,13 +1123,13 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
           JTextField influenceTextField = new JTextField("0");
           influenceTextField.setForeground(Color.lightGray);
           influenceTextField.setBackground(Color.BLACK);
-          influenceTextField.setFont(influenceTextField.getFont().deriveFont(10.0F));
+          influenceTextField.setFont(influenceTextField.getFont().deriveFont(20.0F));
           influenceTextField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.ORANGE));
           
           JLabel influencePercentageSign = new JLabel("%");
           influencePercentageSign.setBackground(Color.BLACK);
           influencePercentageSign.setForeground(Color.lightGray);
-          influencePercentageSign.setFont(influencePercentageSign.getFont().deriveFont(10.0F));
+          influencePercentageSign.setFont(influencePercentageSign.getFont().deriveFont(20.0F));
           
           addEmptyLabels(influenceTextFieldPanel, 9);
           influenceTextFieldPanel.add(influenceTextField);
@@ -1147,7 +1195,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         
         JLabel midiFname = new JLabel(this.currentFileAndArtistNames[i].f.getName());
         midiFname.setForeground(Color.lightGray);
-        midiFname.setFont(midiFname.getFont().deriveFont(10.0f));
+        midiFname.setFont(midiFname.getFont().deriveFont(20.0f));
         midiFname.setHorizontalAlignment(SwingConstants.RIGHT);
         
         JTextField midiArtistname = new JTextField(this.currentFileAndArtistNames[i].artistName);
@@ -1185,7 +1233,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //Add songs for training corpus data editing
     addEmptyLabels(trainingsetPanel, 1);
     JButton nextEditTrainingSetButton = new JButton("Add Songs");
-    nextEditTrainingSetButton.setFont(nextEditTrainingSetButton.getFont().deriveFont(20.0f));
+    nextEditTrainingSetButton.setFont(nextEditTrainingSetButton.getFont().deriveFont(32.0f));
     nextEditTrainingSetButton.setBackground(Color.CYAN);
     //nextEditTrainingSetButton.setBorder(new TextBubbleBorder(Color.BLUE,4,64,0, false));
     
