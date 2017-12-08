@@ -38,7 +38,7 @@ public class MelodySmithVST extends VSTPluginAdapter {
   public final static int NUM_PARAMS = PARAM_ID_OUT + 1;
 
   
-  private MelodySmithVSTGUI[] programs;
+  private MelodySmithVSTProgram[] programs;
   private float[] buffer;
   private float fDelay, fFeedBack, fOut;
   private int delay;
@@ -51,54 +51,35 @@ public class MelodySmithVST extends VSTPluginAdapter {
   
   public MelodySmithVST(long wrapper) {
     super(wrapper);
-    log("Construktor MelodySmith() START!");
+    log("Construktor JayDLay() START!");
 
     this.size = 44100;
     this.cursor = 0;
     this.delay = 0;
     this.buffer = new float[this.size];
 
-   // this.programs = new MelodySmithVSTGUI[0];
-//    try{
-//        this.programs = new MelodySmithVSTGUI[16];
-//        for (int i = 0; i < this.programs.length; i++) {
-//          this.programs[i] = new MelodySmithVSTGUI(null,null);
-//        }
-//    } catch(Exception e) {
-//        log("unable to set programs to melodysmithvstgui");
-//        log(e.toString());
-//    }
-    
-    log("at this point - 1");
+    this.programs = new MelodySmithVSTProgram[16];
+    for (int i = 0; i < this.programs.length; i++) {
+      this.programs[i] = new MelodySmithVSTProgram();
+    }
     this.fDelay = this.fFeedBack = 0F;
     this.fOut = 1.0F;
+
     
-//    try{
-//        this.gui = new MelodySmithVSTGUI(null,null);
-//    } catch(Exception e) {
-//        log("tried to set this.gui but got exception:");
-//        log(e.toString());
-//    }
-    
-    log("at this point - 2");
     //this is bad practice and causes npes on the mac (threading issue)
     //dont call gui stuff before the gui is initialized (which is not the case in the plug constructor)
     this.setProgram(0);
-    
-    log("at this point - 3");
 
     //communicate with the host
     this.setNumInputs(1);// mono input
     this.setNumOutputs(1);// mono output
     //this.hasVu(false); //deprecated as of vst2.4
     this.canProcessReplacing(true);//mandatory for vst 2.4!
-    this.setUniqueID('m'<<24 | 'l'<<16 | 'd'<<8 | 's');//random unique number registered at steinberg (4 byte)
-    
-    log("at this point - 4");
+    this.setUniqueID('j'<<24 | 'D'<<16 | 'l'<<8 | 'y');//random unique number registered at steinberg (4 byte)
 
     this.canMono(true); 
 
-    log("Construktor MelodySmith() INVOKED!");
+    log("Construktor JayDLay() INVOKED!");
   }
 
 
@@ -161,8 +142,7 @@ public class MelodySmithVST extends VSTPluginAdapter {
 
   public int getNumPrograms() {
     log("getNumPrograms");
-    return 0;
-    //return this.programs.length;
+    return this.programs.length;
   }
 
   public int getNumParams() {
@@ -207,41 +187,41 @@ public class MelodySmithVST extends VSTPluginAdapter {
   }
 
   public String getProductString() {
-    return "MelodySmith 1.0";
+    return "JayDLay 1.0";
   }
 
   public void setProgram(int index) {
-    // dp = this.programs[index];
+    MelodySmithVSTProgram dp = this.programs[index];
 
     //log("setProgram index=" + index);
     
     this.currentProgram = index;
 
-//    this.setParameter(PARAM_ID_DELAY, dp.getDelay());
-//    this.setParameter(PARAM_ID_FEEDBACK, dp.getFeedback());
-//    this.setParameter(PARAM_ID_OUT, dp.getOut());
+    this.setParameter(PARAM_ID_DELAY, dp.getDelay());
+    this.setParameter(PARAM_ID_FEEDBACK, dp.getFeedback());
+    this.setParameter(PARAM_ID_OUT, dp.getOut());
     
     updateGUI();
   }
 
   public void setParameter(int index, float value) {
-//    DelayProgram dp = this.programs[this.currentProgram];
-//
-//    //log("setParameter index=" + index + " value=" + value);
-//    
-//    switch (index) {
-//        case PARAM_ID_DELAY:
-//          this.setDelay(value);
-//          break;
-//        case PARAM_ID_FEEDBACK:
-//          this.fFeedBack = value;
-//          dp.setFeedback(value);
-//          break;
-//        case PARAM_ID_OUT:
-//          this.fOut = value;
-//          dp.setOut(value);
-//          break;
-//    }
+    MelodySmithVSTProgram dp = this.programs[this.currentProgram];
+
+    //log("setParameter index=" + index + " value=" + value);
+    
+    switch (index) {
+        case PARAM_ID_DELAY:
+          this.setDelay(value);
+          break;
+        case PARAM_ID_FEEDBACK:
+          this.fFeedBack = value;
+          dp.setFeedback(value);
+          break;
+        case PARAM_ID_OUT:
+          this.fOut = value;
+          dp.setOut(value);
+          break;
+    }
     
     updateGUI();
   }
@@ -355,7 +335,7 @@ public class MelodySmithVST extends VSTPluginAdapter {
 
   private void setDelay(float fdelay) {
     this.fDelay = fdelay;
-    //this.programs[this.currentProgram].setDelay(fdelay);
+    this.programs[this.currentProgram].setDelay(fdelay);
     //this.cursor = 0;
     this.delay = (int)(fdelay * (float)(size - 1));
   }
@@ -395,23 +375,23 @@ public class MelodySmithVST extends VSTPluginAdapter {
  * @author dm
  * @version 1.0
  */
-//class DelayProgram {
-//  private String name = "Init";
-//  private float delay = 0.5F;
-//  private float feedback = 0.5F;
-//  private float out = 1F;
-//
-//
-//
-//  public String getName() { return this.name; }
-//  public void setName(String name) { this.name = name; }
-//
-//  public float getDelay() { return this.delay; }
-//  public void setDelay(float delay) { this.delay = delay; }
-//
-//  public float getFeedback() { return this.feedback; }
-//  public void setFeedback(float feedback) { this.feedback = feedback; }
-//
-//  public float getOut() { return this.out; }
-//  public void setOut(float out) { this.out = out; }
-//}
+class MelodySmithVSTProgram {
+  private String name = "Init";
+  private float delay = 0.5F;
+  private float feedback = 0.5F;
+  private float out = 1F;
+  
+
+
+  public String getName() { return this.name; }
+  public void setName(String name) { this.name = name; }
+
+  public float getDelay() { return this.delay; }
+  public void setDelay(float delay) { this.delay = delay; }
+
+  public float getFeedback() { return this.feedback; }
+  public void setFeedback(float feedback) { this.feedback = feedback; }
+
+  public float getOut() { return this.out; }
+  public void setOut(float out) { this.out = out; }
+}
