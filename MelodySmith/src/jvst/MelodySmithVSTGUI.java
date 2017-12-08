@@ -74,6 +74,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   ImageIcon fireForgeIcon = null;
   ImageIcon fireForgeIconHover = null;
   ImageIcon anvilReforgeIcon = null; 
+  ImageIcon anvilReforgeIconHover = null;
   
   JPanel secondCol;
   boolean isCMajor = true;
@@ -438,9 +439,16 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //JLabel fireForgeLabel = new JLabel();
     
     try {
-        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/anvil_recast.png"));
+        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/anvil_recast2.png"));
         ImageIcon icon = new ImageIcon(img);
         anvilReforgeIcon = icon;
+    } catch(Exception e) {
+        System.out.println(e.toString());
+    }
+    try {
+        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/anvil_recast_hover.png"));
+        ImageIcon icon = new ImageIcon(img);
+        anvilReforgeIconHover = icon;
     } catch(Exception e) {
         System.out.println(e.toString());
     }
@@ -485,9 +493,19 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
    
    
     //Key Chooser
+    JPanel keyandKeyTextPanel = new JPanel();
+    keyandKeyTextPanel.setBackground(Color.BLACK);
+    keyandKeyTextPanel.setLayout(new GridLayout(4,1));
+    
+    JLabel keyLabel = new JLabel("KEY");
+    keyLabel.setForeground(Color.WHITE);
+    keyLabel.setFont(keyLabel.getFont().deriveFont(32.0F));
+    keyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    
     JPanel keyPanel = new JPanel();
     keyPanel.setBackground(Color.BLACK);
-    keyPanel.setLayout(new GridLayout(5,4));
+    keyPanel.setLayout(new GridLayout(1,4)); 
+    
     
     JButton cMajorButton = new JButton("C");
     cMajorButton.setBackground(Color.GREEN);
@@ -698,10 +716,15 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         }
     });
     
-    addEmptyLabels(keyPanel,4);
+    addEmptyLabels(keyPanel,1);
     keyPanel.add(cMajorButton);
     keyPanel.add(aMinorButton);
-    addEmptyLabels(keyPanel, 9);
+    addEmptyLabels(keyPanel, 1);
+    
+    addEmptyLabels(keyandKeyTextPanel,1);
+    keyandKeyTextPanel.add(keyLabel);
+    keyandKeyTextPanel.add(keyPanel);
+    addEmptyLabels(keyandKeyTextPanel,1);
     
     //Forge Panel - TODO
     JPanel forgePanel = new JPanel();
@@ -757,6 +780,18 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     JLabel anvilReforgeLabel = new JLabel(anvilReforgeIcon);
     anvilReforgeLabel.addMouseListener(new MouseAdapter()  
     {  
+        @Override
+         public void mouseEntered(MouseEvent e) {
+    		 anvilReforgeLabel.setIcon(anvilReforgeIconHover);
+                 anvilReforgeLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                 
+         }
+         @Override
+         public void mouseExited(MouseEvent e) {
+    		anvilReforgeLabel.setIcon(anvilReforgeIcon);
+                anvilReforgeLabel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+         }
         public void mouseClicked(MouseEvent e)  
         {  
            // you can open a new frame here as
@@ -787,11 +822,13 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     	 @Override
          public void mouseEntered(MouseEvent e) {
     		 fireForgedLabel.setIcon(fireForgeIconHover);
-    		 
+             fireForgedLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
          }
          @Override
          public void mouseExited(MouseEvent e) {
     		 fireForgedLabel.setIcon(fireForgeIcon);
+                fireForgedLabel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
          }
         @Override
@@ -812,7 +849,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     });
     
     secondCol.add(anvilReforgeLabel);
-    secondCol.add(keyPanel);
+    secondCol.add(keyandKeyTextPanel);
     secondCol.add(fireForgedLabel);
     
     
