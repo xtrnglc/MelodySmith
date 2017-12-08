@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/trungle/Documents/workspace/MelodySmith/MelodySmith/lib/jVSTwRapper-1.0beta.jar"/>
 	<classpathentry kind="lib" path="/Users/trungle/Documents/workspace/MelodySmith/MelodySmith/lib/jVSTsYstem-1.0beta.jar"/>
+	<classpathentry kind="lib" path="/Users/trungle/Documents/workspace/MelodySmith/MelodySmith/lib/commons-io-2.6.jar"/>
+	<classpathentry kind="lib" path="/Users/trungle/Documents/workspace/MelodySmith/MelodySmith/lib/commons-lang3-3.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

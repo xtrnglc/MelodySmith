@@ -60,7 +60,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   
   protected static String currDirectoryPathName;
   final int width = 750;
-  final int height = 900;
+  final int height = 700;
   
   protected FileAndArtistName[] currentFileAndArtistNames = null;
   public JTextField[] artistNameFields = null;
@@ -70,6 +70,10 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   String newDirectoryName;
   File newDirectory;
   String currentAbsolutePath;
+  
+  ImageIcon fireForgeIcon = null;
+  ImageIcon fireForgeIconHover = null;
+  ImageIcon anvilReforgeIcon = null; 
   
   JPanel secondCol;
   boolean isCMajor = true;
@@ -433,9 +437,8 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //JLabel anvilReforgeLabel = new JLabel();
     //JLabel fireForgeLabel = new JLabel();
     
-    ImageIcon anvilReforgeIcon = null; 
     try {
-        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "\\anvil_recast.png"));
+        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/anvil_recast.png"));
         ImageIcon icon = new ImageIcon(img);
         anvilReforgeIcon = icon;
     } catch(Exception e) {
@@ -704,14 +707,22 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     forgePanel.setBackground(Color.BLACK);
     forgePanel.setLayout(new GridLayout(5,3));
     
-    ImageIcon fireForgeIcon = null; 
+ 
     try {
-        Image img = ImageIO.read(new File(currentAbsolutePath + "\\forge_fire.png"));
+        Image img = ImageIO.read(new File(currentAbsolutePath + "/forge_fire2.png"));
         ImageIcon icon = new ImageIcon(img);
         fireForgeIcon = icon;
     } catch(Exception e) {
         System.out.println(e.toString());
-    }    
+    }  
+    
+    try {
+        Image img = ImageIO.read(new File(currentAbsolutePath + "/forge_fire_hover.png"));
+        ImageIcon icon = new ImageIcon(img);
+        fireForgeIconHover = icon;
+    } catch(Exception e) {
+        System.out.println(e.toString());
+    }  
     
 //    JButton forgeButton = new JButton("Forge");
 //    forgeButton.setBackground(Color.ORANGE);
@@ -770,11 +781,37 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         }  
     });
     
-    
+    JLabel fireForgedLabel = new JLabel(fireForgeIcon);
+    fireForgedLabel.addMouseListener(new MouseAdapter() {
+    	 @Override
+         public void mouseEntered(MouseEvent e) {
+    		 fireForgedLabel.setIcon(fireForgeIconHover);
+         }
+         @Override
+         public void mouseExited(MouseEvent e) {
+    		 fireForgedLabel.setIcon(fireForgeIcon);
+
+         }
+        @Override
+        public void mouseClicked(MouseEvent e) {
+        	System.out.println("Calling alex");
+            for(int i = 0; i < influenceTextFields.length; i++) {
+                artistGroupings[i].artistInfluence = Double.parseDouble(influenceTextFields[i].getText()); 
+            }
+            ArtistGrouping[] currArtistGroupings = artistGroupings;
+            for(ArtistGrouping ag: currArtistGroupings) {
+                System.out.println(ag.artistName + ", " + ag.artistInfluence);
+            }
+            boolean currKey = isCMajor;
+            Composer composer = new Composer(currArtistGroupings);
+            composer.composeMelody("file.mid", 200, currKey);
+        }
+
+    });
     
     secondCol.add(anvilReforgeLabel);
     secondCol.add(keyPanel);
-    secondCol.add(new JLabel(fireForgeIcon));
+    secondCol.add(fireForgedLabel);
     
     
     
@@ -1061,8 +1098,6 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
       trainingsetPanel.add(influencesLabel);
       addEmptyLabels(trainingsetPanel, 1);
       
-      
-      
       this.influenceTextFields = new JTextField[this.artistGroupings.length];
       for(int i = 0; i < this.artistGroupings.length; i++) {
           
@@ -1072,6 +1107,9 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
 
           JSlider influenceSlider = new JSlider(0,100,0);
           influenceSlider.setBackground(Color.BLACK);
+          influenceSlider.setPaintTicks(true);
+          influenceSlider.setPaintLabels(true);
+          influenceSlider.setMinorTickSpacing(10);
           //influenceSlider.setBackground(new Color(0,0,0,64));
           //firstCol.add(influenceSlider);
 
