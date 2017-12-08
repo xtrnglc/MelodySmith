@@ -19,6 +19,7 @@ public class AssociationNetwork {
 	double maxDistanceFromTonic = -1.0;
 	double averageDistanceToCadence = -1.0;
 	double maxDistanceToCadence = -1.0;
+	int size = 0;
 	
 	void addAllNotes() {
 		for(Song song : corpus) {
@@ -78,8 +79,10 @@ public class AssociationNetwork {
 					+ scaleWeight
 					+ Composer.getArtistWeight(newNode.artist);
 			
-			if(weight > 4.0)
+			if(weight > 4.0) {
 				newNode.linkNodes(node, weight, reverseWeight);
+				size++;
+			}
 		}
 		network.add(newNode);
 	}
@@ -113,7 +116,10 @@ public class AssociationNetwork {
 				mostLikelyLink = link;
 			}
 		}
-		return mostLikelyLink.endNode;
+		if(mostLikelyLink == null)
+			return getTonic();
+		else
+			return mostLikelyLink.endNode;
 	}
 	
 	void calculateNetworkStatistics() {

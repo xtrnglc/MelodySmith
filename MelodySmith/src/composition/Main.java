@@ -10,8 +10,8 @@ public class Main {
 	static int[] AMINOR = {57, 59, 60, 62, 64, 65, 67, 69};
 	
 	public static void main(String[] args) {
-		Composer composer = new Composer("midiReaderData");
-		composer.composeMelody("beatles2.mid", 100, true);
+		Composer composer = new Composer("midiReaderData/bass");
+		composer.composeMelody("bassLine2.mid", 100, true);
 		System.out.println();
 	}
 
