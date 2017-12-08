@@ -280,7 +280,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     JLabel trainingsetPanelMarginLabel = new JLabel("CORPUS");
     trainingsetPanelMarginLabel.setForeground(Color.WHITE);
     trainingsetPanelMarginLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    trainingsetPanelMarginLabel.setFont(trainingsetPanelMarginLabel.getFont().deriveFont(32.0f));
+    trainingsetPanelMarginLabel.setFont(trainingsetPanelMarginLabel.getFont().deriveFont(20.0f));
     
     trainingsetPanelVerticalMargin.add(trainingsetPanelMarginLabel);
     firstCol.add(trainingsetPanelVerticalMargin);
@@ -497,6 +497,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     aMinorButton.setFont(aMinorButton.getFont().deriveFont(32.0F));
     aMinorButton.setBackground(Color.CYAN);
     aMinorButton.setForeground(Color.BLACK);
+    
     
 
     cMajorButton.addActionListener(new ActionListener() {
@@ -786,6 +787,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     	 @Override
          public void mouseEntered(MouseEvent e) {
     		 fireForgedLabel.setIcon(fireForgeIconHover);
+    		 
          }
          @Override
          public void mouseExited(MouseEvent e) {
@@ -1128,7 +1130,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
           JTextField influenceTextField = new JTextField("0");
           influenceTextField.setForeground(Color.lightGray);
           influenceTextField.setBackground(Color.BLACK);
-          influenceTextField.setFont(influenceTextField.getFont().deriveFont(20.0F));
+          influenceTextField.setFont(influenceTextField.getFont().deriveFont(15.0F));
           influenceTextField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.ORANGE));
           
           JLabel influencePercentageSign = new JLabel("%");
@@ -1238,7 +1240,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //Add songs for training corpus data editing
     addEmptyLabels(trainingsetPanel, 1);
     JButton nextEditTrainingSetButton = new JButton("Add Songs");
-    nextEditTrainingSetButton.setFont(nextEditTrainingSetButton.getFont().deriveFont(32.0f));
+    nextEditTrainingSetButton.setFont(nextEditTrainingSetButton.getFont().deriveFont(18.0f));
     nextEditTrainingSetButton.setBackground(Color.CYAN);
     //nextEditTrainingSetButton.setBorder(new TextBubbleBorder(Color.BLUE,4,64,0, false));
     
