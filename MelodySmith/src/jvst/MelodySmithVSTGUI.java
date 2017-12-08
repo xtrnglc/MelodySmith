@@ -694,7 +694,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
         }
     });
     
-    addEmptyLabels(keyPanel, 9);
+    addEmptyLabels(keyPanel,4);
     keyPanel.add(cMajorButton);
     keyPanel.add(aMinorButton);
     addEmptyLabels(keyPanel, 9);
@@ -742,6 +742,28 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //Image resizedImage = 
     //img.getScaledInstance(lblDisPic.getWidth(), lblDisPic.getHeight(), null);
     
+    JLabel anvilReforgeLabel = new JLabel(anvilReforgeIcon);
+    anvilReforgeLabel.addMouseListener(new MouseAdapter()  
+    {  
+        public void mouseClicked(MouseEvent e)  
+        {  
+           // you can open a new frame here as
+           // i have assumed you have declared "frame" as instance variable
+            isManageTab = true;
+
+            manageButton.setBackground(Color.ORANGE);
+            manageButton.setForeground(Color.WHITE);
+            influencesButton.setBackground(Color.BLACK);
+            influencesButton.setForeground(Color.WHITE);
+            manageAndInfluencesTabsPanel.repaint();
+
+            trainingsetPanel.removeAll();
+            showTrainingSetDataEditing(trainingsetPanel);
+            trainingsetPanel.revalidate();
+            trainingsetPanel.repaint();
+
+        }  
+    });
     
     secondCol.add(new JLabel(anvilReforgeIcon));
     secondCol.add(keyPanel);
