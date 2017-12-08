@@ -45,7 +45,7 @@ public class Composer {
 		boolean lastWasRest = false;
 		for(int i = 0; i < lengthInNotes; i++) {
 			alreadyChosen.add(currentNode);
-			if(alreadyChosen.size() > 100)
+			if(alreadyChosen.size() > network.size/2)
 				alreadyChosen.remove(0);
 			
 			if(currentNode.linkedNodes.size() > 0) {
