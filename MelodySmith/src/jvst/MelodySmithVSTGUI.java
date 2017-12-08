@@ -48,19 +48,19 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
 
   private static final long serialVersionUID = -8641024370578430211L;
 
-  JSlider DelaySlider;
-  JSlider FeedbackSlider;
-  JSlider VolumeSlider;
-  JTextField DelayText;
-  JTextField FeedbackText;
-  JTextField VolumeText;
+//  JSlider DelaySlider;
+//  JSlider FeedbackSlider;
+//  JSlider VolumeSlider;
+//  JTextField DelayText;
+//  JTextField FeedbackText;
+//  JTextField VolumeText;
 
-  private VSTPluginAdapter pPlugin;
+  private VSTPluginAdapter plugin;
   protected static boolean DEBUG = false;
   
   protected static String currDirectoryPathName;
-  final int width = 1500;
-  final int height = 1800;
+  final int width = 750;
+  final int height = 900;
   
   protected FileAndArtistName[] currentFileAndArtistNames = null;
   public JTextField[] artistNameFields = null;
@@ -94,7 +94,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     this.setSize(width, height);
     this.setResizable(false);
     
-    this.pPlugin = plug;
+    this.plugin = plug;
     
     this.currDirectoryPathName = null;
     this.currentFileAndArtistNames = new FileAndArtistName[0];
@@ -124,8 +124,12 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
   } 
 
 
-  public void init() {    
-      //((MelodySmithVST)plugin).gui=this;
+  public void init() {   
+      
+      System.out.println("Made it here, congrats");
+      if (!DEBUG) {
+        ((MelodySmithVST)plugin).gui=this;          
+      }
 //    if (!DEBUG) {
 //    	((MelodySmithVST)plugin).gui=this; //tell the plug that it has a gui!
 //    	
@@ -424,8 +428,10 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //Second column
     this.secondCol = new JPanel();
     secondCol.setBackground(Color.BLACK);
-    
     secondCol.setLayout(new GridLayout(0,1));
+    
+    //JLabel anvilReforgeLabel = new JLabel();
+    //JLabel fireForgeLabel = new JLabel();
     
     ImageIcon anvilReforgeIcon = null; 
     try {
@@ -700,7 +706,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     
     ImageIcon fireForgeIcon = null; 
     try {
-        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "\\forge_fire.png"));
+        Image img = ImageIO.read(new File(currentAbsolutePath + "\\forge_fire.png"));
         ImageIcon icon = new ImageIcon(img);
         fireForgeIcon = icon;
     } catch(Exception e) {
@@ -733,6 +739,8 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //forgePanel.add(new JLabel(fireForgeIcon));
     //addEmptyLabels(forgePanel, 7);    
     
+    //Image resizedImage = 
+    //img.getScaledInstance(lblDisPic.getWidth(), lblDisPic.getHeight(), null);
     
     
     secondCol.add(new JLabel(anvilReforgeIcon));
@@ -935,30 +943,30 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
    *  Slider value has changed...
    */
   public void stateChanged(ChangeEvent e) {
-    JSlider sl = (JSlider)e.getSource();
-    
-    if (!DEBUG) {
-	    if (sl == this.VolumeSlider) {
-	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_OUT, (float)((float)sl.getValue() / 100F));
-	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_OUT, (float)((float)sl.getValue() / 100F));
-	      this.VolumeText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_OUT));
-	    }
-	    else if (sl == this.FeedbackSlider) {
-	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_FEEDBACK, (float)((float)sl.getValue() / 100F));
-	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_FEEDBACK, (float)((float)sl.getValue() / 100F));
-	      this.FeedbackText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_FEEDBACK));
-	    }
-	    else if (sl == this.DelaySlider) {
-	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_DELAY, (float)((float)sl.getValue() / 100F));
-	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_DELAY, (float)((float)sl.getValue() / 100F));
-	      this.DelayText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_DELAY));
-	    }
-    }
+//    JSlider sl = (JSlider)e.getSource();
+//    
+//    if (!DEBUG) {
+//	    if (sl == this.VolumeSlider) {
+//	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_OUT, (float)((float)sl.getValue() / 100F));
+//	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_OUT, (float)((float)sl.getValue() / 100F));
+//	      this.VolumeText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_OUT));
+//	    }
+//	    else if (sl == this.FeedbackSlider) {
+//	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_FEEDBACK, (float)((float)sl.getValue() / 100F));
+//	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_FEEDBACK, (float)((float)sl.getValue() / 100F));
+//	      this.FeedbackText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_FEEDBACK));
+//	    }
+//	    else if (sl == this.DelaySlider) {
+//	      //this.pPlugin.setParameter(DelayProgram.PARAM_ID_DELAY, (float)((float)sl.getValue() / 100F));
+//	      this.pPlugin.setParameterAutomated(MelodySmithVST.PARAM_ID_DELAY, (float)((float)sl.getValue() / 100F));
+//	      this.DelayText.setText(this.pPlugin.getParameterDisplay(MelodySmithVST.PARAM_ID_DELAY));
+//	    }
+//    }
   }
 
   
   public static void main(String[] args) throws Throwable {
-	DEBUG=true;
+      DEBUG=true;
 	
     MelodySmithVSTGUI gui = new MelodySmithVSTGUI(null,null);
     gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -1019,7 +1027,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
       //Influence title
       addEmptyLabels(trainingsetPanel, 1);
       JLabel influencesLabel = new JLabel("Influences");
-      influencesLabel.setFont(influencesLabel.getFont().deriveFont(32.0f));
+      influencesLabel.setFont(influencesLabel.getFont().deriveFont(20.0f));
       influencesLabel.setForeground(Color.WHITE);
       trainingsetPanel.add(influencesLabel);
       addEmptyLabels(trainingsetPanel, 1);

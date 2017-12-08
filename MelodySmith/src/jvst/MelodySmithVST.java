@@ -1,14 +1,31 @@
-/*
- * References:
- * http://jvstwrapper.sourceforge.net/
+/* 
+ * jVSTwRapper - The Java way into VST world!
+ * 
+ * jVSTwRapper is an easy and reliable Java Wrapper for the Steinberg VST interface. 
+ * It enables you to develop VST 2.3 compatible audio plugins and virtual instruments 
+ * plus user interfaces with the Java Programming Language. 3 Demo Plugins(+src) are included!
+ * 
+ * Copyright (C) 2006  Daniel Martin [daniel309@users.sourceforge.net] 
+ * 					   and many others, see CREDITS.txt
+ *
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 package jvst;
 
-/**
- *
- * @author Team AudioMIDIum, University of Utah Senior Project 2017-2018
- */
 
 import jvst.wrapper.*;
 
@@ -21,7 +38,7 @@ public class MelodySmithVST extends VSTPluginAdapter {
   public final static int NUM_PARAMS = PARAM_ID_OUT + 1;
 
   
-  private DelayProgram[] programs;
+  private MelodySmithVSTGUI[] programs;
   private float[] buffer;
   private float fDelay, fFeedBack, fOut;
   private int delay;
@@ -34,35 +51,54 @@ public class MelodySmithVST extends VSTPluginAdapter {
   
   public MelodySmithVST(long wrapper) {
     super(wrapper);
-    log("Constructor MelodySmithVST() START!");
+    log("Construktor MelodySmith() START!");
 
     this.size = 44100;
     this.cursor = 0;
     this.delay = 0;
     this.buffer = new float[this.size];
 
-    this.programs = new DelayProgram[16];
-    for (int i = 0; i < this.programs.length; i++) {
-      this.programs[i] = new DelayProgram();
-    }
+   // this.programs = new MelodySmithVSTGUI[0];
+//    try{
+//        this.programs = new MelodySmithVSTGUI[16];
+//        for (int i = 0; i < this.programs.length; i++) {
+//          this.programs[i] = new MelodySmithVSTGUI(null,null);
+//        }
+//    } catch(Exception e) {
+//        log("unable to set programs to melodysmithvstgui");
+//        log(e.toString());
+//    }
+    
+    log("at this point - 1");
     this.fDelay = this.fFeedBack = 0F;
     this.fOut = 1.0F;
-
     
+//    try{
+//        this.gui = new MelodySmithVSTGUI(null,null);
+//    } catch(Exception e) {
+//        log("tried to set this.gui but got exception:");
+//        log(e.toString());
+//    }
+    
+    log("at this point - 2");
     //this is bad practice and causes npes on the mac (threading issue)
     //dont call gui stuff before the gui is initialized (which is not the case in the plug constructor)
     this.setProgram(0);
+    
+    log("at this point - 3");
 
     //communicate with the host
     this.setNumInputs(1);// mono input
     this.setNumOutputs(1);// mono output
     //this.hasVu(false); //deprecated as of vst2.4
     this.canProcessReplacing(true);//mandatory for vst 2.4!
-    this.setUniqueID('j'<<24 | 'D'<<16 | 'l'<<8 | 'y');//random unique number registered at steinberg (4 byte)
+    this.setUniqueID('m'<<24 | 'l'<<16 | 'd'<<8 | 's');//random unique number registered at steinberg (4 byte)
+    
+    log("at this point - 4");
 
     this.canMono(true); 
 
-    log("Constructor MelodySmithVST() INVOKED!");
+    log("Construktor MelodySmith() INVOKED!");
   }
 
 
@@ -109,7 +145,7 @@ public class MelodySmithVST extends VSTPluginAdapter {
     return ret;
   }
 
-  public String getVendorString() { return "Team AudioMIDIum"; }
+  public String getVendorString() { return "jVSTwRapper"; }
 
   public int getPlugCategory() {
     log("getPlugCategory");
@@ -125,7 +161,8 @@ public class MelodySmithVST extends VSTPluginAdapter {
 
   public int getNumPrograms() {
     log("getNumPrograms");
-    return this.programs.length;
+    return 0;
+    //return this.programs.length;
   }
 
   public int getNumParams() {
@@ -170,47 +207,47 @@ public class MelodySmithVST extends VSTPluginAdapter {
   }
 
   public String getProductString() {
-    return "MelodySmith";
+    return "MelodySmith 1.0";
   }
 
   public void setProgram(int index) {
-    DelayProgram dp = this.programs[index];
+    // dp = this.programs[index];
 
     //log("setProgram index=" + index);
     
     this.currentProgram = index;
 
-    this.setParameter(PARAM_ID_DELAY, dp.getDelay());
-    this.setParameter(PARAM_ID_FEEDBACK, dp.getFeedback());
-    this.setParameter(PARAM_ID_OUT, dp.getOut());
+//    this.setParameter(PARAM_ID_DELAY, dp.getDelay());
+//    this.setParameter(PARAM_ID_FEEDBACK, dp.getFeedback());
+//    this.setParameter(PARAM_ID_OUT, dp.getOut());
     
     updateGUI();
   }
 
   public void setParameter(int index, float value) {
-    DelayProgram dp = this.programs[this.currentProgram];
-
-    //log("setParameter index=" + index + " value=" + value);
-    
-    switch (index) {
-        case PARAM_ID_DELAY:
-          this.setDelay(value);
-          break;
-        case PARAM_ID_FEEDBACK:
-          this.fFeedBack = value;
-          dp.setFeedback(value);
-          break;
-        case PARAM_ID_OUT:
-          this.fOut = value;
-          dp.setOut(value);
-          break;
-    }
+//    DelayProgram dp = this.programs[this.currentProgram];
+//
+//    //log("setParameter index=" + index + " value=" + value);
+//    
+//    switch (index) {
+//        case PARAM_ID_DELAY:
+//          this.setDelay(value);
+//          break;
+//        case PARAM_ID_FEEDBACK:
+//          this.fFeedBack = value;
+//          dp.setFeedback(value);
+//          break;
+//        case PARAM_ID_OUT:
+//          this.fOut = value;
+//          dp.setOut(value);
+//          break;
+//    }
     
     updateGUI();
   }
 
   public String getEffectName() {
-    return "MelodySmith Effect";
+    return "JayDLay";
   }
 
   public String getParameterLabel(int index) {
@@ -318,7 +355,7 @@ public class MelodySmithVST extends VSTPluginAdapter {
 
   private void setDelay(float fdelay) {
     this.fDelay = fdelay;
-    this.programs[this.currentProgram].setDelay(fdelay);
+    //this.programs[this.currentProgram].setDelay(fdelay);
     //this.cursor = 0;
     this.delay = (int)(fdelay * (float)(size - 1));
   }
@@ -331,22 +368,22 @@ public class MelodySmithVST extends VSTPluginAdapter {
 	//for thread savety on the mac, never call gui stuff in the constructor of the plugin
 	//init the gui defaults always when the gui is loaded, not when the plug is loaded.
 	
-	if (	gui!=null && 
-			gui.DelaySlider!=null && 
-			gui.DelayText!=null && 
-			gui.FeedbackSlider!=null && 
-			gui.FeedbackText!=null && 
-			gui.VolumeSlider!=null && 
-			gui.VolumeText!=null) {
-	    gui.DelaySlider.setValue((int)(this.getParameter(PARAM_ID_DELAY) * 100F));
-	    gui.DelayText.setText(this.getParameterDisplay(PARAM_ID_DELAY));
-	    
-	    gui.FeedbackSlider.setValue((int)(this.getParameter(PARAM_ID_FEEDBACK) * 100F));
-	    gui.FeedbackText.setText(this.getParameterDisplay(PARAM_ID_FEEDBACK));
-	    
-	    gui.VolumeSlider.setValue((int)(this.getParameter(PARAM_ID_OUT) * 100F));
-	    gui.VolumeText.setText(this.getParameterDisplay(PARAM_ID_OUT)); 
-	}
+//	if (	gui!=null && 
+//			gui.DelaySlider!=null && 
+//			gui.DelayText!=null && 
+//			gui.FeedbackSlider!=null && 
+//			gui.FeedbackText!=null && 
+//			gui.VolumeSlider!=null && 
+//			gui.VolumeText!=null) {
+//	    gui.DelaySlider.setValue((int)(this.getParameter(PARAM_ID_DELAY) * 100F));
+//	    gui.DelayText.setText(this.getParameterDisplay(PARAM_ID_DELAY));
+//	    
+//	    gui.FeedbackSlider.setValue((int)(this.getParameter(PARAM_ID_FEEDBACK) * 100F));
+//	    gui.FeedbackText.setText(this.getParameterDisplay(PARAM_ID_FEEDBACK));
+//	    
+//	    gui.VolumeSlider.setValue((int)(this.getParameter(PARAM_ID_OUT) * 100F));
+//	    gui.VolumeText.setText(this.getParameterDisplay(PARAM_ID_OUT)); 
+//	}
   }
   
 }
@@ -378,30 +415,3 @@ public class MelodySmithVST extends VSTPluginAdapter {
 //  public float getOut() { return this.out; }
 //  public void setOut(float out) { this.out = out; }
 //}
-
-/**
- * Helper Class (VO) for the support of different presets for the plug
- * if you are using no gui (comment PluginUIClass out in jVSTwRapper.ini)
- * @author dm
- * @version 1.0
- */
-class DelayProgram {
-  private String name = "Init";
-  private float delay = 0.5F;
-  private float feedback = 0.5F;
-  private float out = 1F;
-
-
-
-  public String getName() { return this.name; }
-  public void setName(String name) { this.name = name; }
-
-  public float getDelay() { return this.delay; }
-  public void setDelay(float delay) { this.delay = delay; }
-
-  public float getFeedback() { return this.feedback; }
-  public void setFeedback(float feedback) { this.feedback = feedback; }
-
-  public float getOut() { return this.out; }
-  public void setOut(float out) { this.out = out; }
-}
