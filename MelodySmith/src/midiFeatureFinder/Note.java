@@ -57,9 +57,21 @@ public class Note {
 		if (bpm != 0) {
 			this.bpm = bpm;
 		}
-		scaleDegree = setScaleDegree();
+		scaleDegree = getScaleDegree();
     }
     
+    /**
+     * Regular note constructor
+     * @param key
+     * @param velocity
+     * @param channel
+     * @param startTick
+     * @param song
+     * @param instrument
+     * @param keySignature
+     * @param timeSignature
+     * @param bpm
+     */
 	public Note(int key, int velocity, int channel, long startTick, 
 			String song, String instrument, String keySignature, 
 			String timeSignature, float bpm) {
@@ -81,13 +93,23 @@ public class Note {
 		if (bpm != 0) {
 			this.bpm = bpm;
 		}
-		scaleDegree = setScaleDegree();
+		scaleDegree = getScaleDegree();
 	}
 	
+	/**
+	 * Compares the keys of this and note
+	 * @param note
+	 * @return this.key - note.key
+	 */
 	public int compareTo(Note note) {
 		return this.key - note.key;
 	}
 	
+	/**
+	 * Turns off this note, sets the tickDuration and the noteDuration
+	 * @param endTick
+	 * @param ticksPerQuarterNote
+	 */
 	public void turnOff(long endTick, int ticksPerQuarterNote) {
 		tickDuration = endTick - startTick;
 		
@@ -116,7 +138,11 @@ public class Note {
 		}
 	}
 	
-	private int setScaleDegree() {
+	/**
+	 * Helper method to process the scale degree from the note name and Key Signature
+	 * @return
+	 */
+	private int getScaleDegree() {
 		String note = noteName.substring(0, 1);
 		String start = keySignature.substring(0, 1);
 		
