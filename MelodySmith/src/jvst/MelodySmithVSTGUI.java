@@ -132,8 +132,6 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
 
 
   public void init() {   
-      
-      System.out.println("Made it here, congrats");
       if (!DEBUG) {
         ((MelodySmithVST)plugin).gui=this;          
       }
@@ -441,14 +439,14 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     //JLabel fireForgeLabel = new JLabel();
     
     try {
-        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/anvil_recast2.png"));
+        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/assets/anvil_recast2.png"));
         ImageIcon icon = new ImageIcon(img);
         anvilReforgeIcon = icon;
     } catch(Exception e) {
         System.out.println(e.toString());
     }
     try {
-        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/anvil_recast_hover.png"));
+        BufferedImage img = ImageIO.read(new File(currentAbsolutePath + "/assets/anvil_recast_hover.png"));
         ImageIcon icon = new ImageIcon(img);
         anvilReforgeIconHover = icon;
     } catch(Exception e) {
@@ -735,7 +733,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     
  
     try {
-        Image img = ImageIO.read(new File(currentAbsolutePath + "/forge_fire2.png"));
+        Image img = ImageIO.read(new File(currentAbsolutePath + "/assets/forge_fire2.png"));
         ImageIcon icon = new ImageIcon(img);
         fireForgeIcon = icon;
     } catch(Exception e) {
@@ -743,7 +741,7 @@ public class MelodySmithVSTGUI extends VSTPluginGUIAdapter implements ChangeList
     }  
     
     try {
-        Image img = ImageIO.read(new File(currentAbsolutePath + "/forge_fire_hover.png"));
+        Image img = ImageIO.read(new File(currentAbsolutePath + "/assets/forge_fire_hover.png"));
         ImageIcon icon = new ImageIcon(img);
         fireForgeIconHover = icon;
     } catch(Exception e) {
