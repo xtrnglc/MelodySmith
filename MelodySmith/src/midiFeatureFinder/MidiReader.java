@@ -97,6 +97,20 @@ public class MidiReader {
 		}
 		return ret;
 	}
+	
+	public Hashtable<Integer, ArrayList<Note>> getCurrentNotes() {
+		// CurrentNotes is used to keep track of all ongoing notes. This is
+		// of the form channel -> active notes
+		unorderedNotes = new ArrayList<LinkedHashMap<Long, ArrayList<Note>>>();
+		
+		Hashtable<Integer, ArrayList<Note>> currentNotes = new Hashtable<Integer, ArrayList<Note>>();
+		
+		for (int i = 0; i < maxChannels; i++) {
+			unorderedNotes.add(new LinkedHashMap<Long, ArrayList<Note>>());
+			currentNotes.put(i, new ArrayList<Note>());
+		}
+		return currentNotes;
+	}
 
 	/**
 	 * Reads in a sequence from midiFile and processes it tick by tick, storing
@@ -107,23 +121,15 @@ public class MidiReader {
 	 */
 	public void readSequence(File midiFile) {
 		try {
-			// CurrentNotes is used to keep track of all ongoing notes. This is
-			// of the form channel -> active notes
-			Hashtable<Integer, ArrayList<Note>> currentNotes = new Hashtable<Integer, ArrayList<Note>>();
-			unorderedNotes = new ArrayList<LinkedHashMap<Long, ArrayList<Note>>>();
-
 			// Rest Logic commented out for now because it doesn't work well
 			// with the association network
 			// long[] lastTickOfChannel = new long[maxChannels];
 
-			for (int i = 0; i < maxChannels; i++) {
-				unorderedNotes.add(new LinkedHashMap<Long, ArrayList<Note>>());
-				currentNotes.put(i, new ArrayList<Note>());
-			}
+			Hashtable<Integer, ArrayList<Note>> currentNotes = getCurrentNotes();
 
 			currentSequence = MidiSystem.getSequence(midiFile);
 
-			long currentTick = -1;
+			
 
 			// Currently the logic will only handle MIDI with PPQ division type
 			// This should not be a problem for the prototype as the SMPTE is
@@ -135,92 +141,7 @@ public class MidiReader {
 
 			for (Track track : currentSequence.getTracks()) {
 				for (int i = 0; i < track.size(); i++) {
-					MidiEvent event = track.get(i);
-
-					MidiMessage message = event.getMessage();
-					if (message instanceof ShortMessage) {
-						ShortMessage sMessage = (ShortMessage) message;
-
-						LinkedHashMap<Long, ArrayList<Note>> notes = unorderedNotes.get(sMessage.getChannel());
-
-						int key = sMessage.getData1();
-						int velocity = sMessage.getData2();
-
-						if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
-							// Only record half note rests or lower
-							// Rest Logic
-							// if (event.getTick() -
-							// lastTickOfChannel[sMessage.getChannel()] <
-							// (ticksPerQuarterNote * 2)) {
-							// Note rest = new Note(sMessage.getChannel(),
-							// lastTickOfChannel[sMessage.getChannel()],
-							// trackName, currentInstrument, currentKey,
-							// currentTime, currentBPM);
-							// rest.turnOff(event.getTick(),
-							// ticksPerQuarterNote);
-							//
-							// if
-							// (notes.get(lastTickOfChannel[sMessage.getChannel()])
-							// == null) {
-							// notes.put(lastTickOfChannel[sMessage.getChannel()],
-							// new ArrayList<Note>());
-							// }
-							//
-							// //notes.get(lastTickOfChannel[sMessage.getChannel()]).add(rest);
-							//
-							// //lastTickOfChannel[sMessage.getChannel()] = 0;
-							// }
-
-							// On a note_on event We add the same note object n
-							// to both currentNotes and unordered notes.
-							Note n = new Note(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
-									currentInstrument, currentKey, currentTime, currentBPM);
-							currentNotes.get(sMessage.getChannel()).add(n);
-
-							if (notes.get(event.getTick()) == null) {
-								currentTick = event.getTick();
-								notes.put(currentTick, new ArrayList<Note>());
-							}
-
-							notes.get(currentTick).add(n);
-						} else if (sMessage.getCommand() == NOTE_OFF || velocity == 0) {
-							ArrayList<Note> channelNotes = currentNotes.get(sMessage.getChannel());
-							Note n = null;
-
-							// Find the note in the channel in current notes and
-							// remove and store it
-							for (int k = 0; k < channelNotes.size(); k++) {
-								if (channelNotes.get(k).key == key) {
-									n = channelNotes.remove(k);
-
-									// Rest Logic
-									// if (channelNotes.size() == 0) {
-									// lastTickOfChannel[sMessage.getChannel()]
-									// = event.getTick();
-									// }
-
-									break;
-								}
-							}
-
-							// This may skip some notes, but needed to prevent
-							// NullPointerExeptions if we are
-							// given a note_off event for a note that has never
-							// been turned on
-							if (n != null) {
-								// Because we inserted the same object into
-								// unorderedNotes and currentNotes
-								// we can now turn off the correct note without
-								// having to find it in unordered notes
-								n.turnOff(event.getTick(), ticksPerQuarterNote);
-							}
-						} else {
-							// writer.println("Command: " +
-							// sMessage.getCommand());
-						}
-					} else if (message instanceof MetaMessage) {
-						processMetaMessage((MetaMessage) message);
-					}
+					processTrack(track, currentNotes, i);
 				}
 			}
 
@@ -233,6 +154,69 @@ public class MidiReader {
 			e.printStackTrace();
 			System.out.println("Could not locate the MIDI file");
 		}
+	}
+	
+	/**
+	 * Helper method to process track information
+	 * @param track
+	 * @param currentNotes
+	 * @param i
+	 */
+	public Hashtable<Integer, ArrayList<Note>> processTrack(Track track, Hashtable<Integer, ArrayList<Note>> currentNotes, int i) {
+		MidiEvent event = track.get(i);
+		long currentTick = -1;
+		MidiMessage message = event.getMessage();
+		if (message instanceof ShortMessage) {
+			ShortMessage sMessage = (ShortMessage) message;
+
+			LinkedHashMap<Long, ArrayList<Note>> notes = unorderedNotes.get(sMessage.getChannel());
+
+			int key = sMessage.getData1();
+			int velocity = sMessage.getData2();
+
+			if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
+				Note n = new Note(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
+						currentInstrument, currentKey, currentTime, currentBPM);
+				currentNotes.get(sMessage.getChannel()).add(n);
+
+				if (notes.get(event.getTick()) == null) {
+					currentTick = event.getTick();
+					notes.put(currentTick, new ArrayList<Note>());
+				}
+
+				notes.get(currentTick).add(n);
+			} else if (sMessage.getCommand() == NOTE_OFF || velocity == 0) {
+				ArrayList<Note> channelNotes = currentNotes.get(sMessage.getChannel());
+				Note n = null;
+
+				// Find the note in the channel in current notes and
+				// remove and store it
+				for (int k = 0; k < channelNotes.size(); k++) {
+					if (channelNotes.get(k).key == key) {
+						n = channelNotes.remove(k);
+						
+						// Rest Logic
+						// if (channelNotes.size() == 0) {
+						// lastTickOfChannel[sMessage.getChannel()]
+						// = event.getTick();
+						// }
+
+						break;
+					}
+				}
+
+				if (n != null) {
+					n.turnOff(event.getTick(), ticksPerQuarterNote);
+				}
+			} else {
+				// writer.println("Command: " +
+				// sMessage.getCommand());
+			}
+		} else if (message instanceof MetaMessage) {
+			processMetaMessage((MetaMessage) message);
+		}
+		
+		return currentNotes;
 	}
 
 	/**
