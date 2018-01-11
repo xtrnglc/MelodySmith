@@ -11,6 +11,7 @@ public class MidiWriter {
 	// represent with this code is one tick short of a
 	// two semibreves (i.e., 8 crotchets)
 
+	static final int REST = -1;
 	static final int SEMIQUAVER = 4;
 	static final int QUAVER = 8;
 	static final int CROTCHET = 16;
@@ -47,6 +48,8 @@ public class MidiWriter {
 			0x30, // ticks per click (not used)
 			0x08 // 32nd notes per crotchet
 	};
+	
+	private int currentRest;
 
 	// The collection of events to play, in time order
 	protected Vector<int[]> playEvents;
@@ -129,6 +132,16 @@ public class MidiWriter {
 		data[3] = 0;
 		playEvents.add(data);
 	}
+		
+	/**
+	 * Adds a rest by incrementing the current rest amount by the rest duration
+	 * @param duration
+	 * @return The tick after the rest
+	 */
+	public int addRest(int duration) {
+		currentRest += duration;
+		return currentRest;
+	}
 
 	/** Store a program-change event at current position */
 	public void progChange(int prog) {
@@ -141,12 +154,12 @@ public class MidiWriter {
 
 	/**
 	 * Store a note-on event followed by a note-off event a note length later.
-	 * There is no delta value the note is assumed to follow the previous one
-	 * with no gap.
+	 * The delta of the note on event is based on the amount of current rests
 	 */
 	public void noteOnOffNow(int duration, int note, int velocity) {
-		noteOn(0, note, velocity);
+		noteOn(currentRest, note, velocity);
 		noteOff(duration, note);
+		currentRest = 0;
 	}
 
 	public void noteSequenceFixedVelocity(int[] sequence, int velocity) {
