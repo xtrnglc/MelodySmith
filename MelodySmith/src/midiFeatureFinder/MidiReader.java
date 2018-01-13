@@ -1,15 +1,11 @@
 package midiFeatureFinder;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -32,8 +28,12 @@ public class MidiReader {
 	public static final float oneMinuteInMicroseconds = 60000000;
 	public static final int maxChannels = 16;
 
-	//
+	// A list of the unordered notes of the last song processed
 	public ArrayList<LinkedHashMap<Long, ArrayList<Note>>> unorderedNotes;
+	
+	// A Hashtable with String keys that represent interval Markov Chains in the form (3,4,5) 
+	// where the numbers represent the interval and the value is the number of time that chain of intervals appears
+	public Hashtable<String, Integer> markovIntervalCounts;
 
 	// Need to record current time and interval of song in order to insert
 	// information into notes.
@@ -119,17 +119,14 @@ public class MidiReader {
 	 * 
 	 * @param midiFile
 	 */
-	public void readSequence(File midiFile) {
+	public void readSequence(File midiFile, int markovLength) {
 		try {
 			// Rest Logic commented out for now because it doesn't work well
 			// with the association network
 			// long[] lastTickOfChannel = new long[maxChannels];
-
 			Hashtable<Integer, ArrayList<Note>> currentNotes = getCurrentNotes();
 
 			currentSequence = MidiSystem.getSequence(midiFile);
-
-			
 
 			// Currently the logic will only handle MIDI with PPQ division type
 			// This should not be a problem for the prototype as the SMPTE is
@@ -141,8 +138,12 @@ public class MidiReader {
 
 			for (Track track : currentSequence.getTracks()) {
 				for (int i = 0; i < track.size(); i++) {
-					processTrack(track, currentNotes, i);
+					processEvent(track, currentNotes, i);
 				}
+			}
+			
+			if (markovLength > 0) {
+				recordIntervals(markovLength);
 			}
 
 		} catch (InvalidMidiDataException e) {
@@ -157,12 +158,44 @@ public class MidiReader {
 	}
 	
 	/**
-	 * Helper method to process track information
+	 * Records the counts of all possible interval combinations, in the form key: ,X,Y,Z value: the number of time the key appears in the current song
+	 * @param markovLength
+	 */
+	private void recordIntervals(int markovLength) {
+		Hashtable<String, Integer> intervals = new Hashtable<String, Integer>();
+		
+		ArrayList<ArrayList<Note>> orderedNotes = getOrderedNotes();
+		
+		for (ArrayList<Note> channel : orderedNotes) {
+			for (int i = 0; i < channel.size() - markovLength; i++) {
+				String intervalKey = "";
+				int currentKey = channel.get(i).key;
+				for (int k = i+1; k < (i + markovLength); k++) {
+					intervalKey += "," + (currentKey - channel.get(k).key);
+					
+					if (intervals.get(intervalKey) == null) {
+						intervals.put(intervalKey, 1);
+					}
+					else {
+						intervals.put(intervalKey, intervals.get(intervalKey) + 1);
+					}
+					
+					currentKey = channel.get(k).key;
+				}
+				
+			}
+		}
+		
+		markovIntervalCounts = intervals;
+	}
+	
+	/**
+	 * Helper method to process track information (a single event i)
 	 * @param track
 	 * @param currentNotes
 	 * @param i
 	 */
-	public Hashtable<Integer, ArrayList<Note>> processTrack(Track track, Hashtable<Integer, ArrayList<Note>> currentNotes, int i) {
+	private Hashtable<Integer, ArrayList<Note>> processEvent(Track track, Hashtable<Integer, ArrayList<Note>> currentNotes, int i) {
 		MidiEvent event = track.get(i);
 		long currentTick = -1;
 		MidiMessage message = event.getMessage();
