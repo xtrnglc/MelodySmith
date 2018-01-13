@@ -9,6 +9,8 @@ public class AssociationNetwork {
 	ArrayList<Node> network = new ArrayList<Node>();
 	ArrayList<Song> corpus = new ArrayList<Song>();
 	
+	Link[][] matrix;
+	
 	HashMap<Integer, Double> intervalProbabilities = new HashMap<>();
 	HashMap<String, Double> nextIntervalProbabilities = new HashMap<>();
 	HashMap<Integer, Double> durationProbabilities = new HashMap<>();
@@ -21,6 +23,7 @@ public class AssociationNetwork {
 	double maxDistanceToCadence = -1.0;
 	int size = 0;
 	
+	//TODO: Get rid of this function and refactor what parts you can into Steven's initial parse.
 	void addAllNotes() {
 		for(Song song : corpus) {
 			for(ArrayList<Note> channel : song.channels) {
@@ -87,6 +90,19 @@ public class AssociationNetwork {
 		network.add(newNode);
 	}
 	
+	Link weightNodes(Node start, Node end) {
+		int interval = Math.abs(start.scaleDegree-end.scaleDegree);
+		String key = start.scaleDegree + "->" + end.scaleDegree;
+		
+
+		double weight = getEquivalentValueWeight(start.song == end.song)
+		+ getEquivalentValueWeight(start.key == end.key)
+		+ intervalProbabilities.get(interval)
+		+ getNextIntervalProbability(key);
+		
+		return new Link(start, end, weight);
+	}
+	
 	Node getTonic() {
 		for(Node node : network) {
 			if(node.scaleDegree == 0) {
@@ -107,6 +123,7 @@ public class AssociationNetwork {
 		return null;
 	}
 	
+	//TODO: Refactor to use transition matrix
 	Node deduceNextNode(Node currentNode, ArrayList<Node> alreadyChosenNodes) {
 		Link mostLikelyLink = null;
 		for(Link link : currentNode.linkedNodes) {

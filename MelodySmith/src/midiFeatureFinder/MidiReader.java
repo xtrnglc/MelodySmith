@@ -183,8 +183,9 @@ public class MidiReader {
 					currentTick = event.getTick();
 					notes.put(currentTick, new ArrayList<Note>());
 				}
-
-				notes.get(currentTick).add(n);
+				
+				if(currentTick != -1)
+					notes.get(currentTick).add(n);
 			} else if (sMessage.getCommand() == NOTE_OFF || velocity == 0) {
 				ArrayList<Note> channelNotes = currentNotes.get(sMessage.getChannel());
 				Note n = null;
