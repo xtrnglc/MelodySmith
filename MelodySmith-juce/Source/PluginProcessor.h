@@ -16,12 +16,12 @@
 //==============================================================================
 /**
 */
-class TutorialPluginAudioProcessor  : public AudioProcessor
+class MelodySmithVSTAudioProcessor  : public AudioProcessor
 {
 public:
     //==============================================================================
-    TutorialPluginAudioProcessor();
-    ~TutorialPluginAudioProcessor();
+    MelodySmithVSTAudioProcessor();
+    ~MelodySmithVSTAudioProcessor();
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -60,5 +60,5 @@ public:
 
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TutorialPluginAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessor)
 };

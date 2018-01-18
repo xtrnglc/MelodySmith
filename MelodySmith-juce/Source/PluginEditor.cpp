@@ -14,40 +14,15 @@
 
 
 //==============================================================================
-TutorialPluginAudioProcessorEditor::TutorialPluginAudioProcessorEditor (TutorialPluginAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySmithVSTAudioProcessor& p)
+    : AudioProcessorEditor (&p), processor (p), tabbedCorpusComponent(TabbedButtonBar::Orientation::TabsAtLeft), managePanel(curr_artist_filename_tuples),
+	influencesPanel(curr_artist_filename_tuples, artists_to_influences)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
 	setSizesAndColors();
     setSize (pluginHeight, pluginWidth);
 	//setResizable(true, false);
-
-	// these define the parameters of our slider object
-	//midiVolume.setSliderStyle(Slider::LinearBarVertical);
-	//midiVolume.setRange(0.0, 127.0, 1.0);
-	//midiVolume.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-	//midiVolume.setPopupDisplayEnabled(true, false, this);
-	//midiVolume.setTextValueSuffix(" Volume");
-	//midiVolume.setValue(1.0);
-
-	//// this function adds the slider to the editor
-	//addAndMakeVisible(&midiVolume);
-
-	//midiVolume.addListener(this);
-
-	//sidebar.setColour(TextButton::buttonColourId, Colours::grey);
-	//// [7]
-	//addAndMakeVisible(sidebar);
-	//sideItemA.setColour(TextButton::buttonColourId, Colours::maroon);
-	//sideItemB.setColour(TextButton::buttonColourId, Colours::maroon);
-	//sideItemC.setColour(TextButton::buttonColourId, Colours::maroon);
-	//sideItemA.setButtonText("Item A");
-	//sideItemB.setButtonText("Item B");
-	//sideItemC.setButtonText("Item C");
-	//addAndMakeVisible(sideItemA);
-	//addAndMakeVisible(sideItemB);
-	//addAndMakeVisible(sideItemC);
 
 	corpusHeader.setColour(Label::textColourId, Colours::aqua);
 	corpusHeader.setText("CORPUS", NotificationType::dontSendNotification);
@@ -57,23 +32,23 @@ TutorialPluginAudioProcessorEditor::TutorialPluginAudioProcessorEditor (Tutorial
 
 	//corpusListBoxModel = ManageListBoxModel();
 	//corpusListBox.addSongs();
-	int x = corpusListBox.getNumRows();
-	corpusListBox.setColour(ListBox::backgroundColourId, Colours::darkgrey);
-	addAndMakeVisible(corpusListBox);
-	
-	addSongsBtn.setColour(TextButton::buttonColourId, buttonBgColour);
-	addSongsBtn.setButtonText("Add Songs");
-	addAndMakeVisible(addSongsBtn);
-	addSongsBtn.addListener(this);
+
+	//tabbedCorpusComponent = 
+	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
+	tabbedCorpusComponent.addTab("Manage", Colours::aliceblue, &managePanel, false);
+	tabbedCorpusComponent.addTab("Influences", Colours::aliceblue, &influencesPanel, false);
+	tabbedCorpusComponent.setTabBackgroundColour(0, Colours::aliceblue);
+	tabbedCorpusComponent.setColour(TabbedComponent::backgroundColourId, Colours::beige);
+	addAndMakeVisible(tabbedCorpusComponent);
 
 }
 
-TutorialPluginAudioProcessorEditor::~TutorialPluginAudioProcessorEditor()
+MelodySmithVSTAudioProcessorEditor::~MelodySmithVSTAudioProcessorEditor()
 {
 }
 
 //==============================================================================
-void TutorialPluginAudioProcessorEditor::paint (Graphics& g)
+void MelodySmithVSTAudioProcessorEditor::paint (Graphics& g)
 {
 	// fill the whole window white
 	g.fillAll(pluginBgColour);
@@ -87,7 +62,7 @@ void TutorialPluginAudioProcessorEditor::paint (Graphics& g)
 	//g.drawFittedText("Midi Volume", 0, 0, getWidth(), 30, Justification::centred, 1);
 }
 
-void TutorialPluginAudioProcessorEditor::resized()
+void MelodySmithVSTAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
@@ -110,35 +85,22 @@ void TutorialPluginAudioProcessorEditor::resized()
 	float fontHeight = corpusHeader.getFont().getHeight() + 20;
 	Rectangle<int> tempArea(leftCol.removeFromTop(fontHeight));
 	corpusHeader.setBounds(tempArea);
-	tempArea = Rectangle<int>(leftCol.reduced(15, 10));
-	addSongsBtn.setBounds(tempArea.removeFromBottom(tempArea.getHeight() / 12));
 
-	corpusListBox.setBounds(tempArea);
+	tempArea = Rectangle<int>(leftCol.reduced(15, 10));
+	//tabbedCorpusComponent.setBounds(tempArea.removeFromTop(tempArea.getHeight() / 12));
+	tabbedCorpusComponent.setBounds(tempArea);
+	//corpusListBox.setBounds(tempArea);
 
 }
 
-void TutorialPluginAudioProcessorEditor::sliderValueChanged(Slider* slider)
+
+
+void MelodySmithVSTAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
 	processor.noteOnVel = midiVolume.getValue();
 }
 
-void TutorialPluginAudioProcessorEditor::buttonClicked(Button* button)
-{
-	if (button == &addSongsBtn)
-	{
-		FileChooser myChooser("Please select the midi files you want to load...",
-			File::getSpecialLocation(File::userHomeDirectory),
-			"*.mid");
-		if (myChooser.browseForMultipleFilesToOpen())
-		{
-			Array<File> midi_files = myChooser.getResults();
-			corpusListBox.addSongs(midi_files);
-			corpusListBox.updateContent();
-		}
-	}
-}
-
-void TutorialPluginAudioProcessorEditor::setSizesAndColors()
+void MelodySmithVSTAudioProcessorEditor::setSizesAndColors()
 {
 	pluginWidth = 700;
 	pluginHeight = 900;
@@ -155,12 +117,12 @@ void TutorialPluginAudioProcessorEditor::setSizesAndColors()
 	divBorderColour = Colours::azure;
 }
 
-void TutorialPluginAudioProcessorEditor::createCorpusPanel()
+void MelodySmithVSTAudioProcessorEditor::createCorpusPanel()
 {
 
 }
 
-void TutorialPluginAudioProcessorEditor::createControlsPanel()
+void MelodySmithVSTAudioProcessorEditor::createControlsPanel()
 {
 
 }

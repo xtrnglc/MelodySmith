@@ -13,7 +13,7 @@
 
 
 //==============================================================================
-TutorialPluginAudioProcessor::TutorialPluginAudioProcessor()
+MelodySmithVSTAudioProcessor::MelodySmithVSTAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -27,17 +27,17 @@ TutorialPluginAudioProcessor::TutorialPluginAudioProcessor()
 {
 }
 
-TutorialPluginAudioProcessor::~TutorialPluginAudioProcessor()
+MelodySmithVSTAudioProcessor::~MelodySmithVSTAudioProcessor()
 {
 }
 
 //==============================================================================
-const String TutorialPluginAudioProcessor::getName() const
+const String MelodySmithVSTAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool TutorialPluginAudioProcessor::acceptsMidi() const
+bool MelodySmithVSTAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -46,7 +46,7 @@ bool TutorialPluginAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool TutorialPluginAudioProcessor::producesMidi() const
+bool MelodySmithVSTAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -55,7 +55,7 @@ bool TutorialPluginAudioProcessor::producesMidi() const
    #endif
 }
 
-bool TutorialPluginAudioProcessor::isMidiEffect() const
+bool MelodySmithVSTAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -64,50 +64,50 @@ bool TutorialPluginAudioProcessor::isMidiEffect() const
    #endif
 }
 
-double TutorialPluginAudioProcessor::getTailLengthSeconds() const
+double MelodySmithVSTAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int TutorialPluginAudioProcessor::getNumPrograms()
+int MelodySmithVSTAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int TutorialPluginAudioProcessor::getCurrentProgram()
+int MelodySmithVSTAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void TutorialPluginAudioProcessor::setCurrentProgram (int index)
+void MelodySmithVSTAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const String TutorialPluginAudioProcessor::getProgramName (int index)
+const String MelodySmithVSTAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void TutorialPluginAudioProcessor::changeProgramName (int index, const String& newName)
+void MelodySmithVSTAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
 //==============================================================================
-void TutorialPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void MelodySmithVSTAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 }
 
-void TutorialPluginAudioProcessor::releaseResources()
+void MelodySmithVSTAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool TutorialPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool MelodySmithVSTAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
@@ -130,7 +130,7 @@ bool TutorialPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 }
 #endif
 
-void TutorialPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+void MelodySmithVSTAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
     const int totalNumInputChannels  = getTotalNumInputChannels();
@@ -156,25 +156,25 @@ void TutorialPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
 }
 
 //==============================================================================
-bool TutorialPluginAudioProcessor::hasEditor() const
+bool MelodySmithVSTAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* TutorialPluginAudioProcessor::createEditor()
+AudioProcessorEditor* MelodySmithVSTAudioProcessor::createEditor()
 {
-    return new TutorialPluginAudioProcessorEditor (*this);
+    return new MelodySmithVSTAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void TutorialPluginAudioProcessor::getStateInformation (MemoryBlock& destData)
+void MelodySmithVSTAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void TutorialPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void MelodySmithVSTAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -184,5 +184,5 @@ void TutorialPluginAudioProcessor::setStateInformation (const void* data, int si
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new TutorialPluginAudioProcessor();
+    return new MelodySmithVSTAudioProcessor();
 }

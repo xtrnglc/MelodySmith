@@ -1,6 +1,4 @@
 #include "ManageListBoxModel.h"
-#include "ManageListBoxRow.h"
-
 
 ManageListBoxModel::ManageListBoxModel()
 {
@@ -22,34 +20,29 @@ void ManageListBoxModel::paintListBoxItem(int rowNumber, Graphics& g, int width,
 	g.fillAll(Colours::darkgrey);
 	g.setColour(Colours::aliceblue);
 
-	Rectangle<int> totalArea(0, 0, width, height);
-	Rectangle<int> leftCol(totalArea.removeFromLeft(totalArea.getWidth() / 2));
-	g.drawFittedText(fileNames[rowNumber], leftCol, Justification::centred, 1);
-
-	//Rectangle<int> rightCol(totalArea);
-	//TextEditor artistName;
-	//artistName.setBounds(rightCol);
-	//addAndMakeVisible(artistName);
-	//g.
-	//Label l;
-	//l.setBounds(rightCol);
-	//l.setColour(Label::backgroundColourId, Colours::red);
-	//l.setSize(rightCol.wi)
-	//addAndMakeVisible(l);
-
 }
 
 Component* ManageListBoxModel::refreshComponentForRow(int rowNumber, bool isRowSelected, Component *existingComponentToUpdate)
 {
 	if (rowNumber < fileNames.size()) {
-		//ManageListBoxRow newListBoxRow; 
-		//newListBoxRow.setFileName(fileNames[rowNumber]);
-		//return newListBoxRow;
-		return existingComponentToUpdate;
+		String aName = "";
+		if (curr_artist_filename_tuples != nullptr && curr_artist_filename_tuples->size() > rowNumber)
+		{
+			std::tuple<String, String> s = (*(curr_artist_filename_tuples))[rowNumber];
+			aName = std::get<1>(s);
+		}
+
+		ManageListBoxRow* newListBoxRow = new ManageListBoxRow(fileNames[rowNumber], aName);
+		return newListBoxRow;
 	}
 	else {
 		return nullptr;
 	}
+}
+
+void ManageListBoxModel::setCurrArtistFilenameTuples(Array<std::tuple<String, String>> *curr_artist_filename_tuples_c)
+{
+	curr_artist_filename_tuples = curr_artist_filename_tuples_c;
 }
 
 void ManageListBoxModel::addSongs(Array<File> midi_files)

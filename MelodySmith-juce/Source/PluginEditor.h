@@ -12,17 +12,18 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "ManageListBoxModel.h"
+#include "ManagePanel.h"
+#include "InfluencesPanel.h"
 
 
 //==============================================================================
 /**
 */
-class TutorialPluginAudioProcessorEditor  : public AudioProcessorEditor, private Slider::Listener, public Button::Listener
+class MelodySmithVSTAudioProcessorEditor  : public AudioProcessorEditor, private Slider::Listener
 {
 public:
-    TutorialPluginAudioProcessorEditor (TutorialPluginAudioProcessor&);
-    ~TutorialPluginAudioProcessorEditor();
+    MelodySmithVSTAudioProcessorEditor (MelodySmithVSTAudioProcessor&);
+    ~MelodySmithVSTAudioProcessorEditor();
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -44,20 +45,22 @@ private:
 	Colour divTextColour, divBorderColour;
 
 	Label corpusHeader;
-	ManageListBoxModel corpusListBox;
-	//ManageListBoxModel corpusListBoxModel
+	TabbedComponent tabbedCorpusComponent;
+	Array<std::tuple<String, String>> curr_artist_filename_tuples;
+	Array<std::tuple<String, double>> artists_to_influences;
+	ManagePanel managePanel;
+	InfluencesPanel influencesPanel;
 
-	TextButton addSongsBtn;
+
+	
 
 	void sliderValueChanged(Slider* slider) override;
 
-	void buttonClicked(Button* button) override;
-
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    TutorialPluginAudioProcessor& processor;
+    MelodySmithVSTAudioProcessor& processor;
 
 	Slider midiVolume;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TutorialPluginAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessorEditor)
 };

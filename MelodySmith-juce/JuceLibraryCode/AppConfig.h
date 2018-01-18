@@ -291,10 +291,10 @@
  #define JucePlugin_Enable_IAA             0
 #endif
 #ifndef  JucePlugin_Name
- #define JucePlugin_Name                   "MelodySmith-juce"
+ #define JucePlugin_Name                   "MelodySmithVST"
 #endif
 #ifndef  JucePlugin_Desc
- #define JucePlugin_Desc                   "MelodySmith-juce"
+ #define JucePlugin_Desc                   "MelodySmithVST"
 #endif
 #ifndef  JucePlugin_Manufacturer
  #define JucePlugin_Manufacturer           "yourcompany"
@@ -309,7 +309,7 @@
  #define JucePlugin_ManufacturerCode       0x4d616e75 // 'Manu'
 #endif
 #ifndef  JucePlugin_PluginCode
- #define JucePlugin_PluginCode             0x50616a67 // 'Pajg'
+ #define JucePlugin_PluginCode             0x42356365 // 'B5ce'
 #endif
 #ifndef  JucePlugin_IsSynth
  #define JucePlugin_IsSynth                0
@@ -348,16 +348,16 @@
  #define JucePlugin_AUSubType              JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_AUExportPrefix
- #define JucePlugin_AUExportPrefix         MelodySmithjuceAU
+ #define JucePlugin_AUExportPrefix         MelodySmithVSTAU
 #endif
 #ifndef  JucePlugin_AUExportPrefixQuoted
- #define JucePlugin_AUExportPrefixQuoted   "MelodySmithjuceAU"
+ #define JucePlugin_AUExportPrefixQuoted   "MelodySmithVSTAU"
 #endif
 #ifndef  JucePlugin_AUManufacturerCode
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.yourcompany.MelodySmithjuce
+ #define JucePlugin_CFBundleIdentifier     com.yourcompany.MelodySmithVST
 #endif
 #ifndef  JucePlugin_RTASCategory
  #define JucePlugin_RTASCategory           ePlugInCategory_None
@@ -375,7 +375,7 @@
  #define JucePlugin_RTASDisableMultiMono   0
 #endif
 #ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.yourcompany.MelodySmithjuce
+ #define JucePlugin_AAXIdentifier          com.yourcompany.MelodySmithVST
 #endif
 #ifndef  JucePlugin_AAXManufacturerCode
  #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
@@ -399,5 +399,5 @@
  #define JucePlugin_IAASubType             JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_IAAName
- #define JucePlugin_IAAName                "yourcompany: MelodySmith-juce"
+ #define JucePlugin_IAAName                "yourcompany: MelodySmithVST"
 #endif

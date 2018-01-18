@@ -8,11 +8,11 @@
     <key>CFBundleIconFile</key>
     <string></string>
     <key>CFBundleIdentifier</key>
-    <string>com.yourcompany.MelodySmithjuce</string>
+    <string>com.yourcompany.MelodySmithVST</string>
     <key>CFBundleName</key>
-    <string>MelodySmith-juce</string>
+    <string>MelodySmithVST</string>
     <key>CFBundleDisplayName</key>
-    <string>MelodySmith-juce</string>
+    <string>MelodySmithVST</string>
     <key>CFBundlePackageType</key>
     <string>BNDL</string>
     <key>CFBundleSignature</key>

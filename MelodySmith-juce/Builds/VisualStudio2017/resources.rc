@@ -13,9 +13,9 @@ BEGIN
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "FileDescription",  "MelodySmith-juce\0"
+      VALUE "FileDescription",  "MelodySmithVST\0"
       VALUE "FileVersion",  "1.0.0\0"
-      VALUE "ProductName",  "MelodySmith-juce\0"
+      VALUE "ProductName",  "MelodySmithVST\0"
       VALUE "ProductVersion",  "1.0.0\0"
     END
   END
