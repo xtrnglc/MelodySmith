@@ -44,5 +44,6 @@ void InfluencesPanel::resized()
 
 void InfluencesPanel::visibilityChanged()
 {
+	influencesListBox.generateArtistFileMap();
 	influencesListBox.updateContent();
 }

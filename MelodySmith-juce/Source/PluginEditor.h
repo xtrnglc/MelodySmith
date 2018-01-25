@@ -14,12 +14,13 @@
 #include "PluginProcessor.h"
 #include "ManagePanel.h"
 #include "InfluencesPanel.h"
+#include "MyKnobLF.h"
 
 
 //==============================================================================
 /**
 */
-class MelodySmithVSTAudioProcessorEditor  : public AudioProcessorEditor, private Slider::Listener
+class MelodySmithVSTAudioProcessorEditor  : public AudioProcessorEditor, private Slider::Listener, private ImageButton::Listener
 {
 public:
     MelodySmithVSTAudioProcessorEditor (MelodySmithVSTAudioProcessor&);
@@ -48,19 +49,24 @@ private:
 	TabbedComponent tabbedCorpusComponent;
 	Array<std::tuple<String, String>> curr_artist_filename_tuples;
 	Array<std::tuple<String, double>> artists_to_influences;
+	
 	ManagePanel managePanel;
 	InfluencesPanel influencesPanel;
 
-
-	
+	ImageButton reforgeImageBtn;
+	ImageButton forgeImageBtn;
 
 	void sliderValueChanged(Slider* slider) override;
+
+	void buttonClicked(Button* btn) override;
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     MelodySmithVSTAudioProcessor& processor;
 
 	Slider midiVolume;
+	Slider keyKnob;
+	MyKnobLF keyKnobLF;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessorEditor)
 };

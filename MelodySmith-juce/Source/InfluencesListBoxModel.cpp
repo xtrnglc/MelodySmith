@@ -1,4 +1,4 @@
-/*
+		/*
   ==============================================================================
 
     InfluencesListBoxModel.cpp
@@ -28,8 +28,9 @@ InfluencesListBoxModel::~InfluencesListBoxModel()
 
 int InfluencesListBoxModel::getNumRows()
 {
-	generateArtistFileMap();
-	return artistFileMap.size();
+	if (artists_to_influences == nullptr)
+		return 0;
+	return artists_to_influences->size();
 }
 
 void InfluencesListBoxModel::setArtistsAndFiles(Array<std::tuple<String, String>> *curr)
@@ -39,7 +40,6 @@ void InfluencesListBoxModel::setArtistsAndFiles(Array<std::tuple<String, String>
 
 void InfluencesListBoxModel::generateArtistFileMap()
 {
-	artistFileMap.clear();
 	if (curr_artist_filename_tuples == nullptr)
 		return;
 
@@ -50,35 +50,24 @@ void InfluencesListBoxModel::generateArtistFileMap()
 		String artistName = std::get<1>(currFileArtist);
 		String fileName = std::get<0>(currFileArtist);
 
-		if (artistFileMap.find(artistName) == artistFileMap.end())
+		if (artists_to_influences != nullptr)
 		{
-			Array<String> fNames;
-			artistFileMap.insert(std::make_pair(artistName, fNames));
-			
-			//Add in an artist if necssary
-			if (artists_to_influences != nullptr)
+			bool artistExists = false;
+			for (int j = 0; j < artists_to_influences->size(); j++)
 			{
-				bool artistExists;
-				for (int j = 0; j < artists_to_influences->size(); j++)
+				std::tuple<String, double> currArtistToInfluence((*artists_to_influences)[j]);
+				if (std::get<0>(currArtistToInfluence) == artistName)
 				{
-					std::tuple<String, double> currArtistToInfluence((*artists_to_influences)[j]);
-					if (std::get<0>(currArtistToInfluence) == artistName)
-					{
-						artistExists = true;
-						break;
-					}
-				}
-
-				if (!artistExists)
-				{
-					artists_to_influences->add(std::make_tuple(artistName, 0));
+					artistExists = true;
+					break;
 				}
 			}
-			
-		}
 
-		std::map<String, Array<String>>::iterator it = artistFileMap.find(artistName);
-		it->second.add(fileName);
+			if (!artistExists)
+			{
+				artists_to_influences->add(std::make_tuple(artistName, 0));
+			}
+		}
 	}
 }
 
@@ -92,19 +81,10 @@ void InfluencesListBoxModel::paintListBoxItem(int rowNumber, Graphics& g, int wi
 Component* InfluencesListBoxModel::refreshComponentForRow(int rowNumber, bool isRowSelected, Component *existingComponentToUpdate)
 {
 	if (rowNumber < getNumRows()) {
-		std::map<String, Array<String>>::iterator it = artistFileMap.begin();
-		std::advance(it, rowNumber);
-		String artistName = it->first;
-		for (int i = 0; i < artists_to_influences->size(); i++)
-		{
-			std::tuple<String, double> currArtistToInfluence((*artists_to_influences)[i]);
-			if (std::get<0>(currArtistToInfluence) == artistName)
-			{
-				//double inf = std::get<1>(currArtistToInfluence);
-				InfluencesListBoxRow* newListBoxRow = new InfluencesListBoxRow(artistName, artists_to_influences, i);
-				return newListBoxRow;
-			}
-		}
+		std::tuple<String, double> currArtistToInfluence((*artists_to_influences)[rowNumber]);
+		String artistName = std::get<0>(currArtistToInfluence);
+		InfluencesListBoxRow* newListBoxRow = new InfluencesListBoxRow(artistName, artists_to_influences, rowNumber);
+		return newListBoxRow;
 	}
 	else {
 		return nullptr;

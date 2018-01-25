@@ -147,6 +147,7 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\MyKnobLF.cpp"/>
     <ClCompile Include="..\..\Source\InfluencesListBoxRow.cpp"/>
     <ClCompile Include="..\..\Source\InfluencesListBoxModel.cpp"/>
     <ClCompile Include="..\..\Source\InfluencesPanel.cpp"/>
@@ -1849,6 +1850,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_video.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\MyKnobLF.h"/>
     <ClInclude Include="..\..\Source\InfluencesListBoxRow.h"/>
     <ClInclude Include="..\..\Source\InfluencesListBoxModel.h"/>
     <ClInclude Include="..\..\Source\InfluencesPanel.h"/>

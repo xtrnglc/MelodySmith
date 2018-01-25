@@ -86,7 +86,7 @@ void ManagePanel::buttonClicked(Button* button)
 	}
 	else if (button == &saveSongsBtn)
 	{
-		//curr_artist_filename_tuples->clear();
+		curr_artist_filename_tuples->clear();
 		for (int i = 0; i < corpusListBox.getNumRows(); i++)
 		{
 			ManageListBoxRow *currListBoxRow = dynamic_cast<ManageListBoxRow*>(corpusListBox.getComponentForRowNumber(i));

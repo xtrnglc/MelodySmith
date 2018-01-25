@@ -391,6 +391,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\MyKnobLF.cpp">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\InfluencesListBoxRow.cpp">
       <Filter>MelodySmithVST\Source</Filter>
     </ClCompile>
@@ -2262,6 +2265,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\MyKnobLF.h">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\InfluencesListBoxRow.h">
       <Filter>MelodySmithVST\Source</Filter>
     </ClInclude>

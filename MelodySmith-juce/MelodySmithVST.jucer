@@ -14,6 +14,8 @@
               jucerVersion="5.2.0">
   <MAINGROUP id="IIr9Cu" name="MelodySmithVST">
     <GROUP id="{A2F49132-830D-BEF2-A00C-5FCC948550BE}" name="Source">
+      <FILE id="rLBQbc" name="MyKnobLF.cpp" compile="1" resource="0" file="Source/MyKnobLF.cpp"/>
+      <FILE id="DrhxfO" name="MyKnobLF.h" compile="0" resource="0" file="Source/MyKnobLF.h"/>
       <FILE id="PmkVA3" name="InfluencesListBoxRow.cpp" compile="1" resource="0"
             file="Source/InfluencesListBoxRow.cpp"/>
       <FILE id="icIzLl" name="InfluencesListBoxRow.h" compile="0" resource="0"

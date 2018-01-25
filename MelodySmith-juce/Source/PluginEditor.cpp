@@ -30,16 +30,33 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	corpusHeader.setFont(Font("Avenir", 20.0f, 0));
 	addAndMakeVisible(corpusHeader);
 
-	//corpusListBoxModel = ManageListBoxModel();
-	//corpusListBox.addSongs();
-
-	//tabbedCorpusComponent = 
 	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
 	tabbedCorpusComponent.addTab("Manage", Colours::aliceblue, &managePanel, false);
 	tabbedCorpusComponent.addTab("Influences", Colours::aliceblue, &influencesPanel, false);
 	tabbedCorpusComponent.setTabBackgroundColour(0, Colours::aliceblue);
 	tabbedCorpusComponent.setColour(TabbedComponent::backgroundColourId, Colours::beige);
 	addAndMakeVisible(tabbedCorpusComponent);
+
+	File f1 = File::getCurrentWorkingDirectory().getChildFile("anvil_recast2.png");
+	File f2 = File::getCurrentWorkingDirectory().getChildFile("forge_fire2.png");
+	Image i1 = ImageFileFormat::loadFrom(f1);
+	Image i2 = ImageFileFormat::loadFrom(f2); 
+	reforgeImageBtn.setImages(false, true, false, i1, 1.0f, Colours::transparentWhite, i1, 1.0f, Colours::darkblue, i1, 1.0f, Colours::darkblue);
+	reforgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
+	forgeImageBtn.setImages(false, true, false, i2, 1.0f, Colours::transparentWhite, i2, 1.0f, Colours::yellow, i2, 1.0f, Colours::yellow);
+	forgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
+	addAndMakeVisible(reforgeImageBtn);
+	addAndMakeVisible(forgeImageBtn);
+
+	reforgeImageBtn.addListener(this);
+	forgeImageBtn.addListener(this);
+
+	addAndMakeVisible(keyKnob);
+	keyKnob.setLookAndFeel(&keyKnobLF);
+	keyKnob.setSliderStyle(Slider::Rotary);
+	keyKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+	//keyKnob.value
+	//keyKnob.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
 
 }
 
@@ -89,6 +106,13 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 	tempArea = Rectangle<int>(leftCol.reduced(15, 10));
 	//tabbedCorpusComponent.setBounds(tempArea.removeFromTop(tempArea.getHeight() / 12));
 	tabbedCorpusComponent.setBounds(tempArea);
+
+	Rectangle<int> rightCol(area);
+	int rightColHeight = rightCol.getHeight();
+	reforgeImageBtn.setBounds(rightCol.removeFromTop(rightColHeight / 3));
+	keyKnob.setBounds(rightCol.removeFromTop(rightColHeight / 3).reduced(0, 50));
+	forgeImageBtn.setBounds(rightCol);
+	//txbtn.setBounds(rightCol);
 	//corpusListBox.setBounds(tempArea);
 
 }
@@ -98,6 +122,18 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 void MelodySmithVSTAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
 	processor.noteOnVel = midiVolume.getValue();
+}
+
+void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
+{
+	if (btn == &reforgeImageBtn)
+	{
+		String s = "";
+	}
+	else if (btn == &forgeImageBtn)
+	{
+		String r = "";
+	}
 }
 
 void MelodySmithVSTAudioProcessorEditor::setSizesAndColors()

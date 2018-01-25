@@ -25,6 +25,17 @@ MelodySmithVSTAudioProcessor::MelodySmithVSTAudioProcessor()
                        )
 #endif
 {
+	/*File fileInput = File::getCurrentWorkingDirectory().getChildFile("beatles2.mid");
+	MidiFile mf;
+	mf.readFrom(*(fileInput.createInputStream()));
+
+	MidiMessageSequence mms;
+	double lasttime = mf.getLastTimestamp();
+	for (short i = 0; i < mf.getNumTracks(); i++)
+	{
+		mms.addSequence(*mf.getTrack(i), 0, 0, lasttime);
+	}*/
+
 }
 
 MelodySmithVSTAudioProcessor::~MelodySmithVSTAudioProcessor()
