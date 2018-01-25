@@ -1,2 +1,0 @@
-class TrainingModel < ApplicationRecord
-end
