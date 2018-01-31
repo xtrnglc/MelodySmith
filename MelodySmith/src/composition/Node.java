@@ -5,25 +5,42 @@ import java.util.ArrayList;
 /**
  * Represents a single node in the association network
  * 		Contains information about a single note in a song
- *
  */
-public class Node {
-	int scaleDegree = 0;
-	int pitch = 0;
-	String duration = "";
-	int noteLength = 0;
-	int distanceToCadence = 0;
-	int distanceFromTonic = 0;
-	int beat = 0;
-	int velocity = 0;
-	int tempo = 0;
-	int channel = 0;
-	String key = "";
-	String pattern = "";
-	String song = "";
-	String artist = "";
-	Node destinationNode = null;
-	Node previousNode = null;
+public class Node {	
+	public static final String[] NOTES = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+	public static final String[] SCALEDEGREE = { "C", "D", "E", "F", "G", "A", "B" };
+	
+	public int key;
+	public int note;
+	public int octave;
+	public int velocity;
+	public int scaleDegree;
+	public int channel;
+	public float bpm = 120f;
+	
+	public String noteDuration;
+	
+	public long tickDuration;
+	public long startTick;
+
+	
+	public int noteLength = 0;
+	public int distanceToCadence = 0;
+	public int distanceFromTonic = 0;
+	public int beat = 0;
+	
+	public String noteName;
+	public String song;
+	public String instrument;
+	public String keySignature = "C major";
+	public String timeSignature = "4/4";
+
+	// You can ignore everything below here
+	public int index = 0;
+	
+	public String pattern = "";
+	public String artist = "";
+	
 	ArrayList<Node> concurrentNodes = new ArrayList<Node>();
 	ArrayList<Link> linkedNodes = new ArrayList<Link>();
 	

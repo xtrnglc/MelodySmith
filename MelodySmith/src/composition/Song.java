@@ -16,7 +16,6 @@ public class Song {
 	
 	Song(File file, String name, String artist){
 		MidiReader r = new MidiReader();
-		r.readSequence(file);
 		channels = r.getOrderedNotes();
 		
 		averageDistanceFromTonic = getAverageDistanceFromTonic();

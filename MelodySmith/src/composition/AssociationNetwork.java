@@ -23,6 +23,13 @@ public class AssociationNetwork {
 	double maxDistanceToCadence = -1.0;
 	int size = 0;
 	
+	double intervalContribution;
+	double durationContribution;
+	
+	CorpusAnalyzer probabilities;
+	
+	double sameScaleDegreePenalty = 0.5;
+	
 	//TODO: Get rid of this function and refactor what parts you can into Steven's initial parse.
 	void addAllNotes() {
 		for(Song song : corpus) {
@@ -37,8 +44,8 @@ public class AssociationNetwork {
 					nodeToAdd.scaleDegree = note.scaleDegree;
 					nodeToAdd.distanceFromTonic = Composer.getDistanceFromPreviousTonic(index, scaleDegrees);
 					nodeToAdd.distanceToCadence = Composer.getDistanceToNextTonic(index, scaleDegrees);
-					nodeToAdd.key = note.keySignature;
-					nodeToAdd.duration = note.noteDuration;
+					nodeToAdd.keySignature = note.keySignature;
+					nodeToAdd.noteDuration = note.noteDuration;
 					nodeToAdd.velocity = note.velocity;
 					
 					if(note.key == -1)
@@ -64,7 +71,7 @@ public class AssociationNetwork {
 			double weight = getNormalizedDistanceFromAverage(node.distanceFromTonic, averageDistanceFromTonic, maxDistanceFromTonic)
 							+ getNormalizedDistanceFromAverage(node.distanceToCadence, averageDistanceToCadence, maxDistanceToCadence) 
 							+ getEquivalentValueWeight(node.song == newNode.song)
-							+ getEquivalentValueWeight(node.key == newNode.key)
+							+ getEquivalentValueWeight(node.keySignature == newNode.keySignature)
 							+ intervalProbabilities.get(interval)
 							+ getNextIntervalProbability(nextIntervalKey)
 							+ scaleWeight
@@ -76,7 +83,7 @@ public class AssociationNetwork {
 			double reverseWeight = getNormalizedDistanceFromAverage(newNode.distanceFromTonic, averageDistanceFromTonic, maxDistanceFromTonic)
 					+ getNormalizedDistanceFromAverage(newNode.distanceToCadence, averageDistanceToCadence, maxDistanceToCadence) 
 					+ getEquivalentValueWeight(node.song == newNode.song)
-					+ getEquivalentValueWeight(node.key == newNode.key)
+					+ getEquivalentValueWeight(node.keySignature == newNode.keySignature)
 					+ intervalProbabilities.get(interval)
 					+ getNextIntervalProbability(reverseKey)
 					+ scaleWeight
@@ -90,15 +97,37 @@ public class AssociationNetwork {
 		network.add(newNode);
 	}
 	
+	public void linkNetwork() {
+		matrix = new Link[network.size()][network.size()];
+		ArrayList<Node> alreadyLinked = new ArrayList<Node>();
+		int count = 0;
+		for(Node node : network) {
+			node.index = count;
+			count++;
+			for(Node node2 : alreadyLinked) {
+				Link forwardLink = weightNodes(node, node2);
+				Link backwardLink = weightNodes(node2, node);
+				matrix[node.index][node2.index] = forwardLink;
+				matrix[node2.index][node.index] = backwardLink;
+			}
+		}
+	}
+	
 	Link weightNodes(Node start, Node end) {
-		int interval = Math.abs(start.scaleDegree-end.scaleDegree);
-		String key = start.scaleDegree + "->" + end.scaleDegree;
+		int interval = start.scaleDegree-end.scaleDegree;
+		String scaleDegreeNGram = start.scaleDegree + "," + end.scaleDegree;
+		String durationNGram = start.noteDuration + "," + end.noteDuration;
 		
 
-		double weight = getEquivalentValueWeight(start.song == end.song)
-		+ getEquivalentValueWeight(start.key == end.key)
-		+ intervalProbabilities.get(interval)
-		+ getNextIntervalProbability(key);
+		double weight = 
+		  getEquivalentValueWeight(start.song == end.song)
+		+ getEquivalentValueWeight(start.keySignature == end.keySignature)
+		+ (probabilities.getIntervalProbability(interval) * intervalContribution)
+		+ (probabilities.getScaleDegreeNGramProbability(scaleDegreeNGram) * intervalContribution)
+		+ (probabilities.getDurationNGramProbability(durationNGram) * durationContribution);
+		
+		if(start.scaleDegree == end.scaleDegree)
+			weight -= sameScaleDegreePenalty;
 		
 		return new Link(start, end, weight);
 	}
@@ -123,14 +152,22 @@ public class AssociationNetwork {
 		return null;
 	}
 	
-	//TODO: Refactor to use transition matrix
+	ArrayList<Node> deduceBestNextNodes(Node currentNode, int numberToCollect) {
+		ArrayList<Node> bestNodes = new ArrayList();
+		for(int i = 0; i < numberToCollect; i++) {
+			bestNodes.add(deduceNextNode(currentNode, bestNodes));
+		}
+		return bestNodes;
+	}
+	
 	Node deduceNextNode(Node currentNode, ArrayList<Node> alreadyChosenNodes) {
 		Link mostLikelyLink = null;
-		for(Link link : currentNode.linkedNodes) {
-			if(alreadyChosenNodes.contains(link.endNode))
+		for(int i = 0; i < network.size(); i++) {
+			Link currentLink = matrix[currentNode.index][i];
+			if(alreadyChosenNodes.contains(currentLink.endNode))
 				continue;
-			if(mostLikelyLink == null || link.weight > mostLikelyLink.weight) {
-				mostLikelyLink = link;
+			if(mostLikelyLink == null || currentLink.weight > mostLikelyLink.weight) {
+				mostLikelyLink = currentLink;
 			}
 		}
 		if(mostLikelyLink == null)
@@ -238,7 +275,7 @@ public class AssociationNetwork {
 	private ArrayList<Integer> getTempos(){
 		ArrayList<Integer> allTempos = new ArrayList<Integer>();
 		for(Node currentNode : network) {
-			allTempos.add(currentNode.tempo);
+			allTempos.add((int) currentNode.bpm);
 		}
 		return allTempos;
 	}

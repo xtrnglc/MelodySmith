@@ -38,7 +38,7 @@ public class CorpusAnalyzer {
 	/**
 	 * Returns 1 if the interval hasn't been seen to allow for playing of intervals that haven't been seen
 	 */
-	public int getIntervalCount(int interval) {
+	private int getIntervalCount(int interval) {
 		if(intervalCounts.containsKey(interval))
 			return intervalCounts.get(interval);
 		else
@@ -48,7 +48,7 @@ public class CorpusAnalyzer {
 	/**
 	 * Returns 1 if the ngram hasn't been seen to allow for playing of combinations that haven't been seen
 	 */
-	public int getScaleDegreeNGramCount(String nGram) {
+	private int getScaleDegreeNGramCount(String nGram) {
 		if(scaleDegreeNGramCounts.containsKey(nGram))
 			return scaleDegreeNGramCounts.get(nGram);
 		else
@@ -58,10 +58,32 @@ public class CorpusAnalyzer {
 	/**
 	 * Returns 1 if the ngram hasn't been seen to allow for playing of combinations that haven't been seen
 	 */
-	public int getDurationNGramCount(String nGram) {
+	private int getDurationNGramCount(String nGram) {
 		if(durationNGramCounts.containsKey(nGram))
 			return durationNGramCounts.get(nGram);
 		else
 			return 1;
+	}
+	
+	public double getIntervalProbability(int interval) {
+		return 1.0 * getIntervalCount(interval) / sumAllCounts(intervalCounts);
+	}
+	
+	public double getScaleDegreeNGramProbability(String key) {
+		return 1.0 * getScaleDegreeNGramCount(key) / sumAllCounts(scaleDegreeNGramCounts);
+	}
+	
+	public double getDurationNGramProbability(String key) {
+		return 1.0 * getDurationNGramCount(key) / sumAllCounts(durationNGramCounts);
+	}
+	
+	private int sumAllCounts(HashMap map) {
+		int total = 0;
+		for(Object value : map.values()) {
+			if(value instanceof Integer) {
+				total += ((Integer) value).intValue();
+			}
+		}
+		return total;
 	}
 }
