@@ -185,15 +185,18 @@ public class MidiReader {
 				if (i < channel.size() - 1) {
 					analyzer.addToIntervalCount(channel.get(i+1).key - channel.get(i).key);
 				}
-				String intervalScaleDegrees = channel.get(i).noteName;
+				String intervalScaleDegrees = channel.get(i).scaleDegree + "";
 				String intervalDurations = channel.get(i).noteDuration;
+				String intervalNoteNames = channel.get(i).noteName;
 
 				for (int k = i+1; k < (i + markovLength); k++) {
-					intervalScaleDegrees += "," + channel.get(k).noteName;
+					intervalScaleDegrees += "," + channel.get(k).scaleDegree;
 					intervalDurations += "," + channel.get(k).noteDuration;	
+					intervalNoteNames += "," + channel.get(i).noteName;
 					
 					analyzer.addToScaleDegreeNGramCount(intervalScaleDegrees);
 					analyzer.addToDurationNGramCount(intervalDurations);
+					analyzer.addToNoteNameNGramCount(intervalNoteNames);
 				}
 				
 			}
