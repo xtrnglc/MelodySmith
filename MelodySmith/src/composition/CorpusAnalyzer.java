@@ -4,9 +4,14 @@ import java.util.HashMap;
 
 public class CorpusAnalyzer {
 	
-	private HashMap<Integer, Integer> intervalCounts;
-	private HashMap<String, Integer> scaleDegreeNGramCounts;
-	private HashMap<String, Integer> durationNGramCounts;
+	// Calculated from Key2 - Key1
+	private HashMap<Integer, Integer> intervalCounts = new HashMap<Integer, Integer>();
+	
+	// Form A, B, C#, D...
+	private HashMap<String, Integer> scaleDegreeNGramCounts = new HashMap<String, Integer>();
+	
+	// Form 1/2, 1/4, 1/8, 1/16, 1/3, ...
+	private HashMap<String, Integer> durationNGramCounts = new HashMap<String, Integer>();
 	
 	public void addToIntervalCount(int interval) {
 		if(intervalCounts.containsKey(interval)) {

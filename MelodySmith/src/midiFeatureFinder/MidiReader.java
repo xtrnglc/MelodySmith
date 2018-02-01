@@ -17,6 +17,8 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
+import composition.*;
+
 public class MidiReader {
 
 	// Setup final variables
@@ -29,11 +31,7 @@ public class MidiReader {
 	public static final int maxChannels = 16;
 
 	// A list of the unordered notes of the last song processed
-	public ArrayList<LinkedHashMap<Long, ArrayList<Note>>> unorderedNotes;
-	
-	// A Hashtable with String keys that represent interval Markov Chains in the form (3,4,5) 
-	// where the numbers represent the interval and the value is the number of time that chain of intervals appears
-	public Hashtable<String, Integer> markovIntervalCounts;
+	public ArrayList<LinkedHashMap<Long, ArrayList<Node>>> unorderedNotes;
 
 	// Need to record current time and interval of song in order to insert
 	// information into notes.
@@ -43,27 +41,33 @@ public class MidiReader {
 	private String currentTime = "4/4";
 	private float currentBPM = 120;
 	private String trackName;
-	public boolean isPPQ = false;
 	private int ticksPerQuarterNote = 0;
+	public boolean isPPQ = false;
+	
+	public CorpusAnalyzer analyzer;
+	
+	public MidiReader(CorpusAnalyzer c) {
+		analyzer = c;
+	}
 
 	/**
 	 * Returns the ordered form of the current unordered notes
 	 * 
 	 * @return Ordered 2d array of the type [channel[note]]
 	 */
-	public ArrayList<ArrayList<Note>> getOrderedNotes() {
+	public ArrayList<ArrayList<Node>> getOrderedNotes() {
 
-		ArrayList<ArrayList<Note>> r = new ArrayList<ArrayList<Note>>();
-		for (LinkedHashMap<Long, ArrayList<Note>> channel : unorderedNotes) {
-			ArrayList<Note> temp = new ArrayList<Note>();
+		ArrayList<ArrayList<Node>> r = new ArrayList<ArrayList<Node>>();
+		for (LinkedHashMap<Long, ArrayList<Node>> channel : unorderedNotes) {
+			ArrayList<Node> temp = new ArrayList<Node>();
 			r.add(temp);
 
 			// Because notesByTick is a LinkedHashMap it retains the correct
 			// ordering from when the note arrays were added
-			for (Map.Entry<Long, ArrayList<Note>> notesByTick : channel.entrySet()) {
-				ArrayList<Note> notes = notesByTick.getValue();
+			for (Map.Entry<Long, ArrayList<Node>> notesByTick : channel.entrySet()) {
+				ArrayList<Node> notes = notesByTick.getValue();
 
-				for (Note note : notes) {
+				for (Node note : notes) {
 					temp.add(note);
 				}
 			}
@@ -79,7 +83,7 @@ public class MidiReader {
 	 * @return List containing all the notes started at the same tick as note
 	 *         and in the channel
 	 */
-	public ArrayList<Note> getAllConcurrentNotes(Note note, int channel) {
+	public ArrayList<Node> getAllConcurrentNotes(Node note, int channel) {
 		return unorderedNotes.get(channel).get(note.startTick);
 	}
 
@@ -89,44 +93,55 @@ public class MidiReader {
 	 * @param note
 	 * @return List containing all notes concurrent to note
 	 */
-	public ArrayList<Note> getAllConcurrentNotesAllChannels(Note note) {
-		ArrayList<Note> ret = new ArrayList<Note>();
+	public ArrayList<Node> getAllConcurrentNotesAllChannels(Node note) {
+		ArrayList<Node> ret = new ArrayList<Node>();
 
-		for (LinkedHashMap<Long, ArrayList<Note>> channel : unorderedNotes) {
+		for (LinkedHashMap<Long, ArrayList<Node>> channel : unorderedNotes) {
 			ret.addAll(channel.get(note.startTick));
 		}
 		return ret;
 	}
 	
-	public Hashtable<Integer, ArrayList<Note>> getCurrentNotes() {
+	public Hashtable<Integer, ArrayList<Node>> getCurrentNotes() {
 		// CurrentNotes is used to keep track of all ongoing notes. This is
 		// of the form channel -> active notes
-		unorderedNotes = new ArrayList<LinkedHashMap<Long, ArrayList<Note>>>();
+		unorderedNotes = new ArrayList<LinkedHashMap<Long, ArrayList<Node>>>();
 		
-		Hashtable<Integer, ArrayList<Note>> currentNotes = new Hashtable<Integer, ArrayList<Note>>();
+		Hashtable<Integer, ArrayList<Node>> currentNotes = new Hashtable<Integer, ArrayList<Node>>();
 		
 		for (int i = 0; i < maxChannels; i++) {
-			unorderedNotes.add(new LinkedHashMap<Long, ArrayList<Note>>());
-			currentNotes.put(i, new ArrayList<Note>());
+			unorderedNotes.add(new LinkedHashMap<Long, ArrayList<Node>>());
+			currentNotes.put(i, new ArrayList<Node>());
 		}
 		return currentNotes;
 	}
 
 	/**
-	 * Reads in a sequence from midiFile and processes it tick by tick, storing
+	 * 	 * Reads in a sequence from midiFile and processes it tick by tick, storing
 	 * the result as unordered notes. Unordered notes is of the form Channel
 	 * (ArrayList index) -> Tick (key) -> All notes played on tick
 	 * 
 	 * @param midiFile
+	 * @param markovLength
+	 * @return getOrderedNotes()
 	 */
-	public void readSequence(File midiFile, int markovLength) {
+	public ArrayList<ArrayList<Node>> readSequence(File midiFile, int markovLength) {
 		try {
 			// Rest Logic commented out for now because it doesn't work well
 			// with the association network
 			// long[] lastTickOfChannel = new long[maxChannels];
-			Hashtable<Integer, ArrayList<Note>> currentNotes = getCurrentNotes();
+			Hashtable<Integer, ArrayList<Node>> currentNotes = getCurrentNotes();
 
+			// Reset the fields
 			currentSequence = MidiSystem.getSequence(midiFile);
+			
+			currentInstrument = "";
+			currentKey = "C";
+			currentTime = "4/4";
+			currentBPM = 120;
+			trackName = "";
+			ticksPerQuarterNote = 0;
+			isPPQ = false;
 
 			// Currently the logic will only handle MIDI with PPQ division type
 			// This should not be a problem for the prototype as the SMPTE is
@@ -155,38 +170,43 @@ public class MidiReader {
 			e.printStackTrace();
 			System.out.println("Could not locate the MIDI file");
 		}
+		return getOrderedNotes();
 	}
 	
 	/**
 	 * Records the counts of all possible interval combinations, in the form key: ,X,Y,Z value: the number of time the key appears in the current song
 	 * @param markovLength
 	 */
-	private void recordIntervals(int markovLength) {
-		Hashtable<String, Integer> intervals = new Hashtable<String, Integer>();
+	private void recordIntervals(int markovLength) {		
+		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
 		
-		ArrayList<ArrayList<Note>> orderedNotes = getOrderedNotes();
-		
-		for (ArrayList<Note> channel : orderedNotes) {
+		for (ArrayList<Node> channel : orderedNotes) {
 			for (int i = 0; i < channel.size() - markovLength; i++) {
-				String intervalKey = "";
-				int currentKey = channel.get(i).key;
+				if (i < channel.size() - 1) {
+					analyzer.addToIntervalCount(channel.get(i+1).key - channel.get(i).key);
+				}
+				String intervalScaleDegrees = channel.get(i).noteName;
+				String intervalDurations = channel.get(i).noteDuration;
+
 				for (int k = i+1; k < (i + markovLength); k++) {
-					intervalKey += "," + (currentKey - channel.get(k).key);
+					intervalScaleDegrees += "," + channel.get(k).noteName;
+					intervalDurations += "," + channel.get(k).noteDuration;	
 					
-					if (intervals.get(intervalKey) == null) {
-						intervals.put(intervalKey, 1);
-					}
-					else {
-						intervals.put(intervalKey, intervals.get(intervalKey) + 1);
-					}
-					
-					currentKey = channel.get(k).key;
+					analyzer.addToScaleDegreeNGramCount(intervalScaleDegrees);
+					analyzer.addToDurationNGramCount(intervalDurations);
 				}
 				
 			}
+			
+			// Insert ending intervals into IntervalCount analysis hashmap
+			if (markovLength < channel.size()) {
+				for (int i = channel.size() - markovLength; i < channel.size(); i++) {
+					if (i < channel.size() - 1) {
+						analyzer.addToIntervalCount(channel.get(i+1).key - channel.get(i).key);
+					}
+				}
+			}
 		}
-		
-		markovIntervalCounts = intervals;
 	}
 	
 	/**
@@ -195,33 +215,33 @@ public class MidiReader {
 	 * @param currentNotes
 	 * @param i
 	 */
-	private Hashtable<Integer, ArrayList<Note>> processEvent(Track track, Hashtable<Integer, ArrayList<Note>> currentNotes, int i) {
+	private Hashtable<Integer, ArrayList<Node>> processEvent(Track track, Hashtable<Integer, ArrayList<Node>> currentNotes, int i) {
 		MidiEvent event = track.get(i);
 		long currentTick = -1;
 		MidiMessage message = event.getMessage();
 		if (message instanceof ShortMessage) {
 			ShortMessage sMessage = (ShortMessage) message;
 
-			LinkedHashMap<Long, ArrayList<Note>> notes = unorderedNotes.get(sMessage.getChannel());
+			LinkedHashMap<Long, ArrayList<Node>> notes = unorderedNotes.get(sMessage.getChannel());
 
 			int key = sMessage.getData1();
 			int velocity = sMessage.getData2();
 
 			if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
-				Note n = new Note(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
+				Node n = new Node(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
 						currentInstrument, currentKey, currentTime, currentBPM);
 				currentNotes.get(sMessage.getChannel()).add(n);
 
 				if (notes.get(event.getTick()) == null) {
 					currentTick = event.getTick();
-					notes.put(currentTick, new ArrayList<Note>());
+					notes.put(currentTick, new ArrayList<Node>());
 				}
 				
 				if(currentTick != -1)
 					notes.get(currentTick).add(n);
 			} else if (sMessage.getCommand() == NOTE_OFF || velocity == 0) {
-				ArrayList<Note> channelNotes = currentNotes.get(sMessage.getChannel());
-				Note n = null;
+				ArrayList<Node> channelNotes = currentNotes.get(sMessage.getChannel());
+				Node n = null;
 
 				// Find the note in the channel in current notes and
 				// remove and store it
