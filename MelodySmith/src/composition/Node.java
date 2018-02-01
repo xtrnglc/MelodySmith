@@ -138,12 +138,12 @@ public class Node {
 
 		if (ticksPerQuarterNote == 0) {
 			noteDuration = "N/A";
-		} else if ((tickDuration / (long) (ticksPerQuarterNoteDouble * 4)) >= .9) {
+		} else if ((tickDuration / (double) (ticksPerQuarterNoteDouble * 4)) >= .9) {
 			noteDuration = (int) (Math.round((double) tickDuration / ticksPerQuarterNoteDouble)) + "";
-		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 2.5
-				&& (tickDuration / ticksPerQuarterNoteDouble) >= 1.6) {
+		} else if ((tickDuration / (double) (ticksPerQuarterNoteDouble * 4)) < .9
+				&& (tickDuration / ticksPerQuarterNoteDouble) >= 1.5) {
 			noteDuration = "1/2";
-		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 1.15
+		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 1.5
 				&& (tickDuration / ticksPerQuarterNoteDouble) >= .75) {
 			noteDuration = "1/4";
 		} else if ((tickDuration / ticksPerQuarterNoteDouble) < .75
