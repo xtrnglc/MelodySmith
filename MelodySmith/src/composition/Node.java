@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class Node {	
 	public static final String[] NOTES = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 	public static final String[] SCALEDEGREE = { "C", "D", "E", "F", "G", "A", "B" };
-	
+	public static final String[] KEYS = { "Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#",
+	"C#" };
 	public int key;
 	public int note;
 	public int octave;
@@ -142,9 +143,6 @@ public class Node {
 		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 2.5
 				&& (tickDuration / ticksPerQuarterNoteDouble) >= 1.6) {
 			noteDuration = "1/2";
-		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 1.6
-				&& (tickDuration / ticksPerQuarterNoteDouble) >= 1.15) {
-			noteDuration = "1/3";
 		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 1.15
 				&& (tickDuration / ticksPerQuarterNoteDouble) >= .75) {
 			noteDuration = "1/4";
