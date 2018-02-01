@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class Node {	
 	public static final String[] NOTES = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 	public static final String[] SCALEDEGREE = { "C", "D", "E", "F", "G", "A", "B" };
-	
+	public static final String[] KEYS = { "Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#",
+	"C#" };
 	public int key;
 	public int note;
 	public int octave;
