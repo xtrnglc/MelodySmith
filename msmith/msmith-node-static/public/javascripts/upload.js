@@ -4,6 +4,8 @@ $('.upload-btn').on('click', function (){
     $('.progress-bar').width('0%');
 });
 
+
+
 $('#upload-input').on('change', function(){
 
   var files = $(this).get(0).files;
@@ -24,6 +26,7 @@ $('#upload-input').on('change', function(){
     $.ajax({
       url: '/upload',
       type: 'POST',
+        body: formData,
       data: formData,
       processData: false,
       contentType: false,

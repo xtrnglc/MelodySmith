@@ -38,11 +38,29 @@
                     </div>
                     <div class="column-2 right">
                         <h4>Parameters</h4>
-                        <p>Key Signature</p>
-                        <button class="button button-primary" onClick="cbutton()" id="c-button">C</button>
-                        <button class="button button-primary" onClick="abutton()" id="a-button">a</button>
-                        <p>Chaos</p>
-                        <input type="range" id="chaos-slider" min="0" max="100">
+
+                        <div class="column-2 right">
+                            <p>Chaos</p>
+                            <input type="range" id="chaos-slider" min="0" max="100">
+                            <p>Weight of note duration</p>
+                            <input type="range" id="durationOfNotes-slider" min="0" max="100">
+                            <h6 class="text-right">N-gram selector</h6>
+                            <div class="input-group input-number-group">
+                                <input class="input-number" id="n-gram-selector" type="number" value="1" min="2" max="10">
+                            </div>
+
+                        </div>
+                        <div class="column-2 left">
+                            <p>Interval of Note</p>
+                            <input type="range" id="intervalOfNote-slider" min="0" max="100">
+                            <p>Rest</p>
+                            <input type="range" id="rest-slider" min="0" max="100">
+                            <p>Key Signature</p>
+                            <button class="button button-primary" onClick="cbutton()" id="c-button">C</button>
+                            <button class="button button-primary" onClick="abutton()" id="a-button">a</button>
+                        </div>
+
+
                     </div>
                 </div>
             </div>
@@ -67,6 +85,7 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 <script src="javascripts/browser/midiplayer.min.js"></script>
 <script src="javascripts/soundfont-player.min.js"></script>
 <script src="javascripts/app.js"></script>
