@@ -142,9 +142,6 @@ public class Node {
 		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 2.5
 				&& (tickDuration / ticksPerQuarterNoteDouble) >= 1.6) {
 			noteDuration = "1/2";
-		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 1.6
-				&& (tickDuration / ticksPerQuarterNoteDouble) >= 1.15) {
-			noteDuration = "1/3";
 		} else if ((tickDuration / ticksPerQuarterNoteDouble) < 1.15
 				&& (tickDuration / ticksPerQuarterNoteDouble) >= .75) {
 			noteDuration = "1/4";
