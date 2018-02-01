@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import jvst.*;
-import midiFeatureFinder.MidiReader;
+
 import midiFeatureFinder.MidiWriter;
 
 public class Composer {
@@ -15,12 +15,12 @@ public class Composer {
 	
 	AssociationNetwork network;
 	String keySignature;
+	ArrayList<Song> corpus;
 	int nGramLength;
 	int choicesToCompare;
 	CorpusAnalyzer analyzer;
 	double intervalWeight;
 	double durationWeight;
-	MidiReader reader;
 	
 	public Composer(String folderName) {
 		network = new AssociationNetwork();
@@ -29,10 +29,7 @@ public class Composer {
 	}
 	
 	public Composer(String corpusFolderName, String keySig, int nGramLength, int choicesToCompare, double intervalWeight, double durationWeight, HashMap<String, Double> artistWeightings) {
-		analyzer = new CorpusAnalyzer();
-		reader = new MidiReader(analyzer);
 		network = new AssociationNetwork();
-		network.probabilities = analyzer;
 		network.intervalContribution = intervalWeight;
 		network.durationContribution = durationWeight;
 		this.intervalWeight = intervalWeight;
@@ -40,7 +37,7 @@ public class Composer {
 		this.choicesToCompare = choicesToCompare;
 		this.nGramLength = nGramLength;
 		keySignature = keySig;
-		trainNetwork(corpusFolderName, network);
+		corpus = new ArrayList();
 	}
 	
 	public Composer(ArtistGrouping[] artists) {
@@ -65,21 +62,22 @@ public class Composer {
 
 		for(int i = 0; i < lengthInNotes; i++) {
 			alreadyChosen.add(currentNode);
+			if(alreadyChosen.size() > network.size/2)
+				alreadyChosen.remove(0);
 			
-			ArrayList<Node> choices = network.deduceBestNextNodes(currentNode, choicesToCompare, alreadyChosen);
-			ArrayList<Node> nGram = getMostRecentNGram(alreadyChosen, nGramLength-1);
+			ArrayList<Node> choices = network.deduceBestNextNodes(currentNode, choicesToCompare);
+			ArrayList<Node> nGram = getMostRecentNGram(alreadyChosen, nGramLength);
 			
 			Node nextNode = getBestSelection(distanceToEndOfBar, distanceFromRest, nGram, choices);
 			
 			int duration = decodeDuration(nextNode.noteDuration);
-			int midiKey = getTransposedScaleDegree(nextNode.scaleDegree+midiOffset, scale);
+			int midiKey = getTransposedScaleDegree(nextNode.key, scale);
 			int velocity = smoothVelocity(nextNode.velocity);
 			
 			mw.noteOnOffNow(duration, midiKey, velocity);
 			
 			distanceFromRest++;
 			distanceToEndOfBar = (distanceToEndOfBar - duration) % 64;
-			currentNode = nextNode;
 		}
 		
 		writeMidi(mw, outputFilename);
@@ -87,8 +85,7 @@ public class Composer {
 	
 	private ArrayList<Node> getMostRecentNGram(ArrayList<Node> melodySoFar, int n){
 		ArrayList<Node> nGram = new ArrayList();
-		int bound = Math.min(n, melodySoFar.size());
-		for(int i = 0; i < bound; i++) {
+		for(int i = 0; i < n; i++) {
 			nGram.add(melodySoFar.get(melodySoFar.size()-i-1));
 		}
 		return nGram;
@@ -107,21 +104,13 @@ public class Composer {
 		Node bestNode = choices.get(0);
 		for(Node choice : choices) {
 			double weight = 0.0;
-			for(String scaleDegreeNGram : getScaleDegreeNGramKeys(nGram, choice)) {
-				weight += (intervalWeight * analyzer.getScaleDegreeNGramProbability(scaleDegreeNGram));
-			}
-			
-			for(String noteNameNGram : getNoteNameNGramKeys(nGram, choice)) {
-				System.out.println(noteNameNGram);
-				weight += (intervalWeight * analyzer.getNoteNameNGramProbability(noteNameNGram));
+			for(String intervalNGram : getIntervalNGramStrings(nGram, choice)) {
+				weight += (intervalWeight * analyzer.getScaleDegreeNGramProbability(intervalNGram));
 			}
 			
 			for(String durationNGram : getDurationNGramStrings(nGram, choice)) {
 				weight += (durationWeight * analyzer.getDurationNGramProbability(durationNGram));
 			}
-			
-			if(choice.noteName == nGram.get(nGram.size()-1).noteName)
-				weight -= 1;
 			
 			// If distance from rest == avg distance from rest, weight++		
 			
@@ -138,36 +127,19 @@ public class Composer {
 		return bestNode;
 	}
 	
-	public ArrayList<String> getScaleDegreeNGramKeys(ArrayList<Node> nGram, Node currentNode){
+	public ArrayList<String> getIntervalNGramStrings(ArrayList<Node> nGram, Node currentNode){
 		ArrayList<String> nGrams = new ArrayList();
-		StringBuilder nGramString = new StringBuilder();
-		nGramString.append(currentNode.scaleDegree);
 		for(int i = nGram.size()-1; i >= 0; i--) {
-			nGramString.insert(0, nGram.get(i).scaleDegree + ",");
-			nGrams.add(nGramString.toString());
+			
 		}
 		
 		return nGrams;
 	}
 	
-	public ArrayList<String> getNoteNameNGramKeys(ArrayList<Node> nGram, Node currentNode){
-		ArrayList<String> nGrams = new ArrayList();
-		StringBuilder nGramString = new StringBuilder();
-		nGramString.append(currentNode.noteName);
-		for(int i = nGram.size()-1; i >= 0; i--) {
-			nGramString.insert(0, nGram.get(i).noteName + ",");
-			nGrams.add(nGramString.toString());
-		}	
-		return nGrams;
-	}
-	
 	public ArrayList<String> getDurationNGramStrings(ArrayList<Node> nGram, Node currentNode){
 		ArrayList<String> nGrams = new ArrayList();
-		StringBuilder nGramString = new StringBuilder();
-		nGramString.append(currentNode.noteDuration);
 		for(int i = nGram.size()-1; i >= 0; i--) {
-			nGramString.insert(0, nGram.get(i).noteDuration + ",");
-			nGrams.add(nGramString.toString());
+			
 		}
 		
 		return nGrams;
@@ -198,7 +170,7 @@ public class Composer {
 				alreadyChosen.remove(0);
 			
 			if(currentNode.linkedNodes.size() > 0) {
-				Node nextNode = network.deduceNextNode(currentNode, new ArrayList(), alreadyChosen);
+				Node nextNode = network.deduceNextNode(currentNode, alreadyChosen);
 				
 				if(nextNode.scaleDegree == -1) {
 					restDuration += decodeDuration(nextNode.noteDuration);
@@ -242,10 +214,12 @@ public class Composer {
 	private void trainNetwork(ArtistGrouping[] artists, AssociationNetwork network) {
 		for(ArtistGrouping artist : artists) {
 			for(File file : artist.artistMIDIFiles) {
-				//if(file.isFile())
-					//corpus.add(new Song(file, file.getName(), artist.artistName));
+				if(file.isFile())
+					corpus.add(new Song(file, file.getName(), artist.artistName));
 			}
-		}	
+		}
+		network.calculateNetworkStatistics();
+		network.addAllNotes();	
 	}
 	
 	private void trainNetwork(String corpusFolder, AssociationNetwork network) {
@@ -253,17 +227,12 @@ public class Composer {
 		File[] artistFolders = corp.listFiles();
 		
 		for(File folder : artistFolders) {
-			for(File midiFile : folder.listFiles()) {
-				for(ArrayList<Node> channel : reader.readSequence(midiFile, nGramLength)) {
-					for(Node note : channel) {
-						note.artist = folder.getName();
-						note.song = midiFile.getName();
-					}
-					network.allNodes.addAll(channel);
-				}
-			}
+			for(File midiFile : folder.listFiles())
+				corpus.add(new Song(midiFile, midiFile.getName(), folder.getName()));
 		}
-		network.linkNetwork();
+		
+		network.calculateNetworkStatistics();
+		network.addAllNotes();	
 	}
 	
 	static int decodeDuration(String duration) {
@@ -279,7 +248,6 @@ public class Composer {
 	}
 	
 	static int getTransposedScaleDegree(int octavePosition, int[] scale) {
-		
 		if(octavePosition < scale[0])
 			return -1;
 		
