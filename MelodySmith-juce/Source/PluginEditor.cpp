@@ -66,7 +66,7 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	scaleLabel.setFont(Font("Avenir", 20.0f, 0));
 	addAndMakeVisible(scaleLabel);
 
-	keySelect.addItem("A Minor Blues", 1);
+	keySelect.addItem("A", 1);
 	keySelect.addItem("B Major Blues", 2);
 	keySelect.setSelectedId(1);
 	addAndMakeVisible(keySelect);
@@ -192,10 +192,10 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		if (system(NULL)) puts("Ok");
 		else exit(EXIT_FAILURE);
 
-		String clStr = "java -jar " + clParamsStr;
+		String clStr = "java -jar MelodySmith.jar artists " + clParamsStr;
 
 		printf("Executing command DIR...\n");
-		i = system("dir");
+		i = system(clStr.toStdString().c_str());
 		printf("The value returned was: %d.\n", i);
 	}
 }
