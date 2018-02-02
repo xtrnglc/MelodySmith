@@ -68,5 +68,7 @@ private:
 	Slider keyKnob;
 	MyKnobLF keyKnobLF;
 
+	ComboBox keySelect;
+	Label scaleLabel;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessorEditor)
 };

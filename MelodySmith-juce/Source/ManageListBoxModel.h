@@ -18,6 +18,6 @@ public:
 
 	Array<std::tuple<String, String>> *curr_artist_filename_tuples = nullptr;
 
-	StringArray fileNames;
+	Array<File> fileNames;
 };
 

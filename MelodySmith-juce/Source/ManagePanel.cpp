@@ -90,7 +90,7 @@ void ManagePanel::buttonClicked(Button* button)
 		for (int i = 0; i < corpusListBox.getNumRows(); i++)
 		{
 			ManageListBoxRow *currListBoxRow = dynamic_cast<ManageListBoxRow*>(corpusListBox.getComponentForRowNumber(i));
-			std::tuple<String, String> s(currListBoxRow->fileNameLabel.getText(), currListBoxRow->artistName.getText());
+			std::tuple<String, String> s(corpusListBox.fileNames[i].getFullPathName(), currListBoxRow->artistName.getText());
 
 			curr_artist_filename_tuples->add(s);
 		}

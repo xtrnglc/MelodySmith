@@ -32,7 +32,7 @@ Component* ManageListBoxModel::refreshComponentForRow(int rowNumber, bool isRowS
 			aName = std::get<1>(s);
 		}
 
-		ManageListBoxRow* newListBoxRow = new ManageListBoxRow(fileNames[rowNumber], aName);
+		ManageListBoxRow* newListBoxRow = new ManageListBoxRow(fileNames[rowNumber].getFileName(), aName);
 		return newListBoxRow;
 	}
 	else {
@@ -49,7 +49,7 @@ void ManageListBoxModel::addSongs(Array<File> midi_files)
 {
 	for (int i = 0; i < midi_files.size(); i++) 
 	{
-		fileNames.add(midi_files[i].getFileName());
+		fileNames.add(midi_files[i]);
 	}
 }
 

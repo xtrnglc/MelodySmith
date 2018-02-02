@@ -24,17 +24,19 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
     setSize (pluginHeight, pluginWidth);
 	//setResizable(true, false);
 
-	corpusHeader.setColour(Label::textColourId, Colours::aqua);
+	corpusHeader.setColour(Label::textColourId, header1Colour);
 	corpusHeader.setText("CORPUS", NotificationType::dontSendNotification);
 	corpusHeader.setJustificationType(Justification::centred);
 	corpusHeader.setFont(Font("Avenir", 20.0f, 0));
 	addAndMakeVisible(corpusHeader);
 
 	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
-	tabbedCorpusComponent.addTab("Manage", Colours::aliceblue, &managePanel, false);
-	tabbedCorpusComponent.addTab("Influences", Colours::aliceblue, &influencesPanel, false);
-	tabbedCorpusComponent.setTabBackgroundColour(0, Colours::aliceblue);
-	tabbedCorpusComponent.setColour(TabbedComponent::backgroundColourId, Colours::beige);
+	tabbedCorpusComponent.addTab("Manage", Colours::red, &managePanel, false);
+	tabbedCorpusComponent.addTab("Influences", Colours::red, &influencesPanel, false);
+	//tabbedCorpusComponent.setTabBackgroundColour(0, Colours::aliceblue);
+	//tabbedCorpusComponent.setTabBackgroundColour()
+	tabbedCorpusComponent.setColour(TabbedComponent::backgroundColourId, Colours::red.brighter(0.4f));
+	//tabbedCorpusComponent.setColour()
 	addAndMakeVisible(tabbedCorpusComponent);
 
 	File f1 = File::getCurrentWorkingDirectory().getChildFile("anvil_recast2.png");
@@ -51,12 +53,23 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	reforgeImageBtn.addListener(this);
 	forgeImageBtn.addListener(this);
 
-	addAndMakeVisible(keyKnob);
+	/*addAndMakeVisible(keyKnob);
 	keyKnob.setLookAndFeel(&keyKnobLF);
 	keyKnob.setSliderStyle(Slider::Rotary);
 	keyKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+	*///keyKnob.textbox
+	//keyKnob.addListener(this);
 	//keyKnob.value
 	//keyKnob.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+	scaleLabel.setText("SCALE", NotificationType::dontSendNotification);
+	scaleLabel.setJustificationType(Justification::centred);
+	scaleLabel.setFont(Font("Avenir", 20.0f, 0));
+	addAndMakeVisible(scaleLabel);
+
+	keySelect.addItem("A Minor Blues", 1);
+	keySelect.addItem("B Major Blues", 2);
+	keySelect.setSelectedId(1);
+	addAndMakeVisible(keySelect);
 
 }
 
@@ -68,8 +81,8 @@ MelodySmithVSTAudioProcessorEditor::~MelodySmithVSTAudioProcessorEditor()
 void MelodySmithVSTAudioProcessorEditor::paint (Graphics& g)
 {
 	// fill the whole window white
-	g.fillAll(pluginBgColour);
-
+	//g.fillAll(Colour::fromString("#1a1a1a"));
+	g.fillAll(Colours::black.brighter(0.2f));
 	// set the current drawing colour to black
 	//g.setColour(Colours::white);
 
@@ -110,7 +123,9 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 	Rectangle<int> rightCol(area);
 	int rightColHeight = rightCol.getHeight();
 	reforgeImageBtn.setBounds(rightCol.removeFromTop(rightColHeight / 3));
-	keyKnob.setBounds(rightCol.removeFromTop(rightColHeight / 3).reduced(0, 50));
+	scaleLabel.setBounds(rightCol.removeFromTop(rightColHeight / 6));
+	keySelect.setBounds(rightCol.removeFromTop(rightColHeight / 12).reduced(50, 10));
+	rightCol.removeFromTop(rightColHeight / 12);
 	forgeImageBtn.setBounds(rightCol);
 	//txbtn.setBounds(rightCol);
 	//corpusListBox.setBounds(tempArea);
@@ -121,7 +136,11 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 
 void MelodySmithVSTAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
-	processor.noteOnVel = midiVolume.getValue();
+	//processor.noteOnVel = midiVolume.getValue();
+	if (slider == &keyKnob)
+	{
+
+	}
 }
 
 void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
@@ -132,7 +151,52 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 	}
 	else if (btn == &forgeImageBtn)
 	{
-		String r = "";
+		String clParamsStr = "c ";
+		//Create master directory
+		File f(File::getCurrentWorkingDirectory().getFullPathName() + "/artists");
+		f.deleteRecursively();
+		f.createDirectory();
+
+		//For each artist
+		for (int i = 0; i < artists_to_influences.size(); i++)
+		{
+			//create artist directory
+			std::tuple<String, double> currArtistToInfluence(artists_to_influences[i]);
+			String artistName = std::get<0>(currArtistToInfluence);
+			double inf = std::get<1>(currArtistToInfluence);
+			File artistFolder(f.getFullPathName() + "/" + artistName);
+			artistFolder.createDirectory();
+
+			//add to cl string
+			clParamsStr += artistName + ":" + String(inf) + " ";
+			
+			//populate with artist files
+			for (int j = 0; j < curr_artist_filename_tuples.size(); j++)
+			{
+				std::tuple<String, String> currFileArtist(curr_artist_filename_tuples[j]);
+				String currArtistName = std::get<1>(currFileArtist);
+				String fileName = std::get<0>(currFileArtist);
+
+				if (currArtistName == artistName)
+				{
+					File tempF(fileName);
+					File newF(artistFolder.getFullPathName() + "/file" + String(j) + ".mid");
+					tempF.copyFileTo(newF);
+				}
+			}
+		}
+
+		//Call commandline melodysmith.jar
+		int i;
+		printf("Checking if processor is available...");
+		if (system(NULL)) puts("Ok");
+		else exit(EXIT_FAILURE);
+
+		String clStr = "java -jar " + clParamsStr;
+
+		printf("Executing command DIR...\n");
+		i = system("dir");
+		printf("The value returned was: %d.\n", i);
 	}
 }
 
@@ -141,15 +205,15 @@ void MelodySmithVSTAudioProcessorEditor::setSizesAndColors()
 	pluginWidth = 700;
 	pluginHeight = 900;
 
-	header1Colour = Colours::antiquewhite;
+	header1Colour = Colours::white;
 	buttonBgColour = Colours::crimson,  buttonTextColour = Colours::black;
-
-	pluginBgColour = Colours::black;
+	
+	pluginBgColour = Colour::fromString("#1a1a1a");
 
 	divBgColour = Colours::darkgrey;
 	tabSelectedColour = Colours::maroon;
 
-	divTextColour = Colours::antiquewhite;
+	divTextColour = Colours::white.darker(0.1f);
 	divBorderColour = Colours::azure;
 }
 
