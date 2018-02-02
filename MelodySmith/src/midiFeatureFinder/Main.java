@@ -3,14 +3,15 @@ package midiFeatureFinder;
 import java.io.File;
 import java.util.ArrayList;
 
+import composition.*;
+
 public class Main {
-	//lol
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		MidiReader r = new MidiReader();
-		r.readSequenceRaw(new File("midiReaderData/bwv772.mid"));
-		r.readSequence(new File("midiReaderData/bwv772.mid"));
-		ArrayList<ArrayList<Note>> test = r.getOrderedNotes();
+		CorpusAnalyzer c = new CorpusAnalyzer();
+		MidiReader r = new MidiReader(c);
+		r.readSequenceRaw(new File("midiReaderData/beatles/Lead2.mid"));
+		ArrayList<ArrayList<Node>> test = r.readSequence(new File("midiReaderData/beatles/Lead2.mid"), 5);
 		System.out.println();
 	}
 }

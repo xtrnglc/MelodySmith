@@ -12,11 +12,12 @@ public class MidiWriter {
 	// two semibreves (i.e., 8 crotchets)
 
 	static final int REST = -1;
-	static final int SEMIQUAVER = 4;
-	static final int QUAVER = 8;
-	static final int CROTCHET = 16;
-	static final int MINIM = 32;
-	static final int SEMIBREVE = 64;
+	static final int THIRTYSECONDNOTE = 2;
+	static final int SIXTEENTHNOTE = 4;
+	static final int EIGHTHNOTE = 8;
+	static final int QUARTERNOTE = 16;
+	static final int HALFNOTE = 32;
+	static final int WHOLENOTE = 64; 
 
 	// Standard MIDI file header, for one-track file
 	// 4D, 54... are just magic numbers to identify the

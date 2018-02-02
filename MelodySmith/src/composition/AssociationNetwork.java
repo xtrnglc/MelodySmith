@@ -3,11 +3,11 @@ package composition;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import midiFeatureFinder.Note;
-
 public class AssociationNetwork {
-	ArrayList<Node> network = new ArrayList<Node>();
+	ArrayList<Node> allNodes = new ArrayList<Node>();
 	ArrayList<Song> corpus = new ArrayList<Song>();
+	
+	Link[][] matrix;
 	
 	HashMap<Integer, Double> intervalProbabilities = new HashMap<>();
 	HashMap<String, Double> nextIntervalProbabilities = new HashMap<>();
@@ -21,74 +21,54 @@ public class AssociationNetwork {
 	double maxDistanceToCadence = -1.0;
 	int size = 0;
 	
-	void addAllNotes() {
-		for(Song song : corpus) {
-			for(ArrayList<Note> channel : song.channels) {
-				int index = 0;
-				ArrayList<Integer> scaleDegrees = song.getScaleDegrees(channel);
-				Node previousNode = null;
-				for(Note note : channel) {
-					Node nodeToAdd = new Node();
-					nodeToAdd.song = song.name;
-					nodeToAdd.artist = song.artist;
-					nodeToAdd.scaleDegree = note.scaleDegree;
-					nodeToAdd.distanceFromTonic = Composer.getDistanceFromPreviousTonic(index, scaleDegrees);
-					nodeToAdd.distanceToCadence = Composer.getDistanceToNextTonic(index, scaleDegrees);
-					nodeToAdd.key = note.keySignature;
-					nodeToAdd.duration = note.noteDuration;
-					nodeToAdd.velocity = note.velocity;
-					
-					if(note.key == -1)
-						nodeToAdd.scaleDegree = -1;
-					
-					
-					addNode(nodeToAdd, previousNode);
-					previousNode = nodeToAdd;
-					index++;
-				}
+	double intervalContribution;
+	double durationContribution;
+	
+	CorpusAnalyzer probabilities;
+	
+	double sameScaleDegreePenalty = 0.5;
+	double sameDurationPenalty = 1.0;
+	
+	public void linkNetwork() {
+		matrix = new Link[allNodes.size()][allNodes.size()];
+		ArrayList<Node> alreadyLinked = new ArrayList<Node>();
+		int count = 0;
+		for(Node node : allNodes) {
+			node.index = count;
+			count++;
+			alreadyLinked.add(node);
+			for(Node node2 : alreadyLinked) {
+				Link forwardLink = weightNodes(node, node2);
+				Link backwardLink = weightNodes(node2, node);
+				matrix[node.index][node2.index] = forwardLink;
+				matrix[node2.index][node.index] = backwardLink;
 			}
 		}
 	}
 	
-	void addNode(Node newNode, Node previousNode) {
-		for(Node node : network) {
-			int interval =  Math.abs(newNode.scaleDegree-node.scaleDegree);
-			String nextIntervalKey = newNode.scaleDegree + "->" + interval;
-			double scaleWeight = 0;
-			if(newNode.scaleDegree == node.scaleDegree)
-				scaleWeight -= 0.5;
-			
-			double weight = getNormalizedDistanceFromAverage(node.distanceFromTonic, averageDistanceFromTonic, maxDistanceFromTonic)
-							+ getNormalizedDistanceFromAverage(node.distanceToCadence, averageDistanceToCadence, maxDistanceToCadence) 
-							+ getEquivalentValueWeight(node.song == newNode.song)
-							+ getEquivalentValueWeight(node.key == newNode.key)
-							+ intervalProbabilities.get(interval)
-							+ getNextIntervalProbability(nextIntervalKey)
-							+ scaleWeight
-							+ Composer.getArtistWeight(node.artist);
-			
-			String reverseKey = node.scaleDegree + "->" + interval;
-			if(previousNode == node)
-				scaleWeight += 1;
-			double reverseWeight = getNormalizedDistanceFromAverage(newNode.distanceFromTonic, averageDistanceFromTonic, maxDistanceFromTonic)
-					+ getNormalizedDistanceFromAverage(newNode.distanceToCadence, averageDistanceToCadence, maxDistanceToCadence) 
-					+ getEquivalentValueWeight(node.song == newNode.song)
-					+ getEquivalentValueWeight(node.key == newNode.key)
-					+ intervalProbabilities.get(interval)
-					+ getNextIntervalProbability(reverseKey)
-					+ scaleWeight
-					+ Composer.getArtistWeight(newNode.artist);
-			
-			if(weight > 4.0) {
-				newNode.linkNodes(node, weight, reverseWeight);
-				size++;
-			}
-		}
-		network.add(newNode);
+	Link weightNodes(Node start, Node end) {
+		int interval = end.scaleDegree-start.scaleDegree;
+		String scaleDegreeNGram = start.scaleDegree + "," + end.scaleDegree;
+		String durationNGram = start.noteDuration + "," + end.noteDuration;
+		
+
+		double weight = 
+		  getEquivalentValueWeight(start.song == end.song)
+		+ getEquivalentValueWeight(start.keySignature == end.keySignature)
+		+ (probabilities.getIntervalProbability(interval) * intervalContribution)
+		+ (probabilities.getScaleDegreeNGramProbability(scaleDegreeNGram) * intervalContribution)
+		+ (probabilities.getDurationNGramProbability(durationNGram) * durationContribution);
+		
+		if(start.scaleDegree == end.scaleDegree)
+			weight -= sameScaleDegreePenalty;
+		if(start.noteDuration == end.noteDuration)
+			weight -= sameDurationPenalty;
+		
+		return new Link(start, end, weight);
 	}
 	
 	Node getTonic() {
-		for(Node node : network) {
+		for(Node node : allNodes) {
 			if(node.scaleDegree == 0) {
 				return node;
 			}
@@ -97,7 +77,7 @@ public class AssociationNetwork {
 	}
 	
 	Node getTonic(int i) {
-		for(Node node : network) {
+		for(Node node : allNodes) {
 			if(node.scaleDegree == 0) {
 				i--;
 				if(i <= 0)
@@ -107,19 +87,41 @@ public class AssociationNetwork {
 		return null;
 	}
 	
-	Node deduceNextNode(Node currentNode, ArrayList<Node> alreadyChosenNodes) {
+	ArrayList<Node> deduceBestNextNodes(Node currentNode, int numberToCollect, ArrayList<Node> alreadyChosen) {
+		ArrayList<Node> bestNodes = new ArrayList();
+		ArrayList<Node> chosen = new ArrayList();
+		chosen.addAll(alreadyChosen);
+		for(int i = 0; i < numberToCollect; i++) {
+			Node bestNode = deduceNextNode(currentNode, bestNodes, chosen);
+			bestNodes.add(bestNode);
+			chosen.add(bestNode);
+			//System.out.print();
+		}
+		return bestNodes;
+	}
+	
+	Node deduceNextNode(Node currentNode, ArrayList<Node> bestNodes, ArrayList<Node> alreadyChosenNodes) {
 		Link mostLikelyLink = null;
-		for(Link link : currentNode.linkedNodes) {
-			if(alreadyChosenNodes.contains(link.endNode))
+		for(int i = 0; i < allNodes.size(); i++) {
+			Link currentLink = matrix[currentNode.index][i];
+			if(alreadyChosenNodes.contains(currentLink.endNode) || equivalentNodeInList(currentLink.endNode, bestNodes))
 				continue;
-			if(mostLikelyLink == null || link.weight > mostLikelyLink.weight) {
-				mostLikelyLink = link;
+			if(mostLikelyLink == null || currentLink.weight > mostLikelyLink.weight) {
+				mostLikelyLink = currentLink;
 			}
 		}
 		if(mostLikelyLink == null)
 			return getTonic();
 		else
 			return mostLikelyLink.endNode;
+	}
+	
+	boolean equivalentNodeInList(Node node, ArrayList<Node> listOfNodes) {
+		for(Node node2 : listOfNodes) {
+			if(node.noteName == node2.noteName)
+				return true;
+		}
+		return false;
 	}
 	
 	void calculateNetworkStatistics() {
@@ -142,8 +144,8 @@ public class AssociationNetwork {
 		
 		for(Song song : corpus) {			
 			for(int i=0; i < 12; i++) {
-				double intervalProbability = 1.0*getSingleIntervalFrequencyFromSong(i, song)/song.countNotes();
-				allIntervalProbabilities.set(i, allIntervalProbabilities.get(i) + intervalProbability);
+				//double intervalProbability = 1.0*getSingleIntervalFrequencyFromSong(i, song)/song.countNotes();
+				//allIntervalProbabilities.set(i, allIntervalProbabilities.get(i) + intervalProbability);
 			}
 		}
 		
@@ -158,11 +160,11 @@ public class AssociationNetwork {
 		for(Song song : corpus) {
 			for(int scaleDegree = 1; scaleDegree < 13; scaleDegree++) {
 				for(int interval = 0; interval < 12; interval++) {
-					double intervalProbability = 1.0*getIntervalFrequencyAfterScaleDegreeFromSong(scaleDegree, interval, song)/song.countScaleDegreeOccurences(scaleDegree);
+					//double intervalProbability = 1.0*getIntervalFrequencyAfterScaleDegreeFromSong(scaleDegree, interval, song)/song.countScaleDegreeOccurences(scaleDegree);
 					String key = scaleDegree+"->"+interval;
-					double intervalTotal = map.get(key) + intervalProbability;
-					if(!Double.isNaN(intervalTotal))
-						map.put(key, intervalTotal);
+					//double intervalTotal = map.get(key) + intervalProbability;
+					//if(!Double.isNaN(intervalTotal))
+						//map.put(key, intervalTotal);
 				}
 			}
 		}
@@ -220,17 +222,17 @@ public class AssociationNetwork {
 	
 	private ArrayList<Integer> getTempos(){
 		ArrayList<Integer> allTempos = new ArrayList<Integer>();
-		for(Node currentNode : network) {
-			allTempos.add(currentNode.tempo);
+		for(Node currentNode : allNodes) {
+			allTempos.add((int) currentNode.bpm);
 		}
 		return allTempos;
 	}
 	
 	private int getIntervalFrequencyAfterScaleDegreeFromSong(int scaleDegree, int interval, Song song) {
 		int count = 0;
-		for(ArrayList<Integer> channel : song.getAllScaleDegrees()) {
-			count += getIntervalFrequencyAfterScaleDegree(scaleDegree, interval, channel);
-		}
+		//for(ArrayList<Integer> channel : song.getAllScaleDegrees()) {
+			//count += getIntervalFrequencyAfterScaleDegree(scaleDegree, interval, channel);
+		//}
 		return count;
 	}
 	
@@ -247,9 +249,9 @@ public class AssociationNetwork {
 	
 	private int getSingleIntervalFrequencyFromSong(int interval, Song song) {
 		int count = 0;
-		for(ArrayList<Integer> channel : song.getAllScaleDegrees()) {
-			count += getSingleIntervalFrequencyFromChannel(interval, channel);
-		}
+		//for(ArrayList<Integer> channel : song.getAllScaleDegrees()) {
+			//count += getSingleIntervalFrequencyFromChannel(interval, channel);
+		//}
 		return count;
 	}
 	
