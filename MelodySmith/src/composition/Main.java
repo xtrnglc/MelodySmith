@@ -11,6 +11,8 @@ public class Main {
 	static int[] AMINOR = {57, 59, 60, 62, 64, 65, 67, 69};
 	
 	public static void main(String[] args) {
+//		composeLocalCorpus();
+		
 		String corpusFolder = args[0];
 		String keySig = args[1];
 		HashMap<String, Double> artistWeights = new HashMap<String, Double>();
@@ -21,6 +23,13 @@ public class Main {
 		Composer composer = new Composer(corpusFolder, keySig, 5, 3, 1.5, 0.5, artistWeights);
 		composer.composeMelody("output.mid", 500);
 		System.out.println();
+	}
+	
+	public static void composeLocalCorpus() {
+		HashMap<String, Double> artistWeights = new HashMap<String, Double>();
+		Composer composer = new Composer("Midi_Input/Beatles_Rubber_Soul", "a", 10, 5, 0.0001, 2.0, artistWeights);
+		
+		composer.composeMelody("output.mid", 500);
 	}
 
 }

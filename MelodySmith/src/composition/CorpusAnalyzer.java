@@ -20,6 +20,8 @@ public class CorpusAnalyzer {
 	
 	
 	private HashMap<String,Integer> intervalVocab = new HashMap<String,Integer>();
+	private String totalIntervalCount;
+	
 	private HashMap<String,Integer> scaleDegreeVocab = new HashMap<String,Integer>();
 	private HashMap<String,Integer> noteNameVocab = new HashMap<String,Integer>();
 	private HashMap<String,Integer> durationVocab = new HashMap<String,Integer>();
@@ -123,23 +125,26 @@ public class CorpusAnalyzer {
 		String subKey = constructSubkey(key);
 		if(subKey.length() == 1)
 			return 1.0 * (getNoteNameNGramCount(key)+1) / (noteNameVocab.get(subKey)+noteNameVocab.size());
-		return 1.0 * getNoteNameNGramCount(key) / sumAllCounts(noteNameNGramCounts);
+		return 1.0 * (getNoteNameNGramCount(key)+1) / (getNoteNameNGramCount(subKey)+noteNameVocab.size());
 	}
 	
 	public double getDurationNGramProbability(String key) {
 		String subKey = constructSubkey(key);
 		if(subKey.length() == 1)
 			return 1.0 * (getDurationNGramCount(key)+1) / (durationVocab.get(subKey)+durationVocab.size());
-		return 1.0 * getDurationNGramCount(key) / sumAllCounts(durationNGramCounts);
+		return 1.0 * (getDurationNGramCount(key)+1) / (getDurationNGramCount(subKey)+durationVocab.size());
 	}
 	
 	private int sumAllCounts(HashMap map) {
+		if(totalIntervalCount != null)
+			return Integer.parseInt(totalIntervalCount);
 		int total = 0;
 		for(Object value : map.values()) {
 			if(value instanceof Integer) {
 				total += ((Integer) value).intValue();
 			}
 		}
+		totalIntervalCount = Integer.toString(total);
 		return total;
 	}
 	
