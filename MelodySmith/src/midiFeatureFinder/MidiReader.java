@@ -396,9 +396,9 @@ public class MidiReader {
 		}
 
 		// End of Track
-		else if (message.getType() == 0x2F) {
-			System.out.println("End of Track");
-		}
+//		else if (message.getType() == 0x2F) {
+//			System.out.println("End of Track");
+//		}
 
 		// Instrument
 		else if (message.getType() == 0x04) {
