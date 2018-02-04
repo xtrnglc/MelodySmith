@@ -466,9 +466,364 @@ th {
   font-size: 2rem;
   font-weight: 400;
 }
-.input-number-group .input-number-decrement {
-  margin-right: 0.3rem;
+
+* {
+  box-sizing: border-box;
 }
-.input-number-group .input-number-increment {
-  margin-left: 0.3rem;
+
+radioform {
+  max-width: 30em;
+  margin: 4rem auto;
+  text-align: center;
 }
+fieldset {
+  position: relative;
+  border: none;
+  width: 16rem;
+  height: 16rem;
+  margin: 0 auto;
+}
+fieldset legend {
+  position: absolute;
+  top: -4rem;
+  left: 0;
+  width: 100%;
+}
+fieldset label {
+  position: absolute;
+  display: block;
+  margin: 0 auto;
+  padding-top: 1rem;
+  width: 1rem;
+  left: 7.5rem;
+  transform-origin: 50% 7.5rem;
+}
+fieldset label:hover {
+  cursor: pointer;
+}
+fieldset input {
+  position: absolute;
+  width: 2rem;
+  left: 7rem;
+  display: block;
+  margin: 1rem auto 0 auto;
+  padding: 0;
+  transform-origin: 50% 7.5rem;
+  opacity: 0;
+}
+fieldset input:hover {
+  cursor: pointer;
+}
+fieldset #radio-choice-1, fieldset label[for="radio-choice-1"] {
+  transform: rotateZ(-48deg);
+}
+fieldset #radio-choice-2, fieldset label[for="radio-choice-2"] {
+  transform: rotateZ(-24deg);
+}
+fieldset #radio-choice-3, fieldset label[for="radio-choice-3"] {
+  transform: rotateZ(0deg);
+}
+fieldset #radio-choice-4, fieldset label[for="radio-choice-4"] {
+  transform: rotateZ(24deg);
+}
+fieldset #radio-choice-5, fieldset label[for="radio-choice-5"] {
+  transform: rotateZ(48deg);
+}
+fieldset input[type="radio"]:checked + label {
+  color: #0FA0CE;
+  text-shadow: 0px 0px 4px #0FA0CE;
+}
+input[type="radio"]:checked#radio-choice-1 ~ .dial {
+  transform: rotateZ(-48deg);
+}
+input[type="radio"]:checked#radio-choice-1 ~ .dial::before {
+  transform: rotateZ(48deg);
+}
+input[type="radio"]:checked#radio-choice-1 ~ .dial::after {
+  transform: rotateZ(48deg);
+}
+input[type="radio"]:checked#radio-choice-2 ~ .dial {
+  transform: rotateZ(-24deg);
+}
+input[type="radio"]:checked#radio-choice-2 ~ .dial::before {
+  transform: rotateZ(24deg);
+}
+input[type="radio"]:checked#radio-choice-2 ~ .dial::after {
+  transform: rotateZ(24deg);
+}
+input[type="radio"]:checked#radio-choice-3 ~ .dial {
+  transform: rotateZ(0deg);
+}
+input[type="radio"]:checked#radio-choice-3 ~ .dial::before {
+  transform: rotateZ(0);
+}
+input[type="radio"]:checked#radio-choice-3 ~ .dial::after {
+  transform: rotateZ(0);
+}
+input[type="radio"]:checked#radio-choice-4 ~ .dial {
+  transform: rotateZ(24deg);
+}
+input[type="radio"]:checked#radio-choice-4 ~ .dial::before {
+  transform: rotateZ(-24deg);
+}
+input[type="radio"]:checked#radio-choice-4 ~ .dial::after {
+  transform: rotateZ(-24deg);
+}
+input[type="radio"]:checked#radio-choice-5 ~ .dial {
+  transform: rotateZ(48deg);
+}
+input[type="radio"]:checked#radio-choice-5 ~ .dial::before {
+  transform: rotateZ(-48deg);
+}
+input[type="radio"]:checked#radio-choice-5 ~ .dial::after {
+  transform: rotateZ(-48deg);
+}
+.dial {
+  position: relative;
+  text-align: center;
+  line-height: 0;
+  font-size: 65%;
+  color: #33C3F0;
+  text-shadow: 0px 0px 7px #0FA0CE;
+  display: block;
+  width: 8rem;
+  height: 8rem;
+  padding: 1rem;
+  background: radial-gradient(#272727 30%, #333 50%, #222 65%, #111 90%, black 98%);
+  margin: 3rem auto;
+  border-radius: 50%;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s ease-in-out;
+}
+.dial::before {
+  position: absolute;
+  content: '';
+  display: block;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 80%, rgba(15, 15, 15, 0.4) 40%, rgba(15, 15, 15, 0.1) 70%);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.45);
+  transition: transform 0.3s ease-in-out;
+}
+.dial::after {
+  position: absolute;
+  content: '';
+  display: block;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  background: radial-gradient(circle at 50% 25%, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+  transition: transform 0.3s ease-in-out;
+}
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+
+.sk-folding-cube {
+  margin: 20px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  -webkit-transform: rotateZ(45deg);
+  transform: rotateZ(45deg);
+}
+
+.sk-folding-cube .sk-cube {
+  float: left;
+  width: 50%;
+  height: 50%;
+  position: relative;
+  -webkit-transform: scale(1.1);
+  -ms-transform: scale(1.1);
+  transform: scale(1.1);
+}
+.sk-folding-cube .sk-cube:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #333;
+  -webkit-animation: sk-foldCubeAngle 2.4s infinite linear both;
+  animation: sk-foldCubeAngle 2.4s infinite linear both;
+  -webkit-transform-origin: 100% 100%;
+  -ms-transform-origin: 100% 100%;
+  transform-origin: 100% 100%;
+}
+.sk-folding-cube .sk-cube2 {
+  -webkit-transform: scale(1.1) rotateZ(90deg);
+  transform: scale(1.1) rotateZ(90deg);
+}
+.sk-folding-cube .sk-cube3 {
+  -webkit-transform: scale(1.1) rotateZ(180deg);
+  transform: scale(1.1) rotateZ(180deg);
+}
+.sk-folding-cube .sk-cube4 {
+  -webkit-transform: scale(1.1) rotateZ(270deg);
+  transform: scale(1.1) rotateZ(270deg);
+}
+.sk-folding-cube .sk-cube2:before {
+  -webkit-animation-delay: 0.3s;
+  animation-delay: 0.3s;
+}
+.sk-folding-cube .sk-cube3:before {
+  -webkit-animation-delay: 0.6s;
+  animation-delay: 0.6s;
+}
+.sk-folding-cube .sk-cube4:before {
+  -webkit-animation-delay: 0.9s;
+  animation-delay: 0.9s;
+}
+@-webkit-keyframes sk-foldCubeAngle {
+  0%, 10% {
+    -webkit-transform: perspective(140px) rotateX(-180deg);
+    transform: perspective(140px) rotateX(-180deg);
+    opacity: 0;
+  } 25%, 75% {
+      -webkit-transform: perspective(140px) rotateX(0deg);
+      transform: perspective(140px) rotateX(0deg);
+      opacity: 1;
+    } 90%, 100% {
+        -webkit-transform: perspective(140px) rotateY(180deg);
+        transform: perspective(140px) rotateY(180deg);
+        opacity: 0;
+      }
+}
+
+@keyframes sk-foldCubeAngle {
+  0%, 10% {
+    -webkit-transform: perspective(140px) rotateX(-180deg);
+    transform: perspective(140px) rotateX(-180deg);
+    opacity: 0;
+  } 25%, 75% {
+      -webkit-transform: perspective(140px) rotateX(0deg);
+      transform: perspective(140px) rotateX(0deg);
+      opacity: 1;
+    } 90%, 100% {
+        -webkit-transform: perspective(140px) rotateY(180deg);
+        transform: perspective(140px) rotateY(180deg);
+        opacity: 0;
+      }
+}
+
+/**
+ * Author: Kris Olszewski
+ * CodePen: https://codepen.io/KrisOlszewski/full/wBQBNX
+ */
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+/*dropdowncustom {*/
+  /*padding: 50px 0;*/
+  /*font-family: "Open Sans", "Arial", sans-serif;*/
+  /*text-rendering: optimizeSpeed;*/
+  /*-webkit-font-smoothing: antialiased;*/
+  /*-moz-osx-font-smoothing: grayscale;*/
+  /*text-align: center;*/
+/*}*/
+/**
+ * Component: Dropdown
+ * --------------------------------------------------
+ */
+.c-dropdown {
+  position: relative;
+  display: inline-block;
+  text-align: left;
+}
+.c-dropdown__list {
+  margin: 5px 0 0 0;
+  padding: 6px 0;
+  list-style: none;
+  position: absolute;
+  top: 125%;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  border-radius: 3px;
+  background: #fff;
+  transition: opacity 0.25s linear, top 0.25s linear;
+}
+.c-dropdown.is-open .c-dropdown__list {
+  opacity: 1;
+  visibility: visible;
+  top: 100%;
+}
+.c-dropdown__item {
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  color: #434a54;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.25s linear;
+}
+.c-dropdown__item:hover {
+  background-color: #e6e9ed;
+}
+/**
+ * Component: Button
+ * --------------------------------------------------
+ */
+.c-button {
+  -webkit-appearance: none;
+  margin: 0;
+  border: 0;
+  overflow: visible;
+  font: inherit;
+  text-transform: none;
+  display: inline-block;
+  vertical-align: middle;
+  text-decoration: none;
+  text-align: center;
+  user-select: none;
+}
+.c-button:hover, .c-button:focus {
+  outline: none;
+  text-decoration: none;
+}
+.c-button:not(:disabled) {
+  cursor: pointer;
+}
+/**
+ * Component: Button
+ * Modifier: Dropdown
+ * --------------------------------------------------
+ */
+.c-button--dropdown {
+  padding: 6px 34px 6px 12px;
+  background-color: #33C3F0;
+  color: #e6e9ed;
+  font-size: 14px;
+  line-height: 20px;
+  min-height: 32px;
+  border-radius: 3px;
+  transition: background-color 0.2s linear;
+}
+.c-button--dropdown:hover {
+  background-color: #0FA0CE;
+}
+.c-button--dropdown:after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: 11px;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-top-color: #e6e9ed;
+}
+
+

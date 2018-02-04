@@ -19,72 +19,109 @@
     </style>
 </head>
 <body>
+
 <div class="container" style="padding-top:12px;">
+    <h1>&#9836; MelodySmith</h1>
     <div class="row">
-        <div class="twelve columns">
-            <h1>&#9836; MelodySmith</h1>
-            <div id="container2">
-                <div class="row double">
-
-                    <div class="column-2 left">
-                        <h4>Artists</h4>
-                        <p>Backstreet Boys</p>
-                        <input type="range" id="artist-slider1" min="0" max="100">
-                        <p>Katy Perry</p>
-                        <input type="range" id="artist-slider2" min="0" max="100">
-                        <p>Beethoven</p>
-                        <input type="range" id="artist-slider3" min="0" max="100">
-
-                    </div>
-                    <div class="column-2 right">
-                        <h4>Parameters</h4>
-
-                        <div class="column-2 right">
-                            <p>Chaos</p>
-                            <input type="range" id="chaos-slider" min="0" max="100">
-                            <p>Weight of note duration</p>
-                            <input type="range" id="durationOfNotes-slider" min="0" max="100">
-                            <h6 class="text-right">N-gram selector</h6>
-                            <div class="input-group input-number-group">
-                                <input class="input-number" id="n-gram-selector" type="number" value="1" min="2" max="10">
-                            </div>
-
-                        </div>
-                        <div class="column-2 left">
-                            <p>Interval of Note</p>
-                            <input type="range" id="intervalOfNote-slider" min="0" max="100">
-                            <p>Rest</p>
-                            <input type="range" id="rest-slider" min="0" max="100">
-                            <p>Key Signature</p>
-                            <button class="button button-primary" onClick="cbutton()" id="c-button">C</button>
-                            <button class="button button-primary" onClick="abutton()" id="a-button">a</button>
-                        </div>
-
-
-                    </div>
+        <div class="four columns">
+            <h4>Artists</h4>
+            <p>Backstreet Boys</p>
+            <input type="range" id="artist-slider1" min="0" max="100">
+            <p>Katy Perry</p>
+            <input type="range" id="artist-slider2" min="0" max="100">
+            <p>Beethoven</p>
+            <input type="range" id="artist-slider3" min="0" max="100">
+        </div>
+        <div class="eight columns">
+            <h4>Parameters</h4>
+            <div class="four columns">
+                <!--<p>Chaos</p>-->
+                <!--<input type="range" id="chaos-slider" min="0" max="100">-->
+                <p>Weight of note duration</p>
+                <input type="range" id="durationOfNotes-slider" min="0" max="100">
+                <h6>N-gram selector</h6>
+                <div class="input-group input-number-group">
+                    <input class="input-number" id="n-gram-selector" type="number" value="2" min="2" max="10">
+                </div>
+                <h6>Number of Comparisons</h6>
+                <div class="input-group input-number-group">
+                    <input class="input-number" id="num-comparisons-selector" type="number" value="1" min="2" max="10">
                 </div>
             </div>
 
-            <hr/>
-            <p id="loading">Hit forge when you are ready to listen to some new music!</p>
-            <div style="border:1px solid #ccc;margin-bottom:12px;background:#f7f7f7;">
-                <div id="play-bar" style="height:20px;background:#33C3F0;width:0%;"></div>
-            </div>
-            <p>
-                <button class="button button-primary" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled">Play</button>
-                <button class="button" onclick="stop()">Stop</button>
-                <button class="button button-primary" onClick="forge()" id="forge-button">Forge</button>
+            <div class="four columns">
+                <!--<p>Chaos</p>-->
+                <!--<input type="range" id="chaos-slider" min="0" max="100">-->
+                <p>Interval of Note</p>
+                <input type="range" id="intervalOfNote-slider" min="0" max="100">
 
-            </p>
-            <p>
-            Tempo: <span id="tempo-display"></span> bpm<br />
-            <input type="range" onchange="Player.pause();Player.setTempo(this.value);Player.play()" min="50" max="200">
-            <br />
-            </p>
-            <div id="events" class="well"></div>
+                <!--<radioform action="#">-->
+                    <!--<div>-->
+                        <!--<fieldset>-->
+                            <!--<input type="radio" name="radio-choice" id="radio-choice-1" value="choice-1" />-->
+                            <!--<label for="radio-choice-1">1</label>-->
+
+                            <!--<input type="radio" name="radio-choice" id="radio-choice-2" value="choice-2" />-->
+                            <!--<label for="radio-choice-2">2</label>-->
+
+                            <!--<input type="radio" name="radio-choice" id="radio-choice-3" value="choice-3" />-->
+                            <!--<label for="radio-choice-3">3</label>-->
+
+                            <!--<input type="radio" name="radio-choice" id="radio-choice-4" value="choice-4" />-->
+                            <!--<label for="radio-choice-4">4</label>-->
+
+                            <!--<input type="radio" name="radio-choice" id="radio-choice-5" value="choice-5" />-->
+                            <!--<label for="radio-choice-5">5</label>-->
+
+                            <!--<div class="dial">▲</div>-->
+                        <!--</fieldset>-->
+                    <!--</div>-->
+                <!--</radioform>-->
+
+                <h6>Key Signature</h6>
+                <div class="c-dropdown js-dropdown">
+                    <input type="hidden" name="Framework" id="keysigdropdown" class="js-dropdown__input">
+                    <span class="c-button c-button--dropdown js-dropdown__current">G Chromatic</span>
+                    <ul class="c-dropdown__list">
+                        <li class="c-dropdown__item" data-dropdown-value="cGypsy">c Gypsy</li>
+                        <li class="c-dropdown__item" data-dropdown-value="aMinor">a Minor</li>
+                        <li class="c-dropdown__item" data-dropdown-value="DBlues">D Blues</li>
+                        <li class="c-dropdown__item" data-dropdown-value="fHarmonic">f Harmonic</li>
+                        <li class="c-dropdown__item" data-dropdown-value="GChromatic">G Chromatic</li>
+                    </ul>
+                </div>
+            </div>
+
+            </div>
         </div>
+    <hr/>
+    <p id="loading">Hit forge when you are ready to listen to some new music!</p>
+
+    <div id="loadingcube" class="sk-folding-cube" style="display: none">
+        <div class="sk-cube1 sk-cube"></div>
+        <div class="sk-cube2 sk-cube"></div>
+        <div class="sk-cube4 sk-cube"></div>
+        <div class="sk-cube3 sk-cube"></div>
     </div>
-</div>
+
+    <div style="border:1px solid #ccc;margin-bottom:12px;background:#f7f7f7;">
+        <div id="play-bar" style="height:20px;background:#33C3F0;width:0%;"></div>
+    </div>
+    <p>
+        <button class="button button-primary" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled">Play</button>
+        <button class="button" onclick="stop()">Stop</button>
+        <button class="button button-primary" onClick="forge()" id="forge-button">Forge</button>
+
+    </p>
+    <p>
+        Tempo: <span id="tempo-display"></span> bpm<br />
+        <input type="range" onchange="Player.pause();Player.setTempo(this.value);Player.play()" min="50" max="200">
+        <br />
+    </p>
+    <div id="events" class="well"></div>
+    </div>
+
+
 <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 <script src="javascripts/browser/midiplayer.min.js"></script>
 <script src="javascripts/soundfont-player.min.js"></script>

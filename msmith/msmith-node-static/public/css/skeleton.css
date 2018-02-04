@@ -273,12 +273,9 @@ legend {
   display: block;
   margin-bottom: .5rem;
   font-weight: 600; }
-fieldset {
-  padding: 0;
-  border-width: 0; }
+
 input[type="checkbox"],
-input[type="radio"] {
-  display: inline; }
+
 label > .label-body {
   display: inline-block;
   margin-left: .5rem;
@@ -417,11 +414,3 @@ there.
 /* Larger than Desktop HD */
 @media (min-width: 1200px) {}
 
-
-.row div { height: 100%; }
-.single { background-color: #F8F8F9; }
-.column-2 { width: 48%; }
-.column-3 { width: 30%; }
-.left { background-color: #F8F8F9; float: left; }
-.center { float: left; margin: 0 5%; background-color: #F8F8F9; }
-.right { background-color: #F8F8F9; float: right;}
