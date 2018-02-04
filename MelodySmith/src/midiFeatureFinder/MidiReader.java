@@ -42,8 +42,7 @@ public class MidiReader {
 	private float currentBPM = 120;
 	private String trackName;
 	private int ticksPerQuarterNote = 0;
-	public boolean isPPQ = false;
-	
+	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
 	
 	public MidiReader(CorpusAnalyzer c) {
@@ -368,10 +367,10 @@ public class MidiReader {
 		if (message.getType() == 0x59) {
 			int key = temp[0];
 			if (temp[1] == 1) {
-				System.out.println("Key Signature: " + KEYS[key + 7] + " minor");
+//				System.out.println("Key Signature: " + KEYS[key + 7] + " minor");
 				currentKey = KEYS[key + 7] + " minor";
 			} else {
-				System.out.println("Key Signature: " + KEYS[key + 7] + " major");
+//				System.out.println("Key Signature: " + KEYS[key + 7] + " major");
 				currentKey = KEYS[key + 7] + " major";
 			}
 		}
@@ -381,8 +380,8 @@ public class MidiReader {
 			int num = temp[0];
 			int den = (int) Math.pow(2, temp[1]);
 			int met = temp[2] / (24 / (temp[1] - 1));
-			System.out.println(
-					"Time Signature: " + num + "/" + den + " Metronome: Every " + met + " 1/" + den + " notes");
+//			System.out.println(
+//					"Time Signature: " + num + "/" + den + " Metronome: Every " + met + " 1/" + den + " notes");
 
 			currentTime = num + "/" + den;
 		}
@@ -390,8 +389,8 @@ public class MidiReader {
 		// Tempo
 		else if (message.getType() == 0x51) {
 			int t = ((temp[0] & 0xff) << 16) | ((temp[1] & 0xff) << 8) | (temp[2] & 0xff);
-			System.out.println(
-					"Tempo: " + (oneMinuteInMicroseconds / t) * (Integer.parseInt(currentTime.split("/")[1]) / 4.0f));
+//			System.out.println(
+//					"Tempo: " + (oneMinuteInMicroseconds / t) * (Integer.parseInt(currentTime.split("/")[1]) / 4.0f));
 
 			currentBPM = (oneMinuteInMicroseconds / t) * (Integer.parseInt(currentTime.split("/")[1]) / 4.0f);
 		}
@@ -404,18 +403,42 @@ public class MidiReader {
 		// Instrument
 		else if (message.getType() == 0x04) {
 
-			System.out.println("Instrument: " + Arrays.toString(message.getData()));
+			//System.out.println("Instrument: " + Arrays.toString(message.getData()));
 
 			currentInstrument = Arrays.toString(message.getData());
 		}
 
 		// Track Name
 		else if (message.getType() == 0x03) {
-			System.out.println("Track Name: " + Arrays.toString(message.getData()));
+			//System.out.println("Track Name: " + Arrays.toString(message.getData()));
 
 			trackName = Arrays.toString(message.getData());
-		} else {
-			System.out.println("Meta Message: " + message.getType());
+		} 
+//		else {
+//			System.out.println("Meta Message: " + message.getType());
+//		}
+	}
+	
+	/**
+	 * Processes the current sequence using heuristics to determine a confidence level for each channel that represents that chance that that channel contains the melody
+	 * @return A predictive array of the form index = channel, value = an integer between 0 and 100 which represents the confidence that that channel is the melody channel
+	 * where 0 is a channel that does not contain the melody and 100 is a channel that definitely contains the melody.
+	 */
+	public int[] predictMelodyChannel() {
+		
+		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
+		int[] predictions = new int[orderedNotes.size()];
+		
+		for (int i = 0; i < orderedNotes.size(); i++) {
+			predictions[i] = 100;
 		}
+		
+		for (int i = 0; i < orderedNotes.size(); i++) {
+			if (orderedNotes.get(i).size() == 0) {
+				predictions[i] = 0;
+			}
+		}
+		
+		return predictions;
 	}
 }
