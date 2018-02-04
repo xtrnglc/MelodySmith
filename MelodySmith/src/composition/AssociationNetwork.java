@@ -36,6 +36,7 @@ public class AssociationNetwork {
 		int count = 0;
 		for(Node node : allNodes) {
 			node.index = count;
+			printProgress(count);
 			count++;
 			alreadyLinked.add(node);
 			for(Node node2 : alreadyLinked) {
@@ -45,6 +46,11 @@ public class AssociationNetwork {
 				matrix[node2.index][node.index] = backwardLink;
 			}
 		}
+	}
+	
+	private void printProgress(int count) {
+		if((count % (allNodes.size()/10)) == 0)
+			System.out.println(allNodes.size()/count + "0");
 	}
 	
 	Link weightNodes(Node start, Node end) {
@@ -97,7 +103,6 @@ public class AssociationNetwork {
 			Node bestNode = deduceNextNode(currentNode, bestNodes, chosen);
 			bestNodes.add(bestNode);
 			chosen.add(bestNode);
-			//System.out.print();
 		}
 		return bestNodes;
 	}

@@ -11,7 +11,7 @@ public class Main {
 	static int[] AMINOR = {57, 59, 60, 62, 64, 65, 67, 69};
 	
 	public static void main(String[] args) {
-		composeLocalCorpus();
+		//composeLocalCorpus();
 		
 		try {
 		String corpusFolder = args[0];
@@ -25,7 +25,6 @@ public class Main {
 		
 		Composer composer = new Composer(corpusFolder, keySig, nGramLength, numberOfComparisons, intervalWeight, durationWeight, artistWeights);
 		composer.composeMelody("output.mid", 500);
-		System.out.println();
 		
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
@@ -34,8 +33,6 @@ public class Main {
 			for(String arg : args)
 				System.out.print(arg + " ");
 		}
-		
-
 	}
 	
 	public static void composeLocalCorpus() {

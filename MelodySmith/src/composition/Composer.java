@@ -106,7 +106,6 @@ public class Composer {
 			}
 			
 			for(String noteNameNGram : getNoteNameNGramKeys(nGram, choice)) {
-				System.out.println(noteNameNGram);
 				weight += (intervalWeight * analyzer.getNoteNameNGramProbability(noteNameNGram));
 			}
 			
