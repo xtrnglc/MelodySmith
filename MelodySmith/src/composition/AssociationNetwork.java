@@ -50,7 +50,14 @@ public class AssociationNetwork {
 	
 	private void printProgress(int count) {
 		if((count % (allNodes.size()/10)) == 0)
-			System.out.println(allNodes.size()/count + "0");
+			System.out.println(roundUp(((double)count/allNodes.size())*100));
+	}
+	
+	private int roundUp(double d) {
+		int percent = (int)Math.round(d);
+		while(percent % 10 != 0)
+			percent++;
+		return percent;
 	}
 	
 	Link weightNodes(Node start, Node end) {
