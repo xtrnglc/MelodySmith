@@ -13,6 +13,7 @@ public class AssociationNetwork {
 	HashMap<String, Double> nextIntervalProbabilities = new HashMap<>();
 	HashMap<Integer, Double> durationProbabilities = new HashMap<>();
 	HashMap<String, Double> nextDurationProbabilities = new HashMap<>();
+	HashMap<String, Double> artistWeightings = new HashMap<>();
 	double averageTempo = -1.0;
 	double maxTempo = -1.0;
 	double averageDistanceFromTonic = -1.0;
@@ -55,6 +56,7 @@ public class AssociationNetwork {
 		double weight = 
 		  getEquivalentValueWeight(start.song == end.song)
 		+ getEquivalentValueWeight(start.keySignature == end.keySignature)
+		+ artistWeightings.get(end.artist)
 		+ (probabilities.getIntervalProbability(interval) * intervalContribution)
 		+ (probabilities.getScaleDegreeNGramProbability(scaleDegreeNGram) * intervalContribution)
 		+ (probabilities.getDurationNGramProbability(durationNGram) * durationContribution);

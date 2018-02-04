@@ -4,12 +4,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT;
+
 import midiFeatureFinder.MidiReader;
 import midiFeatureFinder.MidiWriter;
 
 public class Composer {
 	static int[] CMAJOR = {60, 62, 64, 65, 67, 69, 71, 72};
-	static int[] AMINOR = {57, 59, 60, 62, 64, 65, 67, 69};
+	
+	static int[] CGYPSY = {60, 62, 63, 66, 67, 68, 70, 72, 74, 75, 78, 79, 80, 82, 84};
+	static int[] AMINOR = {57, 59, 60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79, 81};
+	static int[] DBLUES = {62, 64, 65, 66, 69, 71, 74, 76, 77, 78, 81, 83, 85};
+	static int[] FHARMONIC = {65, 67, 68, 70, 72, 73, 76, 77, 79, 80, 82, 84, 85, 88, 89};
+	static int[] GCHROMATIC = {55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79};
 	
 	AssociationNetwork network;
 	String keySignature;
@@ -24,6 +31,7 @@ public class Composer {
 		analyzer = new CorpusAnalyzer();
 		reader = new MidiReader(analyzer);
 		network = new AssociationNetwork();
+		network.artistWeightings = artistWeightings;
 		network.probabilities = analyzer;
 		network.intervalContribution = intervalWeight;
 		network.durationContribution = durationWeight;
@@ -38,7 +46,7 @@ public class Composer {
 	public void composeMelody(String outputFilename, int lengthInNotes) {
 		Node startNode = network.getTonic();
 		MidiWriter mw = new MidiWriter();
-		int[] scale = CMAJOR;
+		int[] scale = getScaleMidiKeys(keySignature);
 		
 		int midiOffset = scale[0]; // This ensures that the notes are being played relative to the correct tonic
 		
@@ -107,7 +115,7 @@ public class Composer {
 			}
 			
 			if(choice.noteName == nGram.get(nGram.size()-1).noteName)
-				weight -= 1;
+				weight -= 0;
 			
 			// If distance from rest == avg distance from rest, weight++		
 			
@@ -122,6 +130,16 @@ public class Composer {
 			}
 		}
 		return bestNode;
+	}
+	
+	private int[] getScaleMidiKeys(String scale) {
+		switch(scale) {
+		case "cGypsy": return CGYPSY;
+		case "aMinor": return AMINOR;
+		case "DBlues": return DBLUES;
+		case "fHarmonic" : return FHARMONIC;
+		default : return GCHROMATIC;
+		}
 	}
 	
 	public ArrayList<String> getScaleDegreeNGramKeys(ArrayList<Node> nGram, Node currentNode){
