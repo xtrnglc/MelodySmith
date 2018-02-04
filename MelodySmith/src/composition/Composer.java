@@ -91,6 +91,7 @@ public class Composer {
 	private void writeMidi(MidiWriter mw, String fileName) {
 		try {
 			mw.writeToFile(fileName);
+			System.out.println("100");
 		} catch(Exception e) {
 			System.out.println("Error writing to output file: " + fileName + "\nError Message: " + e.getMessage());
 		}

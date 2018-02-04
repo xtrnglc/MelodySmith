@@ -49,8 +49,11 @@ public class AssociationNetwork {
 	}
 	
 	private void printProgress(int count) {
-		if((count % (allNodes.size()/10)) == 0)
-			System.out.println(roundUp(((double)count/allNodes.size())*100));
+		if((count % (allNodes.size()/10)) == 0) {
+			int progress = roundUp(((double)count/allNodes.size())*100);
+			if(progress != 0 && progress != 100)
+				System.out.println(progress);
+		}
 	}
 	
 	private int roundUp(double d) {
