@@ -11,28 +11,28 @@ public class Main {
 	static int[] AMINOR = {57, 59, 60, 62, 64, 65, 67, 69};
 	
 	public static void main(String[] args) {
-		composeLocalCorpus();
+		//composeLocalCorpus();
 		
-//		try {
-//		String corpusFolder = args[0];
-//		String keySig = args[1];
-//		double intervalWeight = Double.parseDouble(args[2]);
-//		double durationWeight = Double.parseDouble(args[3]);
-//		int nGramLength = Integer.parseInt(args[4]);
-//		int numberOfComparisons = Integer.parseInt(args[5]);
-//		
-//		HashMap<String, Double> artistWeights = initializeArtists(args, 6);
-//		
-//		Composer composer = new Composer(corpusFolder, keySig, nGramLength, numberOfComparisons, intervalWeight, durationWeight, artistWeights);
-//		composer.composeMelody("output.mid", 500);
-//		
-//		}catch(Exception e) {
-//			System.out.println(e.getMessage());
-//			System.out.println("Command arguments improperly formatted\n\tCorrect format =\n\tcorpusPath outputFileName keySignature intervalWeight durationWeight nGramLength numberOfComparisons artist1Name:artist1Weight artist2Name:artist2Weight");
-//			System.out.println("Your arguments:");
-//			for(String arg : args)
-//				System.out.print(arg + " ");
-//		}
+		try {
+		String corpusFolder = args[0];
+		String keySig = args[1];
+		double intervalWeight = Double.parseDouble(args[2]);
+		double durationWeight = Double.parseDouble(args[3]);
+		int nGramLength = Integer.parseInt(args[4]);
+		int numberOfComparisons = Integer.parseInt(args[5]);
+		
+		HashMap<String, Double> artistWeights = initializeArtists(args, 6);
+		
+		Composer composer = new Composer(corpusFolder, keySig, nGramLength, numberOfComparisons, intervalWeight, durationWeight, artistWeights);
+		composer.composeMelody("output.mid", 500);
+		
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+			System.out.println("Command arguments improperly formatted\n\tCorrect format =\n\tcorpusPath outputFileName keySignature intervalWeight durationWeight nGramLength numberOfComparisons artist1Name:artist1Weight artist2Name:artist2Weight");
+			System.out.println("Your arguments:");
+			for(String arg : args)
+				System.out.print(arg + " ");
+		}
 	}
 	
 	public static void composeLocalCorpus() {
