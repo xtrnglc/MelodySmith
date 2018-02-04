@@ -248,7 +248,11 @@ public class Composer {
 		File[] artistFolders = corp.listFiles();
 		
 		for(File folder : artistFolders) {
+			if(folder.getName().startsWith("."))
+				continue;
 			for(File midiFile : folder.listFiles()) {
+				if(midiFile.getName().startsWith("."))
+					continue;
 				for(ArrayList<Node> channel : reader.readSequence(midiFile, nGramLength)) {
 					for(Node note : channel) {
 						note.artist = folder.getName();

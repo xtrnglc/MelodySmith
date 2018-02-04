@@ -27,11 +27,15 @@ public class Main {
 		composer.composeMelody("output.mid", 500);
 		
 		}catch(Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getClass());
+			System.out.println(e.getLocalizedMessage());
+			System.out.println(e.getCause());
 			System.out.println(e.getMessage());
-			System.out.println("Command arguments improperly formatted\n\tCorrect format =\n\tcorpusPath outputFileName keySignature intervalWeight durationWeight nGramLength numberOfComparisons artist1Name:artist1Weight artist2Name:artist2Weight");
+			System.out.println("Command arguments improperly formatted\n\tCorrect format =\n\tcorpusPath keySignature intervalWeight durationWeight nGramLength numberOfComparisons artist1Name:artist1Weight artist2Name:artist2Weight");
 			System.out.println("Your arguments:");
 			for(String arg : args)
-				System.out.print(arg + " ");
+				System.out.println(arg + " ");
 		}
 	}
 	
