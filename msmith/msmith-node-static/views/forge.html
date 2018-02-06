@@ -39,7 +39,7 @@
                 <!--<input type="range" id="chaos-slider" min="0" max="100">-->
                 <p>Weight of note duration</p>
                 <input type="range" id="durationOfNotes-slider" min="0" max="100">
-                <h6>N-gram selector</h6>
+                <h6>N-gram(s)</h6>
                 <div class="input-group input-number-group">
                     <input class="input-number" id="n-gram-selector" type="number" value="2" min="2" max="10">
                 </div>
@@ -107,17 +107,33 @@
     <div style="border:1px solid #ccc;margin-bottom:12px;background:#f7f7f7;">
         <div id="play-bar" style="height:20px;background:#33C3F0;width:0%;"></div>
     </div>
+
     <p>
+
         <button class="button button-primary" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled">Play</button>
         <button class="button" onclick="stop()">Stop</button>
         <button class="button button-primary" onClick="forge()" id="forge-button">Forge</button>
 
+    <div class="c-dropdown js-dropdown">
+        <input type="hidden" name="Framework" id="instrument-dropdown" class="js-dropdown__input">
+        <span class="c-button c-button--dropdown js-dropdown__current">Grand Piano</span>
+        <ul class="c-dropdown__list">
+            <li class="c-dropdown__item" data-dropdown-value="acousticGuitar" onClick="changeInstrument('acousticGuitar')">Acoustic Guitar</li>
+            <li class="c-dropdown__item" data-dropdown-value="churchOrgan" onClick="changeInstrument('churchOrgan')">Church Organ</li>
+            <li class="c-dropdown__item" data-dropdown-value="flute" onClick="changeInstrument('flute')">Flute</li>
+            <li class="c-dropdown__item" data-dropdown-value="grandPiano" onClick="changeInstrument('grandPiano')">Grand Piano</li>
+            <li class="c-dropdown__item" data-dropdown-value="electricGuitar" onClick="changeInstrument('electricGuitar')">Electric Guitar</li>
+        </ul>
+    </div>
+
     </p>
     <p>
+
         Tempo: <span id="tempo-display"></span> bpm<br />
         <input type="range" onchange="Player.pause();Player.setTempo(this.value);Player.play()" min="50" max="200">
         <br />
     </p>
+
     <div id="events" class="well"></div>
     </div>
 
@@ -126,6 +142,7 @@
 <script src="javascripts/browser/midiplayer.min.js"></script>
 <script src="javascripts/soundfont-player.min.js"></script>
 <script src="javascripts/app.js"></script>
+<script src="javascripts/styles.js"></script>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
