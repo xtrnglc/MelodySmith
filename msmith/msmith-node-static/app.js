@@ -29,7 +29,7 @@ app.get('/getmidi', function(req, res) {
     console.log('running jar file\n');
 
     var child = require('child_process').spawn(
-        'java', ['-jar', './MelodySmith.jar', 'public/corpus', req.query.keySignature, req.query.intervalOfNoteSliderval, req.query.durationsOfNotesSliderval, req.query.nGramVal, req.query.numComparisons, 'beatles:87']
+        'java', ['-jar', './MelodySmith.jar', 'public/corpus', 'output.mid',req.query.keySignature, req.query.intervalOfNoteSliderval, req.query.durationsOfNotesSliderval, req.query.nGramVal, req.query.numComparisons, 'beatles:87']
     );
 
     // var exec = require('child_process').exec;

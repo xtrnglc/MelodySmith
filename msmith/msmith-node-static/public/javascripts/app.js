@@ -4,7 +4,8 @@ var AudioContext = window.AudioContext || window.webkitAudioContext || false;
 var ac = new AudioContext || new webkitAudioContext;
 var eventsDiv = document.getElementById('events');
 var songDataURI = '';
-
+var width = 960;
+var height = 500;
 
 const grandPiano = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_grand_piano-mp3.js';
 const acousticGuitar = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_guitar_nylon-mp3.js';
@@ -16,6 +17,7 @@ var instrument = grandPiano;
 
 var changeTempo = function(tempo) {
 	Player.tempo = tempo;
+
 }
 
 var play = function() {
@@ -35,7 +37,17 @@ var abutton = function() {
     document.getElementById('a-button').style.backgroundColor = '#0FA0CE';
 }
 
+var svg = d3.select("#canvas")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var color = d3.scaleLinear().domain([45,75])
+    .interpolate(d3.interpolateHcl)
+    .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]);
+
 var forge = function() {
+
     if(Player) {
         stop();
     }
@@ -103,9 +115,9 @@ var switchInstrument = function(val) {
 var initiatePlayer = function(data, instrumentVal) {
     document.getElementById('loadingcube').style.display = 'none';
 
+    document.getElementById('canvas').style.display = 'block';
 
     switchInstrument(instrumentVal);
-
 
     Soundfont.instrument(ac, instrument).then(function (instrument) {
         document.getElementById('loading').style.display = 'none';
@@ -117,6 +129,35 @@ var initiatePlayer = function(data, instrumentVal) {
                     //document.querySelector('#track-' + event.track + ' code').innerHTML = JSON.stringify(event);
                     //console.log(event);
                 }
+                if(event.name=="Note on"){
+                    //http://localhost/gist/audio/jesu/
+                    var elLength = 40*(event.delta<=1?1:event.delta/120);
+                    var element = svg.append("g");
+                    //console.log(element);
+                    element.attr("transform","translate("+(-1*elLength)+" 0)");
+                    element.append("rect")
+                        .attr("width", elLength)
+                        .attr("height", 20)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .attr("x", 0)
+                        .attr("y", (event.noteNumber - 45)*12)
+                        .attr("fill", color(event.noteNumber));
+
+                    element.append("text")
+                        .attr("x", 3)
+                        .attr("y", 15 + (event.noteNumber - 45)*12)
+                        .text(event.noteName);
+
+
+                    var t = d3.transition()
+                        .duration(4000)
+                        .ease(d3.easeLinear);
+                    element.transition(t)
+                        .attr("transform","translate("+(width+300-elLength)+" 0)")
+                        .remove();
+                }
+
 
                 document.getElementById('tempo-display').innerHTML = Player.tempo;
                 document.getElementById('play-bar').style.width = 100 - Player.getSongPercentRemaining() + '%';
