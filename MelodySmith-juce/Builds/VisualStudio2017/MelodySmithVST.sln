@@ -1,11 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2017
 
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MelodySmithVST - Standalone Plugin", "MelodySmithVST_StandalonePlugin.vcxproj", "{86379B9A-3592-110F-BEBD-AEE4FF545CB3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{7BF2B637-7D9C-7112-E46A-4A02B7CAC485} = {7BF2B637-7D9C-7112-E46A-4A02B7CAC485}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MelodySmithVST - VST", "MelodySmithVST_VST.vcxproj", "{8A271727-8131-6C3A-C21D-3D606F8C19E4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7BF2B637-7D9C-7112-E46A-4A02B7CAC485} = {7BF2B637-7D9C-7112-E46A-4A02B7CAC485}
@@ -23,10 +18,6 @@ Global
 		{8A271727-8131-6C3A-C21D-3D606F8C19E4}.Debug|x64.Build.0 = Debug|x64
 		{8A271727-8131-6C3A-C21D-3D606F8C19E4}.Release|x64.ActiveCfg = Release|x64
 		{8A271727-8131-6C3A-C21D-3D606F8C19E4}.Release|x64.Build.0 = Release|x64
-		{86379B9A-3592-110F-BEBD-AEE4FF545CB3}.Debug|x64.ActiveCfg = Debug|x64
-		{86379B9A-3592-110F-BEBD-AEE4FF545CB3}.Debug|x64.Build.0 = Debug|x64
-		{86379B9A-3592-110F-BEBD-AEE4FF545CB3}.Release|x64.ActiveCfg = Release|x64
-		{86379B9A-3592-110F-BEBD-AEE4FF545CB3}.Release|x64.Build.0 = Release|x64
 		{7BF2B637-7D9C-7112-E46A-4A02B7CAC485}.Debug|x64.ActiveCfg = Debug|x64
 		{7BF2B637-7D9C-7112-E46A-4A02B7CAC485}.Debug|x64.Build.0 = Debug|x64
 		{7BF2B637-7D9C-7112-E46A-4A02B7CAC485}.Release|x64.ActiveCfg = Release|x64

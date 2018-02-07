@@ -16,7 +16,7 @@ ManagePanel::ManagePanel(Array<std::tuple<String, String>>& artist_filename_tupl
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
-	corpusListBox.setColour(ListBox::backgroundColourId, Colours::darkgrey);
+	corpusListBox.setColour(ListBox::backgroundColourId, Colours::red.brighter(0.6f));
 	addAndMakeVisible(corpusListBox);
 
 	addSongsBtn.setColour(TextButton::buttonColourId, Colours::red);
@@ -32,11 +32,32 @@ ManagePanel::ManagePanel(Array<std::tuple<String, String>>& artist_filename_tupl
 	curr_artist_filename_tuples = &artist_filename_tuples;
 
 	corpusListBox.setCurrArtistFilenameTuples(curr_artist_filename_tuples);
+
+	
 }
 
 ManagePanel::~ManagePanel()
 {
 }
+
+bool ManagePanel::isInterestedInFileDrag(const StringArray & files)
+{
+	return true;
+}
+
+void ManagePanel::filesDropped(const StringArray & files, int x, int y)
+{
+	Array<File> midi_files;
+	for (int i = 0; i < files.size(); i++)
+	{
+		File f(files[i].toStdString());
+		midi_files.add(f);
+	}
+	corpusListBox.addSongs(midi_files);
+	corpusListBox.updateContent();
+	
+}
+
 
 void ManagePanel::paint (Graphics& g)
 {

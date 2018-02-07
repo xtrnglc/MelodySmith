@@ -36,6 +36,8 @@ private:
 	void createCorpusPanel();
 	void createControlsPanel();
 
+	MelodySmithVSTAudioProcessor* audioProcessor;
+
 	//Color and size variables
 	int pluginHeight;
 	int pluginWidth;
@@ -70,5 +72,13 @@ private:
 
 	ComboBox keySelect;
 	Label scaleLabel;
+
+	Label intervalWeightLabel, durationWeightLabel, nGramLengthLabel, numberOfComparisonsLabel;
+	Slider invervalWeightSlider, durationWeightSlider, nGramLengthSlider, numberOfComparisonsSlider;
+
+	TextButton exportBtn;
+
+	std::shared_ptr<MidiMessageSequence> MidiSequence = std::make_shared<MidiMessageSequence>();
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessorEditor)
 };
