@@ -269,10 +269,15 @@ public class Composer {
 		if(duration == null)
 			return 8;
 		switch(duration) {
+		case "4":return 256;
+		case "3":return 192;
+		case "2":return 128;
+		case "1":return 64;
+		case "1/2":return 32;
 		case "1/4":return 16;
 		case "1/8":return 8;
 		case "1/16":return 4;
-		//case "1/32":return 2;
+		case "1/32":return 2;
 		default:return 8;
 		}
 	}
