@@ -55,8 +55,8 @@ private:
 	ManagePanel managePanel;
 	InfluencesPanel influencesPanel;
 
-	ImageButton reforgeImageBtn;
-	ImageButton forgeImageBtn;
+	TextButton reforgeImageBtn;
+	TextButton forgeImageBtn;
 
 	void sliderValueChanged(Slider* slider) override;
 
@@ -70,6 +70,8 @@ private:
 	Slider keyKnob;
 	MyKnobLF keyKnobLF;
 
+	String melodysmithDirPath;
+
 	ComboBox keySelect;
 	Label scaleLabel;
 
@@ -77,6 +79,7 @@ private:
 	Slider invervalWeightSlider, durationWeightSlider, nGramLengthSlider, numberOfComparisonsSlider;
 
 	TextButton exportBtn;
+	File exportFolder;
 
 	std::shared_ptr<MidiMessageSequence> MidiSequence = std::make_shared<MidiMessageSequence>();
 

@@ -19,6 +19,9 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	influencesPanel(curr_artist_filename_tuples, artists_to_influences)
 {
 	audioProcessor = &p;
+	melodysmithDirPath = "C:\\Program Files\\MelodySmith\\";
+	//String windowsMelodysmithDirPath = "C:/Users/Daniel Mattheiss/Documents/MelodySmith/MelodySmithVST/MelodySmith/MelodySmith - juce/Builds/VisualStudio2017/";
+
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -41,19 +44,25 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	//tabbedCorpusComponent.setColour()
 	addAndMakeVisible(tabbedCorpusComponent);
 
-	File f1 = File::getCurrentWorkingDirectory().getChildFile("anvil_recast2.png");
-	File f2 = File::getCurrentWorkingDirectory().getChildFile("forge_fire2.png");
-	Image i1 = ImageFileFormat::loadFrom(f1);
-	Image i2 = ImageFileFormat::loadFrom(f2); 
-	reforgeImageBtn.setImages(false, true, false, i1, 1.0f, Colours::transparentWhite, i1, 1.0f, Colours::blue, i1, 1.0f, Colours::blue);
-	reforgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
-	forgeImageBtn.setImages(false, true, false, i2, 1.0f, Colours::transparentWhite, i2, 1.0f, Colours::yellow, i2, 1.0f, Colours::yellow);
-	forgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
-	addAndMakeVisible(reforgeImageBtn);
-	addAndMakeVisible(forgeImageBtn);
+	//File fa = File(windowsMelodysmithDirPath);
+	//int z = fa.getSize();
+	//File f1 = fa.getChildFile("anvil_recast2.png");
+	////File f1 = File(windowsMelodysmithDirPath + "anvil_recast2.png");
+	//File f2 = File(melodysmithDirPath + "forge_fire2.png");
+	//int x = f2.getSize();
+	//int y = f1.getSize();
 
-	//reforgeImageBtn.addListener(this);
-	forgeImageBtn.addListener(this);
+	//Image i1 = ImageFileFormat::loadFrom(f1);
+	//Image i2 = ImageFileFormat::loadFrom(f2); 
+	//reforgeImageBtn.setImages(false, true, false, i1, 1.0f, Colours::transparentWhite, i1, 1.0f, Colours::blue, i1, 1.0f, Colours::blue);
+	//reforgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
+	//forgeImageBtn.setImages(false, true, false, i2, 1.0f, Colours::transparentWhite, i2, 1.0f, Colours::yellow, i2, 1.0f, Colours::yellow);
+	//forgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
+	//addAndMakeVisible(reforgeImageBtn);
+	//addAndMakeVisible(forgeImageBtn);
+
+	////reforgeImageBtn.addListener(this);
+	//forgeImageBtn.addListener(this);
 
 	/*addAndMakeVisible(keyKnob);
 	keyKnob.setLookAndFeel(&keyKnobLF);
@@ -64,13 +73,31 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	//keyKnob.value
 	//keyKnob.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
 
+	reforgeImageBtn.setButtonText("Recast");
+	reforgeImageBtn.setColour(TextButton::buttonColourId, Colours::blue);
+	reforgeImageBtn.setColour(TextButton::textColourOffId, Colours::white);
+	reforgeImageBtn.addListener(this);
+	addAndMakeVisible(reforgeImageBtn);
+
+	forgeImageBtn.setButtonText("Forge");
+	forgeImageBtn.setColour(TextButton::buttonColourId, Colours::orange);
+	forgeImageBtn.setColour(TextButton::textColourOffId, Colours::white);
+	forgeImageBtn.addListener(this);
+	addAndMakeVisible(forgeImageBtn);
+	
+
 	addAndMakeVisible(invervalWeightSlider);
-	invervalWeightSlider.addListener(this);
 	invervalWeightSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
+	invervalWeightSlider.setRange(0, 10, 1.0);
+	//Slider::setSliderSnapsToMousePosition
+
 
 	addAndMakeVisible(durationWeightSlider);
+	durationWeightSlider.setRange(0, 10, 1.0);
 	addAndMakeVisible(nGramLengthSlider);
+	nGramLengthSlider.setRange(2, 10, 1.0);
 	addAndMakeVisible(numberOfComparisonsSlider);
+	numberOfComparisonsSlider.setRange(0, 9, 1.0);
 	durationWeightSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
 	nGramLengthSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
 	numberOfComparisonsSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
@@ -97,17 +124,23 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	//Font f = scaleLabel.getFont();	
 	addAndMakeVisible(scaleLabel);
 
-	keySelect.addItem("A", 1);
-	keySelect.addItem("B Major Blues", 2);
+	keySelect.addItem("c Gypsy", 1);
+	keySelect.addItem("a Minor", 2);
+	keySelect.addItem("D Blues", 3);
+	keySelect.addItem("f Harmonic", 4);
+	keySelect.addItem("G Chromatic", 5);
+	keySelect.addItem("aMinor", 6);
+
 	keySelect.setSelectedId(1);
 	addAndMakeVisible(keySelect);
 
-	exportBtn.setButtonText("Save to DAW");
+	exportBtn.setButtonText("Choose Save Folder");
 	exportBtn.setColour(TextButton::buttonColourId, Colours::red);
 	exportBtn.setColour(TextButton::textColourOffId, Colours::white);
 	exportBtn.addListener(this);
 	addAndMakeVisible(exportBtn);
 
+	exportFolder = File(melodysmithDirPath);
 }
 
 MelodySmithVSTAudioProcessorEditor::~MelodySmithVSTAudioProcessorEditor()
@@ -179,8 +212,8 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 	keySelect.setBounds(thirdRow.removeFromTop(heightPartition).reduced(50, 0));
 
 	//rightCol.removeFromTop(rightColHeight / 12);
-	forgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, 10));
-	reforgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, 10));
+	reforgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
+	forgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
 	exportBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
 	//txbtn.setBounds(rightCol);
 	//corpusListBox.setBounds(tempArea);
@@ -204,11 +237,27 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 	{
 		String s = "";
 	}
+	else if (btn == &exportBtn)
+	{
+		FileChooser myChooser("Select the folder in which to save composed midi files...",
+			File::getSpecialLocation(File::userHomeDirectory));
+		if (myChooser.browseForDirectory())
+		{
+			exportFolder = myChooser.getResult();
+		}
+	}
 	else if (btn == &forgeImageBtn)
 	{
-		String clParamsStr = "c 4 2 2 5 ";
+		String keyValue = keySelect.getText();
+		//int keyIndex = keySelect.getItemId();
+		//if(keyIndex == 0)*/
+		double intervalWeight = invervalWeightSlider.getValue();
+		double durationWeight = durationWeightSlider.getValue();
+		double nGramLength = nGramLengthSlider.getValue();
+		double numberOfComparisons = numberOfComparisonsSlider.getValue();
+		String clParamsStr = "\"" + keyValue + "\" " + String(intervalWeight) + " " + String(durationWeight) + " " + String(nGramLength) + " " + String(numberOfComparisons) + " ";
 		//Create master directory
-		File f("C:\\Users\\Daniel Mattheiss\\Documents\\MelodySmith\\MelodySmithVST\\MelodySmith\\MelodySmith-juce\\Builds\\VisualStudio2017\\artists");
+		File f(melodysmithDirPath + "artists");
 		f.deleteRecursively();
 		f.createDirectory();
 
@@ -248,9 +297,9 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		else exit(EXIT_FAILURE);
 
 		//String melodySmithJarStr = File::getCurrentWorkingDirectory().getChildFile("MelodySmith.jar").getFullPathName();
-		String melodySmithJarStr = "C:\\Users\\Daniel Mattheiss\\Documents\\MelodySmith\\MelodySmithVST\\MelodySmith\\MelodySmith-juce\\Builds\\VisualStudio2017\\MelodySmith1.jar";
-		String artistsStr = "C:\\Users\\Daniel Mattheiss\\Documents\\MelodySmith\\MelodySmithVST\\MelodySmith\\MelodySmith-juce\\Builds\\VisualStudio2017\\artists";
-		String outputFilename = "C:\\Users\\Daniel Mattheiss\\Documents\\MelodySmith\\MelodySmithVST\\MelodySmith\\MelodySmith-juce\\Builds\\VisualStudio2017\\output1.mid";
+		String melodySmithJarStr = melodysmithDirPath + "MelodySmith.jar";
+		String artistsStr = melodysmithDirPath + "artists";
+		String outputFilename = exportFolder.getFullPathName() + "\\output1.mid";
 
 		String clStr = "java -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr + "& pause";
 		//printf("Executing command DIR...\n");
