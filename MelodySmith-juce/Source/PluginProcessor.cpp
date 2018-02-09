@@ -25,17 +25,7 @@ MelodySmithVSTAudioProcessor::MelodySmithVSTAudioProcessor()
                        )
 #endif
 {
-	/*File fileInput = File::getCurrentWorkingDirectory().getChildFile("beatles2.mid");
-	MidiFile mf;
-	mf.readFrom(*(fileInput.createInputStream()));
-
-	MidiMessageSequence mms;
-	double lasttime = mf.getLastTimestamp();
-	for (short i = 0; i < mf.getNumTracks(); i++)
-	{
-		mms.addSequence(*mf.getTrack(i), 0, 0, lasttime);
-	}*/
-
+	MidiSequence = nullptr;
 }
 
 MelodySmithVSTAudioProcessor::~MelodySmithVSTAudioProcessor()
@@ -141,6 +131,15 @@ bool MelodySmithVSTAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 }
 #endif
 
+void MelodySmithVSTAudioProcessor::setMidiSequenceAndReadMIDIFile(std::shared_ptr<MidiMessageSequence> MS, double x)
+{
+	MidiSequence = MS;
+	TPQN = x;
+	//AudioProcessorPlayer app;
+	//app.setProcessor(this);
+	//MidiMessageCollector mmc = app.getMidiMessageCollector();
+}
+
 void MelodySmithVSTAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
@@ -164,7 +163,91 @@ void MelodySmithVSTAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
 
         // ..do something to the data...
     }
+
+	//buffer.clear();
+	//midiMessages.clear();
+	//MidiBuffer generatedMidi;
+	//int time;
+	//MidiMessage m;
+	////int8 ccTempVal;
+	////int8 myVal = (int8)CC00Val;
+
+	////if (myVal != ccTempVal)
+	////{
+	//	//MidiMessage::controllerEvent()
+	//m = MidiMessage::controllerEvent(2, 1, 100);
+	//generatedMidi.addEvent(m, midiMessages.getLastEventTime());
+	//}
+	//else generatedMidi.clear();
+
+	//ccTempVal = myVal;
+	//midiMessages.swapWith(generatedMidi);
+
+	// create a copy
+	//MidiBuffer localCopy(midiMessages);
+
+	//// clear the output before adding stuff
+	//midiMessages.clear();
+
+	//if (MidiSequence != nullptr)
+	//{
+	//	//MidiOutput newDevice = MidiOutput::createNewDevice(“New Midi Output Device”);
+	//	//setMidi
+	//	//processorPlayer->setMidiOutput(newDevice)
+	//	//for (int t = 0; t < MidiSequence->; t++) {
+	//	//	const MidiMessageSequence* track = MidiSequence.getTrack(t);
+	//	//	for (int i = 0; i < track->getNumEvents(); i++) {
+	//	//		MidiMessage& m = track->getEventPointer(i)->message;
+	//	//		m.multiplyVelocity(0.01f);
+	//	//		int sampleOffset = (int)(sampleRate * m.getTimeStamp());
+	//	//		if (sampleOffset > totalSamples)
+	//	//			totalSamples = sampleOffset;
+	//	//		midiMessages.addEvent(m, sampleOffset);
+	//	//	}
+	//	//}
+	//	int numSamples = buffer.getNumSamples();
+	//	system("pause");
+	//	ScopedPointer<MidiMessage> msg(new MidiMessage());
+
+	//	double sampleRate(44100.0);
+
+	//	// now add stuff
+	//	int numEvents = MidiSequence->getNumEvents();
+	//	int currentPosition = 0;
+	//	double NextEventTime = 0.;
+	//	double PrevTimestamp = 0.;
+	//	double msPerTick = 250. / TPQN; //set BPM
+	//									//sending messages to output device in loop
+	//	while ((currentPosition < numEvents) && (currentPosition < numSamples))
+	//	{
+	//		//getting next message
+	//		*msg = MidiSequence->getEventPointer(currentPosition)->message;
+	//		//time left to reach next message
+	//		//NextEventTime = msPerTick * (msg->getTimeStamp() - PrevTimestamp);
+	//		//wait for it 
+	//		//Time::waitForMillisecondCounter(Time::getMillisecondCounter() + NextEventTime);
+	//		//play it
+	//		//const double timestamp = msg->getTimeStamp();
+	//		//const int sampleNumber = (int)(timestamp * sampleRate);
+	//		midiMessages.addEvent(*msg, currentPosition);
+	//		//midiMessages.add(*msg);
+	//		//store previous message timestamp
+	//		//PrevTimestamp = msg->getTimeStamp();
+	//		//moving to next message
+	//		currentPosition++;
+	//	}
+
+	//	//MidiOutput::openDevice(0)->startBackgroundThread();
+	//	//MidiOutput::openDevice(0)->sendBlockOfMessages(midiMessages, Time::getMillisecondCounter(), getSampleRate());
+	//	//MidiOutput::openDevice(0)->stop
+	//	//DeviceMan
+
+ //		MidiSequence = nullptr;
+	//}
+
+
 }
+
 
 //==============================================================================
 bool MelodySmithVSTAudioProcessor::hasEditor() const

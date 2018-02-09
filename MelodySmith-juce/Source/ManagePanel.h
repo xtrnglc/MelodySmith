@@ -17,7 +17,7 @@
 //==============================================================================
 /*
 */
-class ManagePanel    : public Component, public Button::Listener
+class ManagePanel    : public Component, public Button::Listener, public FileDragAndDropTarget
 {
 public:
     ManagePanel(Array<std::tuple<String, String>>& artist_filename_tuples);
@@ -31,6 +31,9 @@ public:
 	Array<std::tuple<String, String>> *curr_artist_filename_tuples;
 
 	void buttonClicked(Button* button) override;
+	bool isInterestedInFileDrag(const StringArray & files) override;
+	void filesDropped(const StringArray & files, int x, int y) override;
+	
 
 
 private:

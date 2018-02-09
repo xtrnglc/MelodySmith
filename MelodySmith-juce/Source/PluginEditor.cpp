@@ -18,6 +18,11 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
     : AudioProcessorEditor (&p), processor (p), tabbedCorpusComponent(TabbedButtonBar::Orientation::TabsAtLeft), managePanel(curr_artist_filename_tuples),
 	influencesPanel(curr_artist_filename_tuples, artists_to_influences)
 {
+	audioProcessor = &p;
+	melodysmithDirPath = "C:\\Program Files\\MelodySmith\\";
+	//String windowsMelodysmithDirPath = "C:/Users/Daniel Mattheiss/Documents/MelodySmith/MelodySmithVST/MelodySmith/MelodySmith - juce/Builds/VisualStudio2017/";
+
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
 	setSizesAndColors();
@@ -25,9 +30,9 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	//setResizable(true, false);
 
 	corpusHeader.setColour(Label::textColourId, header1Colour);
-	corpusHeader.setText("CORPUS", NotificationType::dontSendNotification);
+	corpusHeader.setText("Corpus", NotificationType::dontSendNotification);
 	corpusHeader.setJustificationType(Justification::centred);
-	corpusHeader.setFont(Font("Avenir", 20.0f, 0));
+	//corpusHeader.setFont(Font("Avenir", 20.0f, 0));
 	addAndMakeVisible(corpusHeader);
 
 	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
@@ -39,19 +44,25 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	//tabbedCorpusComponent.setColour()
 	addAndMakeVisible(tabbedCorpusComponent);
 
-	File f1 = File::getCurrentWorkingDirectory().getChildFile("anvil_recast2.png");
-	File f2 = File::getCurrentWorkingDirectory().getChildFile("forge_fire2.png");
-	Image i1 = ImageFileFormat::loadFrom(f1);
-	Image i2 = ImageFileFormat::loadFrom(f2); 
-	reforgeImageBtn.setImages(false, true, false, i1, 1.0f, Colours::transparentWhite, i1, 1.0f, Colours::darkblue, i1, 1.0f, Colours::darkblue);
-	reforgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
-	forgeImageBtn.setImages(false, true, false, i2, 1.0f, Colours::transparentWhite, i2, 1.0f, Colours::yellow, i2, 1.0f, Colours::yellow);
-	forgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
-	addAndMakeVisible(reforgeImageBtn);
-	addAndMakeVisible(forgeImageBtn);
+	//File fa = File(windowsMelodysmithDirPath);
+	//int z = fa.getSize();
+	//File f1 = fa.getChildFile("anvil_recast2.png");
+	////File f1 = File(windowsMelodysmithDirPath + "anvil_recast2.png");
+	//File f2 = File(melodysmithDirPath + "forge_fire2.png");
+	//int x = f2.getSize();
+	//int y = f1.getSize();
 
-	reforgeImageBtn.addListener(this);
-	forgeImageBtn.addListener(this);
+	//Image i1 = ImageFileFormat::loadFrom(f1);
+	//Image i2 = ImageFileFormat::loadFrom(f2); 
+	//reforgeImageBtn.setImages(false, true, false, i1, 1.0f, Colours::transparentWhite, i1, 1.0f, Colours::blue, i1, 1.0f, Colours::blue);
+	//reforgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
+	//forgeImageBtn.setImages(false, true, false, i2, 1.0f, Colours::transparentWhite, i2, 1.0f, Colours::yellow, i2, 1.0f, Colours::yellow);
+	//forgeImageBtn.setMouseCursor(MouseCursor::PointingHandCursor);
+	//addAndMakeVisible(reforgeImageBtn);
+	//addAndMakeVisible(forgeImageBtn);
+
+	////reforgeImageBtn.addListener(this);
+	//forgeImageBtn.addListener(this);
 
 	/*addAndMakeVisible(keyKnob);
 	keyKnob.setLookAndFeel(&keyKnobLF);
@@ -61,16 +72,75 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	//keyKnob.addListener(this);
 	//keyKnob.value
 	//keyKnob.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-	scaleLabel.setText("SCALE", NotificationType::dontSendNotification);
+
+	reforgeImageBtn.setButtonText("Recast");
+	reforgeImageBtn.setColour(TextButton::buttonColourId, Colours::blue);
+	reforgeImageBtn.setColour(TextButton::textColourOffId, Colours::white);
+	reforgeImageBtn.addListener(this);
+	addAndMakeVisible(reforgeImageBtn);
+
+	forgeImageBtn.setButtonText("Forge");
+	forgeImageBtn.setColour(TextButton::buttonColourId, Colours::orange);
+	forgeImageBtn.setColour(TextButton::textColourOffId, Colours::white);
+	forgeImageBtn.addListener(this);
+	addAndMakeVisible(forgeImageBtn);
+	
+
+	addAndMakeVisible(invervalWeightSlider);
+	invervalWeightSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
+	invervalWeightSlider.setRange(0, 10, 1.0);
+	//Slider::setSliderSnapsToMousePosition
+
+
+	addAndMakeVisible(durationWeightSlider);
+	durationWeightSlider.setRange(0, 10, 1.0);
+	addAndMakeVisible(nGramLengthSlider);
+	nGramLengthSlider.setRange(2, 10, 1.0);
+	addAndMakeVisible(numberOfComparisonsSlider);
+	numberOfComparisonsSlider.setRange(0, 9, 1.0);
+	durationWeightSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
+	nGramLengthSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
+	numberOfComparisonsSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
+
+	intervalWeightLabel.setText("Interval", NotificationType::dontSendNotification);
+	intervalWeightLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(intervalWeightLabel);
+
+	durationWeightLabel.setText("Duration", NotificationType::dontSendNotification);
+	durationWeightLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(durationWeightLabel);
+
+	nGramLengthLabel.setText("n-Gram Size", NotificationType::dontSendNotification);
+	nGramLengthLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(nGramLengthLabel);
+
+	numberOfComparisonsLabel.setText("Number of Comparisons", NotificationType::dontSendNotification);
+	numberOfComparisonsLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(numberOfComparisonsLabel);
+
+	scaleLabel.setText("Scale", NotificationType::dontSendNotification);
 	scaleLabel.setJustificationType(Justification::centred);
-	scaleLabel.setFont(Font("Avenir", 20.0f, 0));
+	//scaleLabel.setFont(Font("Avenir", 20.0f, 0));
+	//Font f = scaleLabel.getFont();	
 	addAndMakeVisible(scaleLabel);
 
-	keySelect.addItem("A", 1);
-	keySelect.addItem("B Major Blues", 2);
+	keySelect.addItem("c Gypsy", 1);
+	keySelect.addItem("a Minor", 2);
+	keySelect.addItem("D Blues", 3);
+	keySelect.addItem("f Harmonic", 4);
+	keySelect.addItem("G Chromatic", 5);
+	keySelect.addItem("aMinor", 6);
+
 	keySelect.setSelectedId(1);
 	addAndMakeVisible(keySelect);
 
+	exportBtn.setButtonText("Choose Save Folder");
+	exportBtn.setColour(TextButton::buttonColourId, Colours::red);
+	exportBtn.setColour(TextButton::textColourOffId, Colours::white);
+	exportBtn.addListener(this);
+	addAndMakeVisible(exportBtn);
+
+	exportFolder = File(melodysmithDirPath);
 }
 
 MelodySmithVSTAudioProcessorEditor::~MelodySmithVSTAudioProcessorEditor()
@@ -81,15 +151,12 @@ MelodySmithVSTAudioProcessorEditor::~MelodySmithVSTAudioProcessorEditor()
 void MelodySmithVSTAudioProcessorEditor::paint (Graphics& g)
 {
 	// fill the whole window white
-	//g.fillAll(Colour::fromString("#1a1a1a"));
 	g.fillAll(Colours::black.brighter(0.2f));
+
 	// set the current drawing colour to black
 	//g.setColour(Colours::white);
 
-    //g.setFont (15.0f);
 	g.setFont(Font("Avenir", 20.0f, 0));
-    //g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
-	//g.drawFittedText("Midi Volume", 0, 0, getWidth(), 30, Justification::centred, 1);
 }
 
 void MelodySmithVSTAudioProcessorEditor::resized()
@@ -98,18 +165,8 @@ void MelodySmithVSTAudioProcessorEditor::resized()
     // subcomponents in your editor..
 
 	// sets the position and size of the slider with arguments (x, y, width, height)
-	//midiVolume.setBounds(40, 30, 20, getHeight() - 60);
 	Rectangle<int> area(getLocalBounds());
-	//{
-	//	Rectangle<int> sideBarArea(area.removeFromRight(jmax(80, area.getWidth() / 4)));
-	//	sidebar.setBounds(sideBarArea);
 
-	//	const int sideItemHeight = 40;
-	//	const int sideItemMargin = 5;
-	//	sideItemA.setBounds(sideBarArea.removeFromTop(sideItemHeight).reduced(sideItemMargin));
-	//	sideItemB.setBounds(sideBarArea.removeFromTop(sideItemHeight).reduced(sideItemMargin));
-	//	sideItemC.setBounds(sideBarArea.removeFromTop(sideItemHeight).reduced(sideItemMargin));
-	//}
 	Rectangle<int> leftCol(area.removeFromLeft(area.getWidth() / 2));
 	
 	float fontHeight = corpusHeader.getFont().getHeight() + 20;
@@ -122,11 +179,42 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 
 	Rectangle<int> rightCol(area);
 	int rightColHeight = rightCol.getHeight();
-	reforgeImageBtn.setBounds(rightCol.removeFromTop(rightColHeight / 3));
-	scaleLabel.setBounds(rightCol.removeFromTop(rightColHeight / 6));
-	keySelect.setBounds(rightCol.removeFromTop(rightColHeight / 12).reduced(50, 10));
-	rightCol.removeFromTop(rightColHeight / 12);
-	forgeImageBtn.setBounds(rightCol);
+	int rightColWidth = rightCol.getWidth();
+
+	//reforgeImageBtn.setBounds(rightCol.removeFromTop(rightColHeight / 3));
+	Rectangle<int> firstRow = rightCol.removeFromTop(rightColHeight / 4);
+	Rectangle<int> secondRow = rightCol.removeFromTop(rightColHeight / 4);
+	Rectangle<int> thirdRow = rightCol.removeFromTop(rightColHeight / 4);
+	Rectangle<int> fourthRow = rightCol.removeFromTop(rightColHeight / 4);
+
+	{
+		Rectangle<int> col = firstRow.removeFromLeft(rightCol.getWidth() / 2);
+		int heightPartition = col.getHeight() / 4;
+		intervalWeightLabel.setBounds(col.removeFromTop(heightPartition));
+		invervalWeightSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
+		col = firstRow;
+		durationWeightLabel.setBounds(col.removeFromTop(heightPartition));
+		durationWeightSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
+	}
+
+	{
+		Rectangle<int> col = secondRow.removeFromLeft(rightCol.getWidth() / 2);
+		int heightPartition = col.getHeight() / 4;
+		nGramLengthLabel.setBounds(col.removeFromTop(heightPartition));
+		nGramLengthSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
+		col = secondRow;
+		numberOfComparisonsLabel.setBounds(col.removeFromTop(heightPartition));
+		numberOfComparisonsSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
+	}
+
+	int heightPartition = thirdRow.getHeight() / 4;
+	scaleLabel.setBounds(thirdRow.removeFromTop(heightPartition));
+	keySelect.setBounds(thirdRow.removeFromTop(heightPartition).reduced(50, 0));
+
+	//rightCol.removeFromTop(rightColHeight / 12);
+	reforgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
+	forgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
+	exportBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
 	//txbtn.setBounds(rightCol);
 	//corpusListBox.setBounds(tempArea);
 
@@ -149,11 +237,27 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 	{
 		String s = "";
 	}
+	else if (btn == &exportBtn)
+	{
+		FileChooser myChooser("Select the folder in which to save composed midi files...",
+			File::getSpecialLocation(File::userHomeDirectory));
+		if (myChooser.browseForDirectory())
+		{
+			exportFolder = myChooser.getResult();
+		}
+	}
 	else if (btn == &forgeImageBtn)
 	{
-		String clParamsStr = "c ";
+		String keyValue = keySelect.getText();
+		//int keyIndex = keySelect.getItemId();
+		//if(keyIndex == 0)*/
+		double intervalWeight = invervalWeightSlider.getValue();
+		double durationWeight = durationWeightSlider.getValue();
+		double nGramLength = nGramLengthSlider.getValue();
+		double numberOfComparisons = numberOfComparisonsSlider.getValue();
+		String clParamsStr = "\"" + keyValue + "\" " + String(intervalWeight) + " " + String(durationWeight) + " " + String(nGramLength) + " " + String(numberOfComparisons) + " ";
 		//Create master directory
-		File f(File::getCurrentWorkingDirectory().getFullPathName() + "/artists");
+		File f(melodysmithDirPath + "artists");
 		f.deleteRecursively();
 		f.createDirectory();
 
@@ -192,13 +296,82 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		if (system(NULL)) puts("Ok");
 		else exit(EXIT_FAILURE);
 
-		String clStr = "java -jar MelodySmith.jar artists " + clParamsStr;
+		//String melodySmithJarStr = File::getCurrentWorkingDirectory().getChildFile("MelodySmith.jar").getFullPathName();
+		String melodySmithJarStr = melodysmithDirPath + "MelodySmith.jar";
+		String artistsStr = melodysmithDirPath + "artists";
+		String outputFilename = exportFolder.getFullPathName() + "\\output1.mid";
 
-		printf("Executing command DIR...\n");
+		String clStr = "java -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr + "& pause";
+		//printf("Executing command DIR...\n");
+		//system("pause");
 		i = system(clStr.toStdString().c_str());
-		printf("The value returned was: %d.\n", i);
+		//system("pause");
+		//printf("The value returned was: %d.\n", i);
+
+
+		//File F = File::getCurrentWorkingDirectory().getChildFile("output.mid");
+		//File F("C:\\Users\\Daniel Mattheiss\\Documents\\MelodySmith\\MelodySmithVST\\MelodySmith\\MelodySmith - juce\\Builds\\VisualStudio2017\\output.mid");
+		//FileInputStream S(F);
+		//MidiFile midifile;
+		//midifile.readFrom(S);
+		//midifile.convertTimestampTicksToSeconds();
+
+		//MidiMessageSequence seq;
+		//seq.clear();
+		//for (int t = 0; t < midifile.getNumTracks(); t++)
+		//	seq.addSequence(*midifile.getTrack(t), 0.0 /*timeAdjustmentDelta*/);
+		//seq.updateMatchedPairs();
+		//system("pause");
+		//String r = F.getCurrentWorkingDirectory().getFullPathName();
+
+		//MidiSequence->clear();
+		////file input
+		//ScopedPointer<MidiOutput> OutputController = MidiOutput::openDevice(0);
+		//File* ReadFile(&F);
+		//FileInputStream* ReadFileStream(new FileInputStream(*ReadFile));
+		////String e = ReadFileStream->getStatus().getErrorMessage();
+		//MidiFile* ReadMIDIFile(new MidiFile());
+		//ReadMIDIFile->readFrom(*ReadFileStream);
+		////ScopedPointer<MidiMessageSequence> MidiSequence(new MidiMessageSequence());
+		//MidiMessage* msg(new MidiMessage());
+
+		////get all tracks together
+		//for (int track = 0; track < ReadMIDIFile->getNumTracks(); track++)
+		//{
+		//	const MidiMessageSequence* CurrentTrack = ReadMIDIFile->getTrack(track);
+		//	MidiSequence->addSequence(*CurrentTrack, 0, 0, CurrentTrack->getEndTime());
+		//}
+
+		////should keep note ons and note offs matched?
+		//MidiSequence->updateMatchedPairs();
+		//int numEvents = MidiSequence->getNumEvents();
+		//double TPQN = ReadMIDIFile->getTimeFormat();
+		//int currentPosition = 0;
+		//double NextEventTime = 0.;
+		//double PrevTimestamp = 0.;
+		//double msPerTick = 250. / TPQN; //set BPM
+		//								//sending messages to output device in loop
+
+		//system("pause");
+		//while ((currentPosition < numEvents))
+		//{
+		//	//getting next message
+		//	*msg = MidiSequence->getEventPointer(currentPosition)->message;
+		//	//time left to reach next message
+		//	NextEventTime = msPerTick * (msg->getTimeStamp() - PrevTimestamp);
+		//	//wait for it 
+		//	Time::waitForMillisecondCounter(Time::getMillisecondCounter() + NextEventTime);
+		//	//play it
+		//	OutputController->sendMessageNow(*msg);
+		//	//store previous message timestamp
+		//	PrevTimestamp = msg->getTimeStamp();
+		//	//moving to next message
+		//	currentPosition++;
+		//}
+
+		//audioProcessor->setMidiSequenceAndReadMIDIFile(MidiSequence, TPQN);
 	}
-}
+} 
 
 void MelodySmithVSTAudioProcessorEditor::setSizesAndColors()
 {

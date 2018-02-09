@@ -36,6 +36,8 @@ private:
 	void createCorpusPanel();
 	void createControlsPanel();
 
+	MelodySmithVSTAudioProcessor* audioProcessor;
+
 	//Color and size variables
 	int pluginHeight;
 	int pluginWidth;
@@ -53,8 +55,8 @@ private:
 	ManagePanel managePanel;
 	InfluencesPanel influencesPanel;
 
-	ImageButton reforgeImageBtn;
-	ImageButton forgeImageBtn;
+	TextButton reforgeImageBtn;
+	TextButton forgeImageBtn;
 
 	void sliderValueChanged(Slider* slider) override;
 
@@ -68,7 +70,18 @@ private:
 	Slider keyKnob;
 	MyKnobLF keyKnobLF;
 
+	String melodysmithDirPath;
+
 	ComboBox keySelect;
 	Label scaleLabel;
+
+	Label intervalWeightLabel, durationWeightLabel, nGramLengthLabel, numberOfComparisonsLabel;
+	Slider invervalWeightSlider, durationWeightSlider, nGramLengthSlider, numberOfComparisonsSlider;
+
+	TextButton exportBtn;
+	File exportFolder;
+
+	std::shared_ptr<MidiMessageSequence> MidiSequence = std::make_shared<MidiMessageSequence>();
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessorEditor)
 };

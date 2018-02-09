@@ -4,7 +4,7 @@ ManageListBoxRow::ManageListBoxRow(String fName, String aName)
 {
 	fileName = fName;
 
-	fileNameLabel.setColour(Label::textColourId, Colours::aqua);
+	fileNameLabel.setColour(Label::textColourId, Colours::black.brighter(0.2f));
 	fileNameLabel.setText(fileName, NotificationType::dontSendNotification);
 	fileNameLabel.setJustificationType(Justification::centred);
 	fileNameLabel.setFont(Font("Avenir", 20.0f, 0));
@@ -31,6 +31,8 @@ void ManageListBoxRow::paint(Graphics &g)
 	//Rectangle<int> totalArea(0, 0, width, height);
 	//Rectangle<int> leftCol(totalArea.removeFromLeft(totalArea.getWidth() / 2));
 	//g.drawFittedText(fileName, getLocalBounds(), Justification::centred, 1);
+	g.fillAll(Colours::red.brighter(0.6f));
+
 }
 
 void ManageListBoxRow::resized()

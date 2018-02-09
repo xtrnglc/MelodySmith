@@ -58,6 +58,12 @@ public:
 
 	float noteOnVel;
 
+	//ScopedPointer<MidiMessageSequence> MidiSequence;
+	std::shared_ptr<MidiMessageSequence> MidiSequence;
+	double TPQN;
+	File f;
+	void setMidiSequenceAndReadMIDIFile(std::shared_ptr<MidiMessageSequence> MS, double x);
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessor)
