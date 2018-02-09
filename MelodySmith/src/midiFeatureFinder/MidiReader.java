@@ -426,8 +426,12 @@ public class MidiReader {
 	 */
 	public int[] predictMelodyChannel() {
 		
+		
 		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
 		int[] predictions = new int[orderedNotes.size()];
+		int longestRepeat = 0;
+		int currentRepeat = 0;
+		int currentKey = -1;
 		
 		for (int i = 0; i < orderedNotes.size(); i++) {
 			predictions[i] = 100;
@@ -437,6 +441,29 @@ public class MidiReader {
 			if (orderedNotes.get(i).size() == 0) {
 				predictions[i] = 0;
 			}
+			else {
+				// Counting repeats
+				for (Node note : orderedNotes.get(i)) {
+					if (note.key != currentKey) {
+						currentKey = note.key;
+						currentRepeat = 1;
+					}
+					else {
+						currentRepeat++;
+					}
+					
+					if (currentRepeat > longestRepeat) {
+						longestRepeat = currentRepeat;
+					}
+					
+					
+				}
+				
+				if (longestRepeat >= 10) {
+					predictions[i] = predictions[i] - 10;
+				}
+			}
+			
 		}
 		
 		return predictions;

@@ -33,8 +33,8 @@ public class MidiWriter {
 	// Standard footer
 	static final int footer[] = new int[] { 0x01, 0xFF, 0x2F, 0x00 };
 
-	// A MIDI event to set the tempo
-	static final int tempoEvent[] = new int[] { 0x00, 0xFF, 0x51, 0x03, 0x0F, 0x42, 0x40 };
+	// A MIDI event to set the tempo, dont need, auto set to 120
+	// static final int tempoEvent[] = new int[] { 0x00, 0xFF, 0x51, 0x03, 0x0F, 0x42, 0x40 };
 
 	// A MIDI event to set the key signature. This is irrelent to
 	// playback, but necessary for editing applications
@@ -70,7 +70,7 @@ public class MidiWriter {
 		// _Do_ include the footer but _do not_ include the
 		// track header
 
-		int size = tempoEvent.length + keySigEvent.length + timeSigEvent.length + footer.length;
+		int size = keySigEvent.length + timeSigEvent.length + footer.length;
 
 		for (int i = 0; i < playEvents.size(); i++)
 			size += playEvents.elementAt(i).length;
@@ -86,8 +86,6 @@ public class MidiWriter {
 		fos.write((byte) low);
 
 		// Write the standard metadata tempo, etc
-		// At present, tempo is stuck at crotchet=60
-		fos.write(intArrayToByteArray(tempoEvent));
 		fos.write(intArrayToByteArray(keySigEvent));
 		fos.write(intArrayToByteArray(timeSigEvent));
 
