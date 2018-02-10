@@ -41,8 +41,8 @@ public class MidiReader {
 	private String currentTime = "4/4";
 	private float currentBPM = 120;
 	private String trackName;
-	private long[] lastTickOfChannel;
 	private int ticksPerQuarterNote = 0;
+	private long[] lastTickOfChannel;
 	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
 	
@@ -154,9 +154,8 @@ public class MidiReader {
 	 */
 	public ArrayList<ArrayList<Node>> readSequence(File midiFile, int markovLength, boolean withRests) {
 		try {
-			// Rest Logic commented out for now because it doesn't work well
-			// with the association network
-			// long[] lastTickOfChannel = new long[maxChannels];
+			// Rest Logic
+			lastTickOfChannel = new long[maxChannels];
 			Hashtable<Integer, ArrayList<Node>> currentNotes = getCurrentNotes();
 
 			// Reset the fields
@@ -178,8 +177,6 @@ public class MidiReader {
 				ticksPerQuarterNote = currentSequence.getResolution();
 			}
 			
-			lastTickOfChannel = new long[currentSequence.getTracks().length];
-
 			for (Track track : currentSequence.getTracks()) {
 				for (int i = 0; i < track.size(); i++) {
 					processEvent(track, currentNotes, i);
