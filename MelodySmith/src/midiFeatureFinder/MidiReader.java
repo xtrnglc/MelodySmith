@@ -149,9 +149,10 @@ public class MidiReader {
 	 * 
 	 * @param midiFile
 	 * @param markovLength
+	 * @param withRests
 	 * @return getOrderedNotes()
 	 */
-	public ArrayList<ArrayList<Node>> readSequence(File midiFile, int markovLength) {
+	public ArrayList<ArrayList<Node>> readSequence(File midiFile, int markovLength, boolean withRests) {
 		try {
 			// Rest Logic commented out for now because it doesn't work well
 			// with the association network
@@ -198,7 +199,10 @@ public class MidiReader {
 			e.printStackTrace();
 			System.out.println("Could not locate the MIDI file");
 		}
-		return getOrderedNotes();
+		if (withRests)
+			return getOrderedNotes();
+		else
+			return getOrderedNotesWithoutRests();
 	}
 	
 	/**
