@@ -41,6 +41,7 @@ public class MidiReader {
 	private String currentTime = "4/4";
 	private float currentBPM = 120;
 	private String trackName;
+	private long[] lastTickOfChannel;
 	private int ticksPerQuarterNote = 0;
 	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
@@ -68,6 +69,32 @@ public class MidiReader {
 
 				for (Node note : notes) {
 					temp.add(note);
+				}
+			}
+		}
+		return r;
+	}
+	
+	/**
+	 * Returns the ordered form of the current unordered notes
+	 * 
+	 * @return Ordered 2d array of the type [channel[note]]
+	 */
+	public ArrayList<ArrayList<Node>> getOrderedNotesWithoutRests() {
+
+		ArrayList<ArrayList<Node>> r = new ArrayList<ArrayList<Node>>();
+		for (LinkedHashMap<Long, ArrayList<Node>> channel : unorderedNotes) {
+			ArrayList<Node> temp = new ArrayList<Node>();
+			r.add(temp);
+
+			// Because notesByTick is a LinkedHashMap it retains the correct
+			// ordering from when the note arrays were added
+			for (Map.Entry<Long, ArrayList<Node>> notesByTick : channel.entrySet()) {
+				ArrayList<Node> notes = notesByTick.getValue();
+
+				for (Node note : notes) {
+					if (note.key != -1)
+						temp.add(note);
 				}
 			}
 		}
@@ -149,6 +176,8 @@ public class MidiReader {
 				isPPQ = true;
 				ticksPerQuarterNote = currentSequence.getResolution();
 			}
+			
+			lastTickOfChannel = new long[currentSequence.getTracks().length];
 
 			for (Track track : currentSequence.getTracks()) {
 				for (int i = 0; i < track.size(); i++) {
@@ -173,11 +202,12 @@ public class MidiReader {
 	}
 	
 	/**
-	 * Records the counts of all possible interval combinations, in the form key: ,X,Y,Z value: the number of time the key appears in the current song
+	 * Stores interval scale degrees, note names, and durations into the analyzer (CorpusAnalyzer)
+	 * currently ignores rests
 	 * @param markovLength
 	 */
 	private void recordIntervals(int markovLength) {		
-		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
+		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotesWithoutRests();
 		
 		for (ArrayList<Node> channel : orderedNotes) {
 			for (int i = 0; i < channel.size() - markovLength; i++) {
@@ -230,6 +260,16 @@ public class MidiReader {
 			int velocity = sMessage.getData2();
 
 			if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
+				
+				// Rest Logic, adds a rest when the 
+				if (lastTickOfChannel[sMessage.getChannel()] != 0) {
+					Node n = new Node(sMessage.getChannel(), lastTickOfChannel[sMessage.getChannel()], trackName,
+							currentInstrument, currentKey, currentTime, currentBPM);
+					currentNotes.get(sMessage.getChannel()).add(n);
+					n.turnOff(event.getTick(), ticksPerQuarterNote);
+					lastTickOfChannel[sMessage.getChannel()] = 0;
+				}
+				
 				Node n = new Node(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
 						currentInstrument, currentKey, currentTime, currentBPM);
 				currentNotes.get(sMessage.getChannel()).add(n);
@@ -239,8 +279,11 @@ public class MidiReader {
 					notes.put(currentTick, new ArrayList<Node>());
 				}
 				
-				if(currentTick != -1)
+				if (currentTick != -1)
 					notes.get(currentTick).add(n);
+				
+
+				
 			} else if (sMessage.getCommand() == NOTE_OFF || velocity == 0) {
 				ArrayList<Node> channelNotes = currentNotes.get(sMessage.getChannel());
 				Node n = null;
@@ -252,10 +295,9 @@ public class MidiReader {
 						n = channelNotes.remove(k);
 						
 						// Rest Logic
-						// if (channelNotes.size() == 0) {
-						// lastTickOfChannel[sMessage.getChannel()]
-						// = event.getTick();
-						// }
+						if (channelNotes.size() == 0 && lastTickOfChannel[sMessage.getChannel()] == 0) {
+							lastTickOfChannel[sMessage.getChannel()] = event.getTick();
+						}
 
 						break;
 					}

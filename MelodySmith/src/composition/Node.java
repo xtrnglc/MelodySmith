@@ -46,7 +46,7 @@ public class Node {
 	
 	// Code from Note
 	/**
-	 * A Node with no key is a rest
+	 * A Node constructed with no key is a rest (key is set to -1)
 	 * 
 	 * @param channel
 	 * @param startTick

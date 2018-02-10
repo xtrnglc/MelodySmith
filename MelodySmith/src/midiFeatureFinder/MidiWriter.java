@@ -34,6 +34,7 @@ public class MidiWriter {
 	static final int footer[] = new int[] { 0x01, 0xFF, 0x2F, 0x00 };
 
 	// A MIDI event to set the tempo, dont need, auto set to 120
+	// http://www.deluge.co/?q=midi-tempo-bpm
 	// static final int tempoEvent[] = new int[] { 0x00, 0xFF, 0x51, 0x03, 0x0F, 0x42, 0x40 };
 
 	// A MIDI event to set the key signature. This is irrelent to
