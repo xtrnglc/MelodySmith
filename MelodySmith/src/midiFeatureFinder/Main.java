@@ -10,8 +10,8 @@ public class Main {
 		// TODO Auto-generated method stub
 		CorpusAnalyzer c = new CorpusAnalyzer();
 		MidiReader r = new MidiReader(c);
-		r.readSequenceRaw(new File("midiReaderData/beatles/Lead2.mid"));
-		ArrayList<ArrayList<Node>> test = r.readSequence(new File("midiReaderData/beatles/Lead2.mid"), 5, true);
+		r.readSequenceRaw(new File("simple/1.mid"));
+		ArrayList<ArrayList<Node>> test = r.readSequence(new File("simple/1.mid"), 5, true);
 		System.out.println();
 	}
 }

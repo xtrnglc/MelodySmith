@@ -261,20 +261,27 @@ public class MidiReader {
 			int velocity = sMessage.getData2();
 
 			if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
-				
-				// Rest Logic, adds a rest when the 
-				if (lastTickOfChannel[sMessage.getChannel()] != 0) {
+				// Rest Logic
+				if (lastTickOfChannel[sMessage.getChannel()] == event.getTick()) {
+					lastTickOfChannel[sMessage.getChannel()] = -1;
+				}
+				else if (lastTickOfChannel[sMessage.getChannel()] != -1 && lastTickOfChannel[sMessage.getChannel()] != event.getTick() ) {
 					Node n = new Node(sMessage.getChannel(), lastTickOfChannel[sMessage.getChannel()], trackName,
 							currentInstrument, currentKey, currentTime, currentBPM);
-					currentNotes.get(sMessage.getChannel()).add(n);
 					n.turnOff(event.getTick(), ticksPerQuarterNote);
-					lastTickOfChannel[sMessage.getChannel()] = 0;
+					
+					if (notes.get(lastTickOfChannel[sMessage.getChannel()]) == null) {
+						notes.put(lastTickOfChannel[sMessage.getChannel()], new ArrayList<Node>());
+					}
+					
+					notes.get(lastTickOfChannel[sMessage.getChannel()]).add(n);
+					lastTickOfChannel[sMessage.getChannel()] = -1;
 				}
 				
 				Node n = new Node(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
 						currentInstrument, currentKey, currentTime, currentBPM);
 				currentNotes.get(sMessage.getChannel()).add(n);
-
+				
 				if (notes.get(event.getTick()) == null) {
 					currentTick = event.getTick();
 					notes.put(currentTick, new ArrayList<Node>());
@@ -296,7 +303,7 @@ public class MidiReader {
 						n = channelNotes.remove(k);
 						
 						// Rest Logic
-						if (channelNotes.size() == 0 && lastTickOfChannel[sMessage.getChannel()] == 0) {
+						if (channelNotes.size() == 0 && lastTickOfChannel[sMessage.getChannel()] == -1) {
 							lastTickOfChannel[sMessage.getChannel()] = event.getTick();
 						}
 
@@ -473,39 +480,58 @@ public class MidiReader {
 		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
 		int[] predictions = new int[orderedNotes.size()];
 		int longestRepeat = 0;
+		int longestRepeatOverAllChannels = 0;
+		int indexOfRepeat = 0;
 		int currentRepeat = 0;
 		int currentKey = -1;
+		int restCount = 0;
+		
 		
 		for (int i = 0; i < orderedNotes.size(); i++) {
 			predictions[i] = 100;
 		}
 		
 		for (int i = 0; i < orderedNotes.size(); i++) {
+			
+			currentRepeat = 0;
+			longestRepeat = 0;
+			restCount = 0;
+			
 			if (orderedNotes.get(i).size() == 0) {
 				predictions[i] = 0;
 			}
 			else {
 				// Counting repeats
 				for (Node note : orderedNotes.get(i)) {
-					if (note.key != currentKey) {
-						currentKey = note.key;
-						currentRepeat = 1;
+					if (note.key != -1) {
+						if (note.key != currentKey) {
+							currentKey = note.key;
+							currentRepeat = 1;
+						}
+						else {
+							currentRepeat++;
+						}
+						
+						if (currentRepeat > longestRepeat) {
+							longestRepeat = currentRepeat;
+							if (longestRepeat > longestRepeatOverAllChannels) {
+								indexOfRepeat = i;
+								longestRepeatOverAllChannels = longestRepeat;
+							}
+						}
 					}
 					else {
-						currentRepeat++;
+						restCount++;
 					}
-					
-					if (currentRepeat > longestRepeat) {
-						longestRepeat = currentRepeat;
-					}
-					
-					
 				}
 				
 				if (longestRepeat >= 10) {
 					predictions[i] = predictions[i] - 10;
 				}
+				
+				//if ((double) restCount/(double)orderedNotes.get(i).size() > .25)
 			}
+			predictions[indexOfRepeat] = predictions[indexOfRepeat] - 10;
 			
 		}
 		
