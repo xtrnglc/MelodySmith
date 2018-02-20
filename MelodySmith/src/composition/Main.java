@@ -17,8 +17,8 @@ public class Main {
 		String corpusFolder = args[0];
 		String outputFileName = args[1];
 		String keySig = args[2];
-		double intervalWeight = Double.parseDouble(args[3]);
-		double durationWeight = Double.parseDouble(args[4]);
+		double intervalWeight = Double.parseDouble(args[3])/10000;
+		double durationWeight = Double.parseDouble(args[4])/1000;
 		int nGramLength = Integer.parseInt(args[5]);
 		int numberOfComparisons = Integer.parseInt(args[6]);
 		
@@ -32,6 +32,11 @@ public class Main {
 			System.out.println("Your arguments:");
 			for(String arg : args)
 				System.out.println(arg);
+			
+			e.printStackTrace();
+			System.out.println(e.getLocalizedMessage());
+			System.out.println(e.getCause());
+			System.out.println(e.getClass());
 		}
 	}
 	

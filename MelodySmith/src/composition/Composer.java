@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT;
-
 import midiFeatureFinder.MidiReader;
 import midiFeatureFinder.MidiWriter;
 
@@ -133,11 +131,12 @@ public class Composer {
 	}
 	
 	private int[] getScaleMidiKeys(String scale) {
-		switch(scale) {
-		case "cGypsy": return CGYPSY;
-		case "aMinor": return AMINOR;
-		case "DBlues": return DBLUES;
-		case "fHarmonic" : return FHARMONIC;
+		switch(scale.toUpperCase()) {
+		case "CGYPSY": return CGYPSY;
+		case "AMINOR": return AMINOR;
+		case "DBLUES": return DBLUES;
+		case "FHARMONIC" : return FHARMONIC;
+		case "CMAJOR" : return CMAJOR;
 		default : return GCHROMATIC;
 		}
 	}
@@ -253,7 +252,7 @@ public class Composer {
 			for(File midiFile : folder.listFiles()) {
 				if(midiFile.getName().startsWith("."))
 					continue;
-				for(ArrayList<Node> channel : reader.readSequence(midiFile, nGramLength)) {
+				for(ArrayList<Node> channel : reader.readSequence(midiFile, nGramLength, true)) {
 					for(Node note : channel) {
 						note.artist = folder.getName();
 						note.song = midiFile.getName();

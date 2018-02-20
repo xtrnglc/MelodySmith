@@ -11,7 +11,7 @@ public class Main {
 		CorpusAnalyzer c = new CorpusAnalyzer();
 		MidiReader r = new MidiReader(c);
 		r.readSequenceRaw(new File("midiReaderData/beatles/Lead2.mid"));
-		ArrayList<ArrayList<Node>> test = r.readSequence(new File("midiReaderData/beatles/Lead2.mid"), 5);
+		ArrayList<ArrayList<Node>> test = r.readSequence(new File("midiReaderData/beatles/Lead2.mid"), 5, true);
 		System.out.println();
 	}
 }

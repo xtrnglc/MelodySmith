@@ -27,8 +27,8 @@ public class AssociationNetwork {
 	
 	CorpusAnalyzer probabilities;
 	
-	double sameScaleDegreePenalty = 0.5;
-	double sameDurationPenalty = 1.0;
+	double sameScaleDegreePenalty = 1.5;
+	double sameDurationPenalty = 1.5;
 	
 	public void linkNetwork() {
 		matrix = new Link[allNodes.size()][allNodes.size()];
@@ -91,7 +91,7 @@ public class AssociationNetwork {
 				return node;
 			}
 		}
-		return null;
+		return allNodes.get(0);
 	}
 	
 	Node getTonic(int i) {
