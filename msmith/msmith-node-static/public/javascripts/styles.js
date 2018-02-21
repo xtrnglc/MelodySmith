@@ -26,3 +26,19 @@
     });
 
 })(jQuery, window, document);
+
+$("#num-comparisons-selector").keypress(function (evt) {
+    evt.preventDefault();
+});
+
+$("#n-gram-selector").keypress(function (evt) {
+    evt.preventDefault();
+});
+
+$(document).keydown(function(e) {
+    var elid = $(document.activeElement).hasClass('input-number');
+    console.log(e.keyCode + ' && ' + elid);
+    if (e.keyCode === 8 && !elid) {
+        return false;
+    };
+});

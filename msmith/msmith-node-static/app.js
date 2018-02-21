@@ -27,9 +27,24 @@ app.get('/getmidi', function(req, res) {
     //call melodysmith jar with args here
 
     console.log('running jar file\n');
+    // console.log('beatles: ' + req.query.beatles);
+    // console.log('bach: ' + req.query.bach);
+    // console.log('bieber: ' + req.query.bieber);
+
 
     var child = require('child_process').spawn(
-        'java', ['-jar', './MelodySmith.jar', 'public/corpus', 'output.mid',req.query.keySignature, req.query.intervalOfNoteSliderval, req.query.durationsOfNotesSliderval, req.query.nGramVal, req.query.numComparisons, 'beatles:87']
+        'java', ['-jar', './MelodySmith.jar',
+            'public/corpus',
+            'output.mid',
+            req.query.keySignature,
+            req.query.intervalOfNoteSliderval,
+            req.query.durationsOfNotesSliderval,
+            req.query.nGramVal,
+            req.query.numComparisons,
+            'beatles:'+req.query.beatles,
+            'bach:'+req.query.bach,
+            'bieber:'+req.query.bieber
+        ]
     );
 
     // var exec = require('child_process').exec;
@@ -92,6 +107,6 @@ app.post('/upload', function(req, res){
   console.log('upload');
 });
 
-var server = app.listen(3000, function(){
-  console.log('Server listening on port 3000');
+var server = app.listen(process.env.PORT || 3000, function(){
+    console.log('Server listening on port 3000');
 });

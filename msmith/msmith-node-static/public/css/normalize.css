@@ -478,6 +478,13 @@ fieldset input {
 fieldset input:hover {
   cursor: pointer;
 }
+
+fieldset #radio-choice-8, fieldset label[for="radio-choice-8"] {
+  transform: rotateZ(-96deg);
+}
+fieldset #radio-choice-7, fieldset label[for="radio-choice-7"] {
+  transform: rotateZ(-72deg);
+}
 fieldset #radio-choice-1, fieldset label[for="radio-choice-1"] {
   transform: rotateZ(-48deg);
 }
@@ -493,9 +500,36 @@ fieldset #radio-choice-4, fieldset label[for="radio-choice-4"] {
 fieldset #radio-choice-5, fieldset label[for="radio-choice-5"] {
   transform: rotateZ(48deg);
 }
+fieldset #radio-choice-6, fieldset label[for="radio-choice-6"] {
+  transform: rotateZ(72deg);
+}
+fieldset #radio-choice-9, fieldset label[for="radio-choice-9"] {
+  transform: rotateZ(96deg);
+}
+
+
 fieldset input[type="radio"]:checked + label {
   color: #0FA0CE;
   text-shadow: 0px 0px 4px #0FA0CE;
+}
+
+input[type="radio"]:checked#radio-choice-8 ~ .dial {
+  transform: rotateZ(-96deg);
+}
+input[type="radio"]:checked#radio-choice-8 ~ .dial::before {
+  transform: rotateZ(96deg);
+}
+input[type="radio"]:checked#radio-choice-8 ~ .dial::after {
+  transform: rotateZ(96deg);
+}
+input[type="radio"]:checked#radio-choice-7 ~ .dial {
+  transform: rotateZ(-72deg);
+}
+input[type="radio"]:checked#radio-choice-7 ~ .dial::before {
+  transform: rotateZ(72deg);
+}
+input[type="radio"]:checked#radio-choice-7 ~ .dial::after {
+  transform: rotateZ(72deg);
 }
 input[type="radio"]:checked#radio-choice-1 ~ .dial {
   transform: rotateZ(-48deg);
@@ -542,6 +576,28 @@ input[type="radio"]:checked#radio-choice-5 ~ .dial::before {
 input[type="radio"]:checked#radio-choice-5 ~ .dial::after {
   transform: rotateZ(-48deg);
 }
+
+input[type="radio"]:checked#radio-choice-6 ~ .dial {
+  transform: rotateZ(72deg);
+}
+input[type="radio"]:checked#radio-choice-6 ~ .dial::before {
+  transform: rotateZ(-72deg);
+}
+input[type="radio"]:checked#radio-choice-6 ~ .dial::after {
+  transform: rotateZ(-72deg);
+}
+input[type="radio"]:checked#radio-choice-9 ~ .dial {
+  transform: rotateZ(96deg);
+}
+input[type="radio"]:checked#radio-choice-9 ~ .dial::before {
+  transform: rotateZ(-96deg);
+}
+input[type="radio"]:checked#radio-choice-9 ~ .dial::after {
+  transform: rotateZ(-96deg);
+}
+
+
+
 .dial {
   position: relative;
   text-align: center;
@@ -590,7 +646,6 @@ input[type="radio"]:checked#radio-choice-5 ~ .dial::after {
   clear: both;
   height: 0;
 }
-
 
 /*
 Loading cube

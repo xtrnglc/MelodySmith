@@ -5,19 +5,19 @@ var ac = new AudioContext || new webkitAudioContext;
 var eventsDiv = document.getElementById('events');
 var songDataURI = '';
 var width = 960;
-var height = 500;
+var height = 400;
+var numComparisons = 6;
 
 const grandPiano = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_grand_piano-mp3.js';
 const acousticGuitar = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_guitar_nylon-mp3.js';
 const flute = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/flute-mp3.js';
 const electricGuitar = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/electric_guitar_clean-mp3.js';
-const churchOrgan = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/church_organ-mp3.js';
+const musicBox = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/music_box-mp3.js';
 
 var instrument = grandPiano;
 
 var changeTempo = function(tempo) {
 	Player.tempo = tempo;
-
 }
 
 var play = function() {
@@ -35,6 +35,14 @@ var cbutton = function() {
 var abutton = function() {
     document.getElementById('c-button').style.backgroundColor = '#33C3F0';
     document.getElementById('a-button').style.backgroundColor = '#0FA0CE';
+}
+
+var changeNumComparisons = function(newVal) {
+    numComparisons = newVal;
+}
+
+var changeNgrams = function(newVal) {
+    nGramVal = newVal;
 }
 
 var svg = d3.select("#canvas")
@@ -63,8 +71,7 @@ var forge = function() {
     var intervalOfNoteSliderval = document.getElementById('intervalOfNote-slider').value;
     //var restSlider = document.getElementById('rest-slider').value;
     var nGramVal = document.getElementById('n-gram-selector').value;
-    var numComparisons = document.getElementById('num-comparisons-selector').value;
-
+    //var numComparisons = document.getElementById('num-comparisons-selector').value;
     if(document.getElementById('keysigdropdown').value === '') {
 
     } else {
@@ -73,15 +80,17 @@ var forge = function() {
 
 
     var formData = {
-        backstreetboys: artistslider1,
-        beethoven:artistslider2,
-        katy:artistslider3,
+        bieber: artistslider1,
+        bach:artistslider2,
+        beatles:artistslider3,
         durationsOfNotesSliderval: durationOfNotesSliderval,
         intervalOfNoteSliderval: intervalOfNoteSliderval,
         nGramVal: nGramVal,
         numComparisons: numComparisons,
         keySignature : keySignature
     };
+
+    console.log(formData);
 
     //console.log(formData);
     $.ajax({
@@ -104,18 +113,24 @@ var switchInstrument = function(val) {
     if(val === 'electricGuitar') {
         instrument = electricGuitar;
     }
-    if(val === 'churchOrgan') {
-        instrument = churchOrgan;
+    if(val === 'musicBox') {
+        instrument = musicBox;
     }if(val === 'grandPiano') {
         instrument = grandPiano;
     }
+}
 
+var showControls = function() {
+    document.getElementById('loadingcube').style.display = 'none';
+    document.getElementById('canvas').style.display = 'block';
+    document.getElementById('music-controls').style.display = 'block';
+    document.getElementById('tempo-div').style.display = 'block';
+    document.getElementById('play-bar-button').style.display = 'block';
 }
 
 var initiatePlayer = function(data, instrumentVal) {
-    document.getElementById('loadingcube').style.display = 'none';
 
-    document.getElementById('canvas').style.display = 'block';
+    showControls();
 
     switchInstrument(instrumentVal);
 
@@ -124,12 +139,14 @@ var initiatePlayer = function(data, instrumentVal) {
 
         loadDataUri = function(dataUri) {
             Player = new MidiPlayer.Player(function(event) {
+                //console.log(event);
                 if (event.name == 'Note on' && event.velocity > 0) {
                     instrument.play(event.noteName, ac.currentTime, {gain:event.velocity/100});
                     //document.querySelector('#track-' + event.track + ' code').innerHTML = JSON.stringify(event);
                     //console.log(event);
                 }
                 if(event.name=="Note on"){
+
                     //http://localhost/gist/audio/jesu/
                     var elLength = 40*(event.delta<=1?1:event.delta/120);
                     var element = svg.append("g");
@@ -177,10 +194,14 @@ var initiatePlayer = function(data, instrumentVal) {
     });
 }
 
-var changeInstrument = function(instrument) {
-    console.log('changing instruments ' + instrument);
-    Player.stop();
-    initiatePlayer(songDataURI, instrument);
+var changeInstrument = function(instrumentval) {
+    console.log('changing instruments ' + instrumentval);
+    switchInstrument(instrumentval);
+    if(Player) {
+        Player.stop();
+        initiatePlayer(songDataURI, instrument);
+    }
+
 }
 
 var pause = function() {

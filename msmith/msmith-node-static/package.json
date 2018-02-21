@@ -1,12 +1,13 @@
 {
-  "name": "file-uploader",
+  "name": "MelodySmith",
   "version": "1.0.0",
-  "description": "An AJAX file uploader using JS and NodeJS",
+  "description": "Music Composition",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
-  "author": "Fady Makram",
+  "author": "audioMIDIum",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.17.1",
