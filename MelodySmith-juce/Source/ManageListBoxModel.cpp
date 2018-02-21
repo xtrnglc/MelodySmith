@@ -49,7 +49,20 @@ void ManageListBoxModel::addSongs(Array<File> midi_files)
 {
 	for (int i = 0; i < midi_files.size(); i++) 
 	{
-		fileNames.add(midi_files[i]);
+		if (midi_files[i].isDirectory())
+		{
+			//Array<File> midi_files_in_dir(f.child);
+			DirectoryIterator iter(midi_files[i], false, "*.mid");
+			while (iter.next())
+			{
+				File f(iter.getFile());
+				std::tuple<String, String> s(f.getFullPathName(), midi_files[i].getFileNameWithoutExtension());
+				curr_artist_filename_tuples->add(s);
+				fileNames.add(f);
+			}
+		}
+		else
+			fileNames.add(midi_files[i]);
 	}
 }
 
@@ -60,5 +73,5 @@ void ManageListBoxModel::removeSong()
 
 void ManageListBoxModel::clearSongs()
 {
-
+	fileNames.clear();
 }

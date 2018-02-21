@@ -17,7 +17,7 @@ InfluencesListBoxRow::InfluencesListBoxRow(String aName, Array<std::tuple<String
 	index = i;
 	std::tuple<String, double> currArtistToInfluence((*artists_to_influences)[index]);
 
-	artistNameLabel.setColour(Label::textColourId, Colours::black.brighter(0.2f));
+	artistNameLabel.setColour(Label::textColourId, Colours::white);
 	artistNameLabel.setText(artistName, NotificationType::dontSendNotification);
 	artistNameLabel.setJustificationType(Justification::centred);
 	artistNameLabel.setFont(Font("Avenir", 20.0f, 0));
@@ -41,7 +41,7 @@ void InfluencesListBoxRow::paint(Graphics &g)
 	//Rectangle<int> totalArea(0, 0, width, height);
 	//Rectangle<int> leftCol(totalArea.removeFromLeft(totalArea.getWidth() / 2));
 	//g.drawFittedText(fileName, getLocalBounds(), Justification::centred, 1);
-	g.fillAll(Colours::red.brighter(0.6f));
+	g.fillAll(Colours::black.brighter(0.2f));
 }
 
 void InfluencesListBoxRow::resized()

@@ -28,9 +28,15 @@ InfluencesListBoxModel::~InfluencesListBoxModel()
 
 int InfluencesListBoxModel::getNumRows()
 {
-	if (artists_to_influences == nullptr)
+	try {
+		if (artists_to_influences == nullptr)
+			return 0;
+		return artists_to_influences->size();
+	}
+	catch (...)
+	{
 		return 0;
-	return artists_to_influences->size();
+	}
 }
 
 void InfluencesListBoxModel::setArtistsAndFiles(Array<std::tuple<String, String>> *curr)

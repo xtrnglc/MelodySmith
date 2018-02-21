@@ -147,6 +147,10 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\CorpusPanel.cpp"/>
+    <ClCompile Include="..\..\Source\ScaleParamsPanel.cpp"/>
+    <ClCompile Include="..\..\Source\AdvancedParamsPanel.cpp"/>
+    <ClCompile Include="..\..\Source\BasicParamsPanel.cpp"/>
     <ClCompile Include="..\..\Source\MyKnobLF.cpp"/>
     <ClCompile Include="..\..\Source\InfluencesListBoxRow.cpp"/>
     <ClCompile Include="..\..\Source\InfluencesListBoxModel.cpp"/>
@@ -1850,6 +1854,10 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_video.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\CorpusPanel.h"/>
+    <ClInclude Include="..\..\Source\ScaleParamsPanel.h"/>
+    <ClInclude Include="..\..\Source\AdvancedParamsPanel.h"/>
+    <ClInclude Include="..\..\Source\BasicParamsPanel.h"/>
     <ClInclude Include="..\..\Source\MyKnobLF.h"/>
     <ClInclude Include="..\..\Source\InfluencesListBoxRow.h"/>
     <ClInclude Include="..\..\Source\InfluencesListBoxModel.h"/>

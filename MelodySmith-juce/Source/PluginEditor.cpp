@@ -10,6 +10,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <Windows.h>
+#include <ShellApi.h>
 
 
 
@@ -20,29 +22,29 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 {
 	audioProcessor = &p;
 	melodysmithDirPath = "C:\\Program Files\\MelodySmith\\";
+	countOfOutputFiles = 0;
 	//String windowsMelodysmithDirPath = "C:/Users/Daniel Mattheiss/Documents/MelodySmith/MelodySmithVST/MelodySmith/MelodySmith - juce/Builds/VisualStudio2017/";
 
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
 	setSizesAndColors();
-    setSize (pluginHeight, pluginWidth);
-	//setResizable(true, false);
+	setSize(700, 550);
+    //setSize (pluginHeight, pluginWidth);
+	setResizable(true, true);
+	setResizeLimits(100, 100, 1800, 3200);
 
 	corpusHeader.setColour(Label::textColourId, header1Colour);
 	corpusHeader.setText("Corpus", NotificationType::dontSendNotification);
 	corpusHeader.setJustificationType(Justification::centred);
 	//corpusHeader.setFont(Font("Avenir", 20.0f, 0));
 	addAndMakeVisible(corpusHeader);
+	//addAndMakeVisible(corpusPanel);
 
-	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
-	tabbedCorpusComponent.addTab("Manage", Colours::red, &managePanel, false);
-	tabbedCorpusComponent.addTab("Influences", Colours::red, &influencesPanel, false);
-	//tabbedCorpusComponent.setTabBackgroundColour(0, Colours::aliceblue);
-	//tabbedCorpusComponent.setTabBackgroundColour()
-	tabbedCorpusComponent.setColour(TabbedComponent::backgroundColourId, Colours::red.brighter(0.4f));
-	//tabbedCorpusComponent.setColour()
-	addAndMakeVisible(tabbedCorpusComponent);
+	parametersHeader.setColour(Label::textColourId, header1Colour);
+	parametersHeader.setText("Parameters", NotificationType::dontSendNotification);
+	parametersHeader.setJustificationType(Justification::centred);
+	addAndMakeVisible(parametersHeader);
 
 	//File fa = File(windowsMelodysmithDirPath);
 	//int z = fa.getSize();
@@ -84,61 +86,25 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	forgeImageBtn.setColour(TextButton::textColourOffId, Colours::white);
 	forgeImageBtn.addListener(this);
 	addAndMakeVisible(forgeImageBtn);
-	
 
-	addAndMakeVisible(invervalWeightSlider);
-	invervalWeightSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
-	invervalWeightSlider.setRange(0, 10, 1.0);
-	//Slider::setSliderSnapsToMousePosition
-
-
-	addAndMakeVisible(durationWeightSlider);
-	durationWeightSlider.setRange(0, 10, 1.0);
-	addAndMakeVisible(nGramLengthSlider);
-	nGramLengthSlider.setRange(2, 10, 1.0);
-	addAndMakeVisible(numberOfComparisonsSlider);
-	numberOfComparisonsSlider.setRange(0, 9, 1.0);
-	durationWeightSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
-	nGramLengthSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
-	numberOfComparisonsSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
-
-	intervalWeightLabel.setText("Interval", NotificationType::dontSendNotification);
-	intervalWeightLabel.setJustificationType(Justification::centred);
-	addAndMakeVisible(intervalWeightLabel);
-
-	durationWeightLabel.setText("Duration", NotificationType::dontSendNotification);
-	durationWeightLabel.setJustificationType(Justification::centred);
-	addAndMakeVisible(durationWeightLabel);
-
-	nGramLengthLabel.setText("n-Gram Size", NotificationType::dontSendNotification);
-	nGramLengthLabel.setJustificationType(Justification::centred);
-	addAndMakeVisible(nGramLengthLabel);
-
-	numberOfComparisonsLabel.setText("Number of Comparisons", NotificationType::dontSendNotification);
-	numberOfComparisonsLabel.setJustificationType(Justification::centred);
-	addAndMakeVisible(numberOfComparisonsLabel);
-
-	scaleLabel.setText("Scale", NotificationType::dontSendNotification);
-	scaleLabel.setJustificationType(Justification::centred);
-	//scaleLabel.setFont(Font("Avenir", 20.0f, 0));
-	//Font f = scaleLabel.getFont();	
-	addAndMakeVisible(scaleLabel);
-
-	keySelect.addItem("c Gypsy", 1);
-	keySelect.addItem("a Minor", 2);
-	keySelect.addItem("D Blues", 3);
-	keySelect.addItem("f Harmonic", 4);
-	keySelect.addItem("G Chromatic", 5);
-	keySelect.addItem("aMinor", 6);
-
-	keySelect.setSelectedId(1);
-	addAndMakeVisible(keySelect);
+	addAndMakeVisible(advancedParamsPanel);
+	addAndMakeVisible(basicParamsPanel);
+	addAndMakeVisible(scaleParamsPanel);
 
 	exportBtn.setButtonText("Choose Save Folder");
 	exportBtn.setColour(TextButton::buttonColourId, Colours::red);
 	exportBtn.setColour(TextButton::textColourOffId, Colours::white);
 	exportBtn.addListener(this);
 	addAndMakeVisible(exportBtn);
+
+	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
+	tabbedCorpusComponent.addTab("Manage", Colours::red, &managePanel, false);
+	tabbedCorpusComponent.addTab("Influences", Colours::red, &influencesPanel, false);
+	//tabbedCorpusComponent.setTabBackgroundColour(0, Colours::aliceblue);
+	//tabbedCorpusComponent.setTabBackgroundColour()
+	tabbedCorpusComponent.setColour(TabbedComponent::backgroundColourId, Colours::red.brighter(0.4f));
+	//tabbedCorpusComponent.setColour()
+	addAndMakeVisible(tabbedCorpusComponent);
 
 	exportFolder = File(melodysmithDirPath);
 }
@@ -165,51 +131,35 @@ void MelodySmithVSTAudioProcessorEditor::resized()
     // subcomponents in your editor..
 
 	// sets the position and size of the slider with arguments (x, y, width, height)
-	Rectangle<int> area(getLocalBounds());
+	juce::Rectangle<int> area(getLocalBounds());
 
-	Rectangle<int> leftCol(area.removeFromLeft(area.getWidth() / 2));
+	juce::Rectangle<int> leftCol(area.removeFromLeft(area.getWidth() / 2));
 	
 	float fontHeight = corpusHeader.getFont().getHeight() + 20;
-	Rectangle<int> tempArea(leftCol.removeFromTop(fontHeight));
+	juce::Rectangle<int> tempArea(leftCol.removeFromTop(fontHeight));
 	corpusHeader.setBounds(tempArea);
 
-	tempArea = Rectangle<int>(leftCol.reduced(15, 10));
+	tempArea = juce::Rectangle<int>(leftCol.reduced(15, 10));
 	//tabbedCorpusComponent.setBounds(tempArea.removeFromTop(tempArea.getHeight() / 12));
+	//corpusPanel.setBounds(tempArea);
 	tabbedCorpusComponent.setBounds(tempArea);
 
-	Rectangle<int> rightCol(area);
+	juce::Rectangle<int> rightCol(area);
+
+	parametersHeader.setBounds(rightCol.removeFromTop(fontHeight));
+
 	int rightColHeight = rightCol.getHeight();
 	int rightColWidth = rightCol.getWidth();
 
 	//reforgeImageBtn.setBounds(rightCol.removeFromTop(rightColHeight / 3));
-	Rectangle<int> firstRow = rightCol.removeFromTop(rightColHeight / 4);
-	Rectangle<int> secondRow = rightCol.removeFromTop(rightColHeight / 4);
-	Rectangle<int> thirdRow = rightCol.removeFromTop(rightColHeight / 4);
-	Rectangle<int> fourthRow = rightCol.removeFromTop(rightColHeight / 4);
+	juce::Rectangle<int> firstRow = rightCol.removeFromTop(rightColHeight / 4);
+	juce::Rectangle<int> secondRow = rightCol.removeFromTop(rightColHeight / 4);
+	juce::Rectangle<int> thirdRow = rightCol.removeFromTop(rightColHeight / 4);
+	juce::Rectangle<int> fourthRow = rightCol.removeFromTop(rightColHeight / 4);
 
-	{
-		Rectangle<int> col = firstRow.removeFromLeft(rightCol.getWidth() / 2);
-		int heightPartition = col.getHeight() / 4;
-		intervalWeightLabel.setBounds(col.removeFromTop(heightPartition));
-		invervalWeightSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
-		col = firstRow;
-		durationWeightLabel.setBounds(col.removeFromTop(heightPartition));
-		durationWeightSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
-	}
-
-	{
-		Rectangle<int> col = secondRow.removeFromLeft(rightCol.getWidth() / 2);
-		int heightPartition = col.getHeight() / 4;
-		nGramLengthLabel.setBounds(col.removeFromTop(heightPartition));
-		nGramLengthSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
-		col = secondRow;
-		numberOfComparisonsLabel.setBounds(col.removeFromTop(heightPartition));
-		numberOfComparisonsSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
-	}
-
-	int heightPartition = thirdRow.getHeight() / 4;
-	scaleLabel.setBounds(thirdRow.removeFromTop(heightPartition));
-	keySelect.setBounds(thirdRow.removeFromTop(heightPartition).reduced(50, 0));
+	basicParamsPanel.setBounds(firstRow.removeFromLeft(firstRow.getWidth() - 10).reduced(0, 10));
+	advancedParamsPanel.setBounds(secondRow.removeFromLeft(secondRow.getWidth() - 10).reduced(0, 10));
+	scaleParamsPanel.setBounds(thirdRow.removeFromLeft(thirdRow.getWidth() - 10).reduced(0, 10));
 
 	//rightCol.removeFromTop(rightColHeight / 12);
 	reforgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
@@ -235,12 +185,27 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 {
 	if (btn == &reforgeImageBtn)
 	{
-		String s = "";
+		curr_artist_filename_tuples.clear();
+		artists_to_influences.clear();
+		/*corpusPanel.managePanel.corpusListBox.clearSongs();
+		corpusPanel.managePanel.corpusListBox.updateContent();
+		corpusPanel.influencesPanel.influencesListBox.updateContent();*/
+		managePanel.corpusListBox.clearSongs();
+		managePanel.corpusListBox.updateContent();
+		influencesPanel.influencesListBox.updateContent();
+		/*NativeDesktopWindow* const w = getNativeWindow();
+
+		if (w->isMinimised())
+			w->setMinimised(false);
+		else
+			w->setMinimised(true);*/
 	}
 	else if (btn == &exportBtn)
 	{
+		//File f("C:\\Users\\Daniel Mattheiss\\Downloads\\corpus");
 		FileChooser myChooser("Select the folder in which to save composed midi files...",
 			File::getSpecialLocation(File::userHomeDirectory));
+		//myChooser.
 		if (myChooser.browseForDirectory())
 		{
 			exportFolder = myChooser.getResult();
@@ -248,13 +213,14 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 	}
 	else if (btn == &forgeImageBtn)
 	{
-		String keyValue = keySelect.getText();
+		std::string keyValue = scaleParamsPanel.keySelect.getText().toStdString();
+		keyValue.erase(std::remove(keyValue.begin(), keyValue.end(), ' '), keyValue.end());
 		//int keyIndex = keySelect.getItemId();
 		//if(keyIndex == 0)*/
-		double intervalWeight = invervalWeightSlider.getValue();
-		double durationWeight = durationWeightSlider.getValue();
-		double nGramLength = nGramLengthSlider.getValue();
-		double numberOfComparisons = numberOfComparisonsSlider.getValue();
+		double intervalWeight = basicParamsPanel.invervalWeightSlider.getValue();
+		double durationWeight = basicParamsPanel.durationWeightSlider.getValue();
+		double nGramLength = advancedParamsPanel.nGramLengthSlider.getValue();
+		double numberOfComparisons = advancedParamsPanel.numberOfComparisonsSlider.getValue();
 		String clParamsStr = "\"" + keyValue + "\" " + String(intervalWeight) + " " + String(durationWeight) + " " + String(nGramLength) + " " + String(numberOfComparisons) + " ";
 		//Create master directory
 		File f(melodysmithDirPath + "artists");
@@ -299,12 +265,77 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		//String melodySmithJarStr = File::getCurrentWorkingDirectory().getChildFile("MelodySmith.jar").getFullPathName();
 		String melodySmithJarStr = melodysmithDirPath + "MelodySmith.jar";
 		String artistsStr = melodysmithDirPath + "artists";
-		String outputFilename = exportFolder.getFullPathName() + "\\output1.mid";
+		//String outputFilename = exportFolder.getFullPathName() + "\\output" + String(countOfOutputFiles++) + ".mid";
+		String outputFilename = /*"C:\\Users\\Daniel Mattheiss\\Documents\\Ableton\\User Library\\Clips\\melodysmith"*/ "C:\\Program Files\\MelodySmith\\melodysmith" + String(countOfOutputFiles++) + ".mid";
 
-		String clStr = "java -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr + "& pause";
+		String clStr = "java -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
 		//printf("Executing command DIR...\n");
 		//system("pause");
+		//STARTUPINFOW si;
+		//PROCESS_INFORMATION pi;
+
+		//ZeroMemory(&si, sizeof(si));
+		//si.cb = sizeof(si);
+		//ZeroMemory(&pi, sizeof(pi));
+
+		//if (CreateProcessW(command, arg, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+		//{
+		//	WaitForSingleObject(pi.hProcess, INFINITE);
+		//	CloseHandle(pi.hProcess);
+		//	CloseHandle(pi.hThread);
+		//}
+
+		//LPWSTR cmdLine[] = clStr.toStdString().c_str();
+
+		//SECURITY_ATTRIBUTES sa = { 0 };
+		//sa.nLength = sizeof(sa);
+		//sa.lpSecurityDescriptor = NULL;
+		//sa.bInheritHandle = TRUE;
+
+		//HANDLE hStdOutRd, hStdOutWr;
+		//HANDLE hStdErrRd, hStdErrWr;
+
+		//if (!CreatePipe(&hStdOutRd, &hStdOutWr, &sa, 0))
+		//{
+		//	// error handling...
+		//}
+
+		//if (!CreatePipe(&hStdErrRd, &hStdErrWr, &sa, 0))
+		//{
+		//	// error handling...
+		//}
+
+		//SetHandleInformation(hStdOutRd, HANDLE_FLAG_INHERIT, 0);
+		//SetHandleInformation(hStdErrRd, HANDLE_FLAG_INHERIT, 0);
+
+		//STARTUPINFO si = { 0 };
+		//si.cbSize = sizeof(si);
+		//si.dwFlags = STARTF_USESTDHANDLES;
+		//si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+		//si.hStdOutput = hStdOutWr;
+		//si.hStdError = hStdErrWr;
+
+		//PROCESS_INFORMATION pi = { 0 };
+
+		//if (!CreateProcessW(NULL, cmdLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+		//{
+		//	// error handling...
+		//}
+		//else
+		//{
+		//	// read from hStdOutRd and hStdErrRd as needed until the process is terminated...
+
+		//	CloseHandle(pi.hThread);
+		//	CloseHandle(pi.hProcess);
+		//}
+
+		//CloseHandle(hStdOutRd);
+		//CloseHandle(hStdOutWr);
+		//CloseHandle(hStdErrRd);
+		//CloseHandle(hStdErrWr);
 		i = system(clStr.toStdString().c_str());
+		//WinExec(clStr.toStdString().c_str(), SW_HIDE);
+		//ShellExecute(GetDesktopWindow(), "")
 		//system("pause");
 		//printf("The value returned was: %d.\n", i);
 
@@ -376,7 +407,7 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 void MelodySmithVSTAudioProcessorEditor::setSizesAndColors()
 {
 	pluginWidth = 700;
-	pluginHeight = 900;
+	pluginHeight = 600;
 
 	header1Colour = Colours::white;
 	buttonBgColour = Colours::crimson,  buttonTextColour = Colours::black;

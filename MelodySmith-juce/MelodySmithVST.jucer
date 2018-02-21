@@ -14,6 +14,20 @@
               jucerVersion="5.2.0">
   <MAINGROUP id="IIr9Cu" name="MelodySmithVST">
     <GROUP id="{A2F49132-830D-BEF2-A00C-5FCC948550BE}" name="Source">
+      <FILE id="sjb8xP" name="CorpusPanel.cpp" compile="1" resource="0" file="Source/CorpusPanel.cpp"/>
+      <FILE id="K9Xw92" name="CorpusPanel.h" compile="0" resource="0" file="Source/CorpusPanel.h"/>
+      <FILE id="ccTHaI" name="ScaleParamsPanel.cpp" compile="1" resource="0"
+            file="Source/ScaleParamsPanel.cpp"/>
+      <FILE id="iUrNBG" name="ScaleParamsPanel.h" compile="0" resource="0"
+            file="Source/ScaleParamsPanel.h"/>
+      <FILE id="lXQhpB" name="AdvancedParamsPanel.cpp" compile="1" resource="0"
+            file="Source/AdvancedParamsPanel.cpp"/>
+      <FILE id="mocHZS" name="AdvancedParamsPanel.h" compile="0" resource="0"
+            file="Source/AdvancedParamsPanel.h"/>
+      <FILE id="rHeRlI" name="BasicParamsPanel.cpp" compile="1" resource="0"
+            file="Source/BasicParamsPanel.cpp"/>
+      <FILE id="IYSfjV" name="BasicParamsPanel.h" compile="0" resource="0"
+            file="Source/BasicParamsPanel.h"/>
       <FILE id="rLBQbc" name="MyKnobLF.cpp" compile="1" resource="0" file="Source/MyKnobLF.cpp"/>
       <FILE id="DrhxfO" name="MyKnobLF.h" compile="0" resource="0" file="Source/MyKnobLF.h"/>
       <FILE id="PmkVA3" name="InfluencesListBoxRow.cpp" compile="1" resource="0"

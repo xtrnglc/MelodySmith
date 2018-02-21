@@ -12,10 +12,11 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "ManagePanel.h"
-#include "InfluencesPanel.h"
 #include "MyKnobLF.h"
-
+#include "ScaleParamsPanel.h"
+#include "BasicParamsPanel.h";
+#include "AdvancedParamsPanel.h"
+#include "CorpusPanel.h"
 
 //==============================================================================
 /**
@@ -48,12 +49,13 @@ private:
 	Colour divTextColour, divBorderColour;
 
 	Label corpusHeader;
+	Label parametersHeader;
+	//CorpusPanel corpusPanel;
 	TabbedComponent tabbedCorpusComponent;
-	Array<std::tuple<String, String>> curr_artist_filename_tuples;
-	Array<std::tuple<String, double>> artists_to_influences;
-	
 	ManagePanel managePanel;
 	InfluencesPanel influencesPanel;
+	Array<std::tuple<String, String>> curr_artist_filename_tuples;
+	Array<std::tuple<String, double>> artists_to_influences;
 
 	TextButton reforgeImageBtn;
 	TextButton forgeImageBtn;
@@ -72,16 +74,16 @@ private:
 
 	String melodysmithDirPath;
 
-	ComboBox keySelect;
-	Label scaleLabel;
-
-	Label intervalWeightLabel, durationWeightLabel, nGramLengthLabel, numberOfComparisonsLabel;
-	Slider invervalWeightSlider, durationWeightSlider, nGramLengthSlider, numberOfComparisonsSlider;
+	ScaleParamsPanel scaleParamsPanel;
+	BasicParamsPanel basicParamsPanel;
+	AdvancedParamsPanel advancedParamsPanel;
 
 	TextButton exportBtn;
 	File exportFolder;
 
 	std::shared_ptr<MidiMessageSequence> MidiSequence = std::make_shared<MidiMessageSequence>();
+
+	int countOfOutputFiles;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessorEditor)
 };

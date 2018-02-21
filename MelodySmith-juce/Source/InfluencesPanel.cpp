@@ -17,7 +17,7 @@ InfluencesPanel::InfluencesPanel(Array<std::tuple<String, String>>& artist_filen
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 
-	influencesListBox.setColour(ListBox::backgroundColourId, Colours::red.brighter(0.6f));
+	influencesListBox.setColour(ListBox::backgroundColourId, Colours::black.brighter(0.2f));
 	addAndMakeVisible(influencesListBox);
 
 	curr_artist_filename_tuples = &artist_filename_tuples;

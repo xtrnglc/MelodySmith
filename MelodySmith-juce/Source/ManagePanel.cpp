@@ -16,7 +16,7 @@ ManagePanel::ManagePanel(Array<std::tuple<String, String>>& artist_filename_tupl
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
-	corpusListBox.setColour(ListBox::backgroundColourId, Colours::red.brighter(0.6f));
+	corpusListBox.setColour(ListBox::backgroundColourId, Colours::black.brighter(0.2f));
 	addAndMakeVisible(corpusListBox);
 
 	addSongsBtn.setColour(TextButton::buttonColourId, Colours::red);
@@ -32,6 +32,8 @@ ManagePanel::ManagePanel(Array<std::tuple<String, String>>& artist_filename_tupl
 	curr_artist_filename_tuples = &artist_filename_tuples;
 
 	corpusListBox.setCurrArtistFilenameTuples(curr_artist_filename_tuples);
+
+	//File
 
 	
 }
@@ -77,6 +79,9 @@ void ManagePanel::paint (Graphics& g)
     //g.setFont (14.0f);
     //g.drawText ("ManagePanel", getLocalBounds(),
     //            Justification::centred, true);   // draw some placeholder text
+
+	/*g.setColour(Colours::white);
+	g.drawRect(getLocalBounds(), 3);   // draw an outline around the component*/
 }
 
 void ManagePanel::resized()
@@ -84,6 +89,7 @@ void ManagePanel::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 	Rectangle<int> area(getLocalBounds());
+	//area = area.reduced(10);
 	int areaHeight = area.getHeight();
 	saveSongsBtn.setBounds(area.removeFromBottom(areaHeight / 12));
 	addSongsBtn.setBounds(area.removeFromBottom(areaHeight / 12));
@@ -95,10 +101,10 @@ void ManagePanel::buttonClicked(Button* button)
 {
 	if (button == &addSongsBtn)
 	{
+		File f(/*"C:\\Users\\Daniel Mattheiss\\Downloads\\corpus"*/ File::getSpecialLocation(File::userHomeDirectory));
 		FileChooser myChooser("Please select the midi files you want to load...",
-			File::getSpecialLocation(File::userHomeDirectory),
-			"*.mid");
-		if (myChooser.browseForMultipleFilesToOpen())
+			f);
+		if (myChooser.browseForMultipleFilesOrDirectories())
 		{
 			Array<File> midi_files = myChooser.getResults();
 			corpusListBox.addSongs(midi_files);

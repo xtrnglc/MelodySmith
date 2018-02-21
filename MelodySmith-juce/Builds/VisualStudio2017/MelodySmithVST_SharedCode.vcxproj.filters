@@ -391,6 +391,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\CorpusPanel.cpp">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ScaleParamsPanel.cpp">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedParamsPanel.cpp">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\BasicParamsPanel.cpp">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\MyKnobLF.cpp">
       <Filter>MelodySmithVST\Source</Filter>
     </ClCompile>
@@ -2265,6 +2277,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\CorpusPanel.h">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ScaleParamsPanel.h">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\AdvancedParamsPanel.h">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\BasicParamsPanel.h">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\MyKnobLF.h">
       <Filter>MelodySmithVST\Source</Filter>
     </ClInclude>
