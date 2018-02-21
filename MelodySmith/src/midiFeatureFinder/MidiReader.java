@@ -208,7 +208,7 @@ public class MidiReader {
 	 * @param markovLength
 	 */
 	private void recordIntervals(int markovLength) {		
-		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotesWithoutRests();
+		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
 		
 		for (ArrayList<Node> channel : orderedNotes) {
 			for (int i = 0; i < channel.size() - markovLength; i++) {

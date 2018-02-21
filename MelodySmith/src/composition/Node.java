@@ -196,4 +196,9 @@ public class Node {
 		otherNode.linkedNodes.add(otherLink);
 	}
 	
+	@Override
+	public String toString() {
+		String result = this.noteName + " " + this.scaleDegree + " " + this.noteDuration;
+		return result;
+	}
 }

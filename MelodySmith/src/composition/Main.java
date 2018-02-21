@@ -44,11 +44,13 @@ public class Main {
 		HashMap<String, Double> artistWeights = new HashMap<String, Double>();
 		//artistWeights.put("bach", 1.0);
 		//artistWeights.put("beiber", 1.5);
-		artistWeights.put("bass", 1.0);
-		artistWeights.put("lead", 2.0);
-		Composer composer = new Composer("corpus", "aMinor", 2, 3, 0.0005, 1.0, artistWeights);
+		//artistWeights.put("bass", 1.0);
+		//artistWeights.put("lead", 2.0);
+		//artistWeights.put("simpleMelodies", 1.0);
+		artistWeights.put("simple", 1.0);
+		Composer composer = new Composer("corpus", "CMAJOR", 4, 3, 1, 1, artistWeights);
 		
-		composer.composeMelody("output.mid", 500);
+		composer.composeMelody("output.mid", 100);
 	}
 	
 	private static HashMap<String, Double> initializeArtists(String[] args, int currentPosition){

@@ -121,7 +121,7 @@ public class AssociationNetwork {
 		Link mostLikelyLink = null;
 		for(int i = 0; i < allNodes.size(); i++) {
 			Link currentLink = matrix[currentNode.index][i];
-			if(alreadyChosenNodes.contains(currentLink.endNode) || equivalentNodeInList(currentLink.endNode, bestNodes))
+			if(alreadyChosenNodes.contains(currentLink.endNode) || equivalentNodeInList(currentLink.endNode, bestNodes)) 
 				continue;
 			if(mostLikelyLink == null || currentLink.weight > mostLikelyLink.weight) {
 				mostLikelyLink = currentLink;
