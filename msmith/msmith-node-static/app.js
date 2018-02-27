@@ -7,54 +7,68 @@ var fs = require('fs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req, res){
+    res.sendFile(path.join(__dirname, 'views/landing.html'));
+});
+
+app.get('/forge', function(req, res){
   res.sendFile(path.join(__dirname, 'views/forge.html'));
 });
 
+app.get('/temp', function(req, res){
+    res.sendFile(path.join(__dirname, 'views/index1.html'));
+});
+
+
 app.get('/getmidi', function(req, res) {
-    //console.log(req.query);
+    console.log(req.query);
 
-    // //pathToCorpus keySignature artist:weight artist:weight
-    // { backstreetboys: '50',
-    //     beethoven: '50',
-    //     katy: '50',
-    //     durationsOfNotesSliderval: '0',
-    //     intervalOfNoteSliderval: '0',
-    //     nGramVal: '10',
-    //     numComparisons: '1',
-    //     keySignature: 'c' }
+    // var formData = {
+    //     bieber: artistslider1,
+    //     bach:artistslider2,
+    //     beatles:artistslider3,
+    //     rhythmicImportance: rhythmicImportance,
+    //     melodicImportance: melodicImportance,
+    //     speed: speed,
+    //     syncopation : syncopation,
+    //     phraseLength : phraseLength,
+    //     restAmount : restAmount,
+    //     restType : restType,
+    //     keySignature : keySignature
+    // };
 
-    //java -jar MelodySmith.jar corpusPath keySignature intervalWeight durationWeight nGramLength numberOfComparisons artist1Name:artist1Weight artist2Name:artist2Weight...
-    //call melodysmith jar with args here
 
-    console.log('running jar file\n');
-    // console.log('beatles: ' + req.query.beatles);
-    // console.log('bach: ' + req.query.bach);
-    // console.log('bieber: ' + req.query.bieber);
-
+    //java -jar MelodySmith.jar
+    // corpusPath
+    // outputFileName
+    // keySignature
+    // rhythmicImportance
+    // melodicImportance
+    // restType
+    // restAmount
+    // syncopation
+    // phraseLength
+    // creativity
+    // speed
+    // artistValues
 
     var child = require('child_process').spawn(
         'java', ['-jar', './MelodySmith.jar',
             'public/corpus',
             'output.mid',
             req.query.keySignature,
-            req.query.intervalOfNoteSliderval,
-            req.query.durationsOfNotesSliderval,
-            req.query.nGramVal,
-            req.query.numComparisons,
+            req.query.rhythmicImportance,
+            req.query.melodicImportance,
+            req.query.restType,
+            req.query.restAmount,
+            req.query.syncopation,
+            req.query.phraseLength,
+            req.query.creativity,
+            req.query.speed,
             'beatles:'+req.query.beatles,
             'bach:'+req.query.bach,
             'bieber:'+req.query.bieber
         ]
     );
-
-    // var exec = require('child_process').exec;
-    // var child = exec('java -jar ./MelodySmith.jar public/corpus cGypsy 12 14 4 5 beatles:87',
-    //     function (error, stdout, stderr){
-    //         console.log('Output -> ' + stdout);
-    //         if(stderr !== null){
-    //             console.log("Error -> "+stderr);
-    //         }
-    //     });
 
     var encoded = 'test';
     child.stdout.on('data', function(data) {
@@ -65,8 +79,12 @@ app.get('/getmidi', function(req, res) {
 
             const Datauri = require('datauri').sync;
             encoded = Datauri(filename);
+            //res.setHeader('Access-Control-Allow-Origin', 'http://0.0.0.0:8080');
+            res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+            res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+            res.setHeader('Access-Control-Allow-Credentials', true);
+            console.log('sending');
             res.send(encoded);
-
         }
     });
 
@@ -102,9 +120,8 @@ app.get('/getmidi', function(req, res) {
     // }
 });
 
-
-app.post('/upload', function(req, res){
-  console.log('upload');
+app.get('/*', function(req, res){
+    res.send('error page here');
 });
 
 var server = app.listen(process.env.PORT || 3000, function(){

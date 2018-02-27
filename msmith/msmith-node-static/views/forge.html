@@ -11,113 +11,223 @@
     <link rel="stylesheet" href="css/skeleton.css">
     <link rel="shortcut icon" type="image/png" href="icon.png"/>
 
-    <link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,700,700italic" rel="stylesheet">
     <style type="text/css">
-        body {background:#f8f8f9;}
-        h1 {text-shadow:2px 3px 1px #ccc;}
-        h1,h2,h3,h4 {font-family: 'Bree Serif', serif;}
+        h1,h2,h3,h4,h5,h6,p {font-family: "Open Sans";}
         #select-file {display:none;}
+
     </style>
 </head>
 <body>
 
 <div class="container" style="padding-top:12px;">
-    <h1>&#9836; MelodySmith</h1>
     <div class="row">
-        <div class="four columns">
-            <h4>Artists</h4>
-            <div class="tooltip">Justin Bieber
-                <span class="tooltiptext">Give this artist more influence in the composition</span>
+        <div class="four columns" style="background-color:#346991; color: whitesmoke;border: 0.5px solid whitesmoke;border-radius: 5px;background-size: 100% 100%;-moz-box-shadow: 0 0 3px #ccc;
+-webkit-box-shadow: 0 0 3px #ccc;
+box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
+            <div>
+                <p style="margin-left: 42%">Artists</p>
+                <div  style=" margin-left: 35% ;font-size:12px" class="tooltip">Justin Bieber
+                    <span class="tooltiptext">Give this artist more influence in the composition</span>
+                </div>
+                <p> </p>
+                <input  style=" margin-left: 30%; font-size:12px" type="range" id="artist-slider1" min="0" max="100">
+
+                <p style=" margin-left: 35%; font-size:12px">Bach</p>
+                <input  style=" margin-left: 30%" type="range" id="artist-slider2" min="0" max="100">
+                <p style=" margin-left: 35%; font-size:12px">Beatles</p>
+                <input type="range"  style=" margin-left: 30%"id="artist-slider3" min="0" max="100">
             </div>
-            <p> </p>
-            <input type="range" id="artist-slider1" min="0" max="100">
-            <p>Bach</p>
-            <input type="range" id="artist-slider2" min="0" max="100">
-            <p>Beatles</p>
-            <input type="range" id="artist-slider3" min="0" max="100">
+
         </div>
-        <div class="eight columns">
-            <h4>Parameters</h4>
-            <div class="four columns">
-                <!--<p>Chaos</p>-->
-                <!--<input type="range" id="chaos-slider" min="0" max="100">-->
-
-                <div class="tooltip">Focus on Rhythm
-                    <span class="tooltiptext">How important are rhythymic details?</span>
-                </div>
-                <p></p>
-                <input type="range" id="durationOfNotes-slider" min="0" max="100">
-                <div class="tooltip">N-gram(s)
-                    <span class="tooltiptext">What is the length of phrases analyzed?</span>
-                </div>
-                <p></p>
-                <div class="input-group input-number-group">
-                    <input class="input-number" id="n-gram-selector" type="number" value="2" min="2" max="10">
-
-                </div>
-                <div class="tooltip">Decisions to Compare
-                    <span class="tooltiptext">How important is the current context?</span>
-                </div>
-                <p></p>
-                <radioform action="#">
-                    <div>
-                        <fieldset>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(2)" id="radio-choice-8" value="choice-8" />
-                            <label for="radio-choice-8">2</label>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(3)" id="radio-choice-7" value="choice-7" />
-                            <label for="radio-choice-7">3</label>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(4)" id="radio-choice-1" value="choice-1" />
-                            <label for="radio-choice-1">4</label>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(5)" id="radio-choice-2" value="choice-2" />
-                            <label for="radio-choice-2">5</label>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(6)" id="radio-choice-3" value="choice-3" />
-                            <label for="radio-choice-3">6</label>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(7)" id="radio-choice-4" value="choice-4" />
-                            <label for="radio-choice-4">7</label>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(8)" id="radio-choice-5" value="choice-5" />
-                            <label for="radio-choice-5">8</label>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(9)" id="radio-choice-6" value="choice-6" />
-                            <label for="radio-choice-6">9</label>
-                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(10)" id="radio-choice-9" value="choice-9" />
-                            <label for="radio-choice-9">10</label>
-                            <div class="dial">▲</div>
-                        </fieldset>
-                    </div>
-                </radioform>
-            </div>
-
-            <div class="four columns">
-                <!--<p>Chaos</p>-->
-                <!--<input type="range" id="chaos-slider" min="0" max="100">-->
-                <div class="tooltip">Focus on Intervals
-                    <span class="tooltiptext">How important are melodic details?</span>
-                </div>
-                <p></p>
-                <input type="range" id="intervalOfNote-slider" min="0" max="100">
-
-
-                <p>Scale</p>
-                <div class="c-dropdown js-dropdown">
-                    <input type="hidden" name="Framework" id="keysigdropdown" class="js-dropdown__input">
-                    <span class="c-button c-button--dropdown js-dropdown__current">G Chromatic</span>
-                    <ul class="c-dropdown__list">
-                        <li class="c-dropdown__item" data-dropdown-value="cGypsy">c Gypsy</li>
-                        <li class="c-dropdown__item" data-dropdown-value="aMinor">a Minor</li>
-                        <li class="c-dropdown__item" data-dropdown-value="DBlues">D Blues</li>
-                        <li class="c-dropdown__item" data-dropdown-value="fHarmonic">f Harmonic</li>
-                        <li class="c-dropdown__item" data-dropdown-value="GChromatic">G Chromatic</li>
-                        <li class="c-dropdown__item" data-dropdown-value="cMajor">C Major</li>
+        <div class="eight columns"  style="background-color:#346991; color: whitesmoke;border: 0.5px solid whitesmoke;border-radius: 5px;background-size: 100% 100%;-moz-box-shadow: 0 0 3px #ccc;-webkit-box-shadow: 0 0 3px #ccc;box-shadow: 0 0 3px #ccc;; background-image: url('divbg-rect.png') " >
+            <p style="margin-left: 35%">Melody-type Controls</p>
+            <div class="three columns"  >
+                <h6 style="margin-left: 43%; font-size:12px">Speed</h6>
+                <div class="dial" id="speed-dial" style="margin-left: -5%">
+                    <ul class="numset">
+                        <li class="rot0 on" onclick="setSpeed(1)">1</li>
+                        <li class="rot1" onclick="setSpeed(2)">2</li>
+                        <li class="rot2" onclick="setSpeed(3)">3</li >
+                        <li class="rot3" onclick="setSpeed(4)">4</li>
+                        <li class="rot4" onclick="setSpeed(5)">5</li>
+                        <li class="rot5" onclick="setSpeed(6)">6</li>
+                        <li class="rot6" onclick="setSpeed(7)">7</li>
+                        <li class="rot7" onclick="setSpeed(8)">8</li>
+                        <li class="rot8" onclick="setSpeed(9)">9</li>
+                        <li class="rot9" onclick="setSpeed(10)">10</li>
                     </ul>
+                    <div class="knob"><div class="line"></div></div>
                 </div>
             </div>
 
+            <div class="three columns">
+                <h6 style="margin-left: 45%; font-size:12px">Phrase Length </h6>
+                <div class="dial" id="phrase-length-dial" style="margin-left: 10%">
+                    <ul class="numset">
+                        <li class="rot0 on" onclick="setPhraseLength(1)">1</li>
+                        <li class="rot1" onclick="setPhraseLength(2)">2</li>
+                        <li class="rot2" onclick="setPhraseLength(3)">3</li>
+                        <li class="rot3" onclick="setPhraseLength(4)">4</li>
+                        <li class="rot4" onclick="setPhraseLength(5)">5</li>
+                        <li class="rot5" onclick="setPhraseLength(6)">6</li>
+                        <li class="rot6" onclick="setPhraseLength(7)">7</li>
+                        <li class="rot7" onclick="setPhraseLength(8)">8</li>
+                        <li class="rot8" onclick="setPhraseLength(9)">9</li>
+                        <li class="rot9" onclick="setPhraseLength(10)">10</li>
+                    </ul>
+                    <div class="knob"><div class="line"></div></div>
+                </div>
+            </div>
+
+            <div class="three columns">
+                <h6 style="margin-left: 45%; font-size:12px">Creativity</h6>
+                <div class="dial" id="creativity-dial"style="margin-left: 3%">
+                    <ul class="numset">
+                        <li class="rot0 on" onclick="setCreativity(1)">1</li>
+                        <li class="rot1" onclick="setCreativity(2)">2</li>
+                        <li class="rot2" onclick="setCreativity(3)">3</li>
+                        <li class="rot3" onclick="setCreativity(4)">4</li>
+                        <li class="rot4" onclick="setCreativity(5)">5</li>
+                        <li class="rot5" onclick="setCreativity(6)">6</li>
+                        <li class="rot6" onclick="setCreativity(7)">7</li>
+                        <li class="rot7" onclick="setCreativity(8)">8</li>
+                        <li class="rot8" onclick="setCreativity(9)">9</li>
+                        <li class="rot9" onclick="setCreativity(10)">10</li>
+                    </ul>
+                    <div class="knob"><div class="line"></div></div>
+                </div>
             </div>
         </div>
-    <button class="button button-primary"   onClick="forge()" id="forge-button">Forge</button>
+    </div>
+    <div class="row" style="margin-top: 2%">
+        <div class="four columns"  style="background-color:#346991; color: whitesmoke;border: 0.5px solid whitesmoke;border-radius: 5px;background-size: 100% 100%;-moz-box-shadow: 0 0 3px #ccc;-webkit-box-shadow: 0 0 3px #ccc;box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
+            <p style="margin-left: 30%">Analysis Controls</p>
+            <div class="two columns">
+                <h6 style="; font-size:12px">Rhythmic Importance</h6>
+                <div class="dial" id="Rhythmic-importance-dial" style="margin-left: -35%">
+                    <ul class="numset">
+                        <li class="rot0 on" onclick="setRhythmicImportance(1)">1</li>
+                        <li class="rot1" onclick="setRhythmicImportance(2)">2</li>
+                        <li class="rot2" onclick="setRhythmicImportance(3)">3</li >
+                        <li class="rot3" onclick="setRhythmicImportance(4)">4</li>
+                        <li class="rot4" onclick="setRhythmicImportance(5)">5</li>
+                        <li class="rot5" onclick="setRhythmicImportance(6)">6</li>
+                        <li class="rot6" onclick="setRhythmicImportance(7)">7</li>
+                        <li class="rot7" onclick="setRhythmicImportance(8)">8</li>
+                        <li class="rot8" onclick="setRhythmicImportance(9)">9</li>
+                        <li class="rot9" onclick="setRhythmicImportance(10)">10</li>
+                    </ul>
+                    <div class="knob"><div class="line"></div></div>
+                </div>
+            </div>
 
+            <div class="two columns"  style="margin-left: 35%">
+                <h6 style="margin-left: 35% ; font-size:12px">Melodic Importance</h6>
+                <div class="dial" id="melodic-importance-dial" style="margin-left: -50%">
+                    <ul class="numset">
+                        <li class="rot0 on" onclick="setMelodicImportance(1)">1</li>
+                        <li class="rot1" onclick="setMelodicImportance(1)">2</li>
+                        <li class="rot2" onclick="setMelodicImportance(1)">3</li>
+                        <li class="rot3" onclick="setMelodicImportance(1)">4</li>
+                        <li class="rot4" onclick="setMelodicImportance(1)">5</li>
+                        <li class="rot5" onclick="setMelodicImportance(1)">6</li>
+                        <li class="rot6" onclick="setMelodicImportance(1)">7</li>
+                        <li class="rot7" onclick="setMelodicImportance(1)">8</li>
+                        <li class="rot8" onclick="setMelodicImportance(1)">9</li>
+                        <li class="rot9" onclick="setMelodicImportance(1)">10</li>
+                    </ul>
+                    <div class="knob"><div class="line"></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="eight columns"  style="background-color:#346991; color: whitesmoke;border: 0.5px solid whitesmoke;border-radius: 5px;background-size: 100% 100%;-moz-box-shadow: 0 0 3px #ccc;-webkit-box-shadow: 0 0 3px #ccc;box-shadow: 0 0 3px #ccc;; background-image: url('divbg-rect.png') " >
+            <p style="margin-left: 35%">Rest-type Controls</p>
+            <div class="three columns">
+                <h6 style="margin-left: 32%; font-size:12px">Syncopation</h6>
+                <div class="dial" id="syncopation-dial" style="margin-left: -5%">
+                    <ul class="numset">
+                        <li class="rot0 on" onclick="setSyncopation(1)">1</li>
+                        <li class="rot1" onclick="setSyncopation(1)">2</li>
+                        <li class="rot2" onclick="setSyncopation(1)">3</li >
+                        <li class="rot3" onclick="setSyncopation(1)">4</li>
+                        <li class="rot4" onclick="setSyncopation(1)">5</li>
+                        <li class="rot5" onclick="setSyncopation(1)">6</li>
+                        <li class="rot6" onclick="setSyncopation(1)">7</li>
+                        <li class="rot7" onclick="setSyncopation(1)">8</li>
+                        <li class="rot8" onclick="setSyncopation(1)">9</li>
+                        <li class="rot9" onclick="setSyncopation(1)">10</li>
+                    </ul>
+                    <div class="knob"><div class="line"></div></div>
+                </div>
+            </div>
+
+            <div class="three columns">
+                <h6 style="margin-left: 47%; font-size:12px">Rest Amount</h6>
+                <div class="dial" id="rest-amount-dial" style="margin-left: 10%">
+                    <ul class="numset">
+                        <li class="rot0 on" onclick="setRestAmount(1)">1</li>
+                        <li class="rot1" onclick="setRestAmount(2)">2</li>
+                        <li class="rot2" onclick="setRestAmount(3)">3</li>
+                        <li class="rot3" onclick="setRestAmount(4)">4</li>
+                        <li class="rot4" onclick="setRestAmount(5)">5</li>
+                        <li class="rot5" onclick="setRestAmount(6)">6</li>
+                        <li class="rot6" onclick="setRestAmount(7)">7</li>
+                        <li class="rot7" onclick="setRestAmount(8)">8</li>
+                        <li class="rot8" onclick="setRestAmount(9)">9</li>
+                        <li class="rot9" onclick="setRestAmount(10)">10</li>
+                    </ul>
+                    <div class="knob"><div class="line"></div></div>
+                </div>
+            </div>
+
+            <div class="three columns">
+                <h6 style="margin-left: 47%; font-size:12px">Rest Type</h6>
+
+                <div class="can-toggle demo-rebrand-1" style="margin-top: 10%; margin-left: 10%">
+                    <input id="d" type="checkbox">
+                    <label for="d">
+                        <div class="can-toggle__switch" onclick="toggleRestType()" data-checked="Constructive" data-unchecked="Destructive"></div>
+                    </label>
+                </div>
+            </div>
+            <h6 style="margin-top: 13%; margin-left: 68%; font-size: 12px">Scale</h6>
+            <div class="c-dropdown js-dropdown" style="margin-top: 2%; margin-left: 9%; ">
+                <input type="hidden" name="Framework" id="keysigdropdown" class="js-dropdown__input">
+                <span class="c-button c-button--dropdown js-dropdown__current">G Chromatic</span>
+                <ul class="c-dropdown__list">
+                    <li class="c-dropdown__item" data-dropdown-value="cGypsy">c Gypsy</li>
+                    <li class="c-dropdown__item" data-dropdown-value="aMinor">a Minor</li>
+                    <li class="c-dropdown__item" data-dropdown-value="DBlues">D Blues</li>
+                    <li class="c-dropdown__item" data-dropdown-value="fHarmonic">f Harmonic</li>
+                    <li class="c-dropdown__item" data-dropdown-value="GChromatic">G Chromatic</li>
+                    <li class="c-dropdown__item" data-dropdown-value="cMajor">C Major</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <button style="margin-top: 2%" class="button button-primary"   onClick="forge()" id="forge-button">Forge</button>
     <hr/>
-    <p id="loading">Hit forge when you are ready to listen to some new music!</p>
-    <div id="canvas" style="display: none">
+    <p id="loading" style="color: #369597">Hit forge when you are ready to listen to some new music!</p>
+
+
+    <div id="visualization" style="display: none; height: 400px; width: 960px;">
+        <ul class="tab-nav">
+            <li>
+                <a class="button active" href="#notesVisualizer" style="color: #369597">Notes</a>
+            </li>
+            <li>
+                <a class="button" href="#dataStructuresVisualizer"  style="color: #369597">Data Structure</a>
+            </li>
+
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="one"><div id="canvas" style="display: none"></div>
+                <div class="tab-pane" id="two">Show Data structures</div>
+            </div>
+
+        </div>
 
     </div>
     <div id="loadingcube" class="sk-folding-cube" style="display: none">
@@ -149,7 +259,7 @@
     </div>
 
     </p>
-    <p id="tempo-div" style="display: none">
+    <p id="tempo-div" style="display: none; color: #369597;">
 
         Tempo: <span id="tempo-display"></span> bpm<br />
         <input type="range" onchange="Player.pause();Player.setTempo(this.value);Player.play()" min="50" max="200">
@@ -157,7 +267,11 @@
     </p>
 
     <div id="events" class="well"></div>
-    </div>
+</div>
+</div>
+
+
+
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
@@ -175,5 +289,8 @@
     ga('create', 'UA-1454657-6', 'auto');
     ga('send', 'pageview');
 </script>
+<footer>
+    by <a href="http://rena.to/" target="_blank">audioMIDIum</a>
+</footer>
 </body>
 </html>

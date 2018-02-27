@@ -746,12 +746,12 @@ Drop down
 }
 
 /*dropdowncustom {*/
-/*padding: 50px 0;*/
-/*font-family: "Open Sans", "Arial", sans-serif;*/
-/*text-rendering: optimizeSpeed;*/
-/*-webkit-font-smoothing: antialiased;*/
-/*-moz-osx-font-smoothing: grayscale;*/
-/*text-align: center;*/
+  /*padding: 50px 0;*/
+  /*font-family: "Open Sans", "Arial", sans-serif;*/
+  /*text-rendering: optimizeSpeed;*/
+  /*-webkit-font-smoothing: antialiased;*/
+  /*-moz-osx-font-smoothing: grayscale;*/
+  /*text-align: center;*/
 /*}*/
 /**
  * Component: Dropdown

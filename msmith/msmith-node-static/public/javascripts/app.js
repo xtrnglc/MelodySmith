@@ -7,6 +7,60 @@ var songDataURI = '';
 var width = 960;
 var height = 400;
 var numComparisons = 6;
+var restType = 'Constructive';
+var rhythmicImportance = '0';
+var melodicImportance = '0';
+var syncopation = '0';
+var phraseLength = '0';
+var creativity = '0';
+var speed = '0';
+var restAmount = '0';
+// Rhythmic importance (Int 0-100)  "How closely should rhythmic details be analyzed?" (edited)
+// Melodic importance (Int 0-100)  "How closely should intervalic details be analyzed?" (edited)
+//
+// Composition Controls:
+// Rest Type (Switch with options: Constructive, Destructive)  "How should rests be added to the melody?" (edited)
+// Rest Amount (Int 0-20) "How often should rests be played?" (edited)
+// Syncopation  (Int 0-100) "How syncopated should the rhythm be?" (edited)
+// Phrase Length (Int 0-20) "About how many notes should one phrase last?" (edited)
+// Creativity (Int 0-10) "How often can less conventional notes be played?" (edited)
+// Speed (Int 0-100) "Should shorter or longer notes be preferred?" (edited)
+
+var toggleRestType = function() {
+    if(restType === 'Constructive') {
+        restType = 'Destructive';
+    } else {
+        restType = 'Constructive';
+    }
+}
+
+var setRestAmount = function(val) {
+    restAmount = val * 2;
+}
+
+var setRhythmicImportance = function(val) {
+    rhythmicImportance = val * 10;
+}
+
+var setMelodicImportance = function(val) {
+    melodicImportance = val * 10;
+}
+
+var setSyncopation = function(val) {
+    syncopation = val * 10;
+}
+
+var setPhraseLength = function(val) {
+    phraseLength = val * 2;
+}
+
+var setCreativity = function(val) {
+    creativity = val;
+}
+
+var setSpeed = function(val) {
+    speed = val * 10;
+}
 
 const grandPiano = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_grand_piano-mp3.js';
 const acousticGuitar = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_guitar_nylon-mp3.js';
@@ -27,15 +81,6 @@ var play = function() {
 
 var keySignature = 'gChromatic';
 
-var cbutton = function() {
-    document.getElementById('c-button').style.backgroundColor = '#0FA0CE';
-    document.getElementById('a-button').style.backgroundColor = '#33C3F0';
-}
-
-var abutton = function() {
-    document.getElementById('c-button').style.backgroundColor = '#33C3F0';
-    document.getElementById('a-button').style.backgroundColor = '#0FA0CE';
-}
 
 var changeNumComparisons = function(newVal) {
     numComparisons = newVal;
@@ -66,12 +111,6 @@ var forge = function() {
     var artistslider2 = document.getElementById('artist-slider2').value;
     var artistslider3 = document.getElementById('artist-slider3').value;
 
-    //var chaosSliderval = document.getElementById('chaos-slider').value;
-    var durationOfNotesSliderval = document.getElementById('durationOfNotes-slider').value;
-    var intervalOfNoteSliderval = document.getElementById('intervalOfNote-slider').value;
-    //var restSlider = document.getElementById('rest-slider').value;
-    var nGramVal = document.getElementById('n-gram-selector').value;
-    //var numComparisons = document.getElementById('num-comparisons-selector').value;
     if(document.getElementById('keysigdropdown').value === '') {
 
     } else {
@@ -83,10 +122,14 @@ var forge = function() {
         bieber: artistslider1,
         bach:artistslider2,
         beatles:artistslider3,
-        durationsOfNotesSliderval: durationOfNotesSliderval,
-        intervalOfNoteSliderval: intervalOfNoteSliderval,
-        nGramVal: nGramVal,
-        numComparisons: numComparisons,
+        rhythmicImportance: rhythmicImportance,
+        melodicImportance: melodicImportance,
+        speed: speed,
+        syncopation : syncopation,
+        phraseLength : phraseLength,
+        restAmount : restAmount,
+        creativity : creativity,
+        restType : restType,
         keySignature : keySignature
     };
 
@@ -126,6 +169,7 @@ var showControls = function() {
     document.getElementById('music-controls').style.display = 'block';
     document.getElementById('tempo-div').style.display = 'block';
     document.getElementById('play-bar-button').style.display = 'block';
+    document.getElementById('visualization').style.display = 'block';
 }
 
 var initiatePlayer = function(data, instrumentVal) {
@@ -135,7 +179,6 @@ var initiatePlayer = function(data, instrumentVal) {
     switchInstrument(instrumentVal);
 
     Soundfont.instrument(ac, instrument).then(function (instrument) {
-        document.getElementById('loading').style.display = 'none';
 
         loadDataUri = function(dataUri) {
             Player = new MidiPlayer.Player(function(event) {
@@ -144,12 +187,14 @@ var initiatePlayer = function(data, instrumentVal) {
                     instrument.play(event.noteName, ac.currentTime, {gain:event.velocity/100});
                     //document.querySelector('#track-' + event.track + ' code').innerHTML = JSON.stringify(event);
                     //console.log(event);
+
                 }
                 if(event.name=="Note on"){
 
                     //http://localhost/gist/audio/jesu/
                     var elLength = 40*(event.delta<=1?1:event.delta/120);
                     var element = svg.append("g");
+
                     //console.log(element);
                     element.attr("transform","translate("+(-1*elLength)+" 0)");
                     element.append("rect")
@@ -173,6 +218,7 @@ var initiatePlayer = function(data, instrumentVal) {
                     element.transition(t)
                         .attr("transform","translate("+(width+300-elLength)+" 0)")
                         .remove();
+                   // console.log(element);
                 }
 
 

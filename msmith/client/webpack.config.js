@@ -20,9 +20,13 @@ module.exports = {
     extensions: ['', '.js', '.jsx']
   },
     devServer: {
-        historyApiFallback: true,
-        disableHostCheck: true,   // That solved it
-        contentBase: './'
-
+    historyApiFallback: true,
+    disableHostCheck: true,   // That solved it
+    contentBase: './',
+    headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
     }
+  }
 };
