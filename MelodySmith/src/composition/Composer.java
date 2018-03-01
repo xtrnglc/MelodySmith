@@ -3,6 +3,7 @@ package composition;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import midiFeatureFinder.MidiReader;
 import midiFeatureFinder.MidiWriter;
@@ -282,7 +283,25 @@ public class Composer {
 				}
 			}
 		}
+		printBigrams();
 		network.linkNetwork();
+	}
+	
+	private void printBigrams() {
+		HashMap<String,Double> bigramProbabilities = analyzer.getNoteNameBigramProbabilities();
+		Set<String> noteNameVocab = analyzer.getNoteNameVocab();
+		StringBuilder json = new StringBuilder();
+		json.append("{");
+		for(String noteName : noteNameVocab) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("'" + noteName +"':[");
+			for(String note2Name : noteNameVocab) {
+				String key = noteName+","+note2Name;
+				builder.append(bigramProbabilities.get(key)+",");
+			}
+			json.append(builder.substring(0, builder.length()-1) + "], ");
+		}
+		System.out.println(json.substring(0, json.length()-2) + "}");
 	}
 	
 	static int decodeDuration(String duration) {

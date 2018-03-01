@@ -53,7 +53,7 @@ public class Main {
 		artistWeights.put("lead", 2.0);
 		artistWeights.put("simpleMelodies", 5.0);
 		artistWeights.put("simple", 1.0);
-		Composer composer = new Composer("corpus", "CMAJOR", 1.0, 3.0, "Constructive", 6, 1, 8, 5, 1, artistWeights);
+		Composer composer = new Composer("corpus", "CMAJOR", 1.0, 3.0, "Constructive", 10, 10, 5, 5, 1, artistWeights);
 		
 		composer.composeMelody("output.mid", 100);
 	}

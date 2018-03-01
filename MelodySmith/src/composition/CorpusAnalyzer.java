@@ -1,6 +1,8 @@
 package composition;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 public class CorpusAnalyzer {
 	
@@ -23,6 +25,28 @@ public class CorpusAnalyzer {
 	private HashMap<String,Integer> scaleDegreeVocab = new HashMap<String,Integer>();
 	private HashMap<String,Integer> noteNameVocab = new HashMap<String,Integer>();
 	private HashMap<String,Integer> durationVocab = new HashMap<String,Integer>();
+	
+	public HashMap<String,Double> getNoteNameBigramProbabilities(){
+		HashMap<String,Double> bigramProbabilities = new HashMap<>();
+		for(String noteName : noteNameVocab.keySet()) {
+			int total = 0;
+			for(String note2Name : noteNameVocab.keySet()) {
+				String key = noteName+","+note2Name;
+				int count = getNoteNameNGramCount(key);
+				total += count;
+				bigramProbabilities.put(key, (double)count);
+			}
+			for(String note2Name : noteNameVocab.keySet()) {
+				String key = noteName+","+note2Name;
+				bigramProbabilities.put(key, bigramProbabilities.get(key)/total);
+			}
+		}
+		return bigramProbabilities;
+	}
+	
+	public Set<String> getNoteNameVocab() {
+		return noteNameVocab.keySet();
+	}
 	
 	public void addToIntervalCount(int interval) {
 		collectNewVocabulary(Integer.toString(interval) ,intervalVocab);

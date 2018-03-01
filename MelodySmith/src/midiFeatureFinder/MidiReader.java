@@ -224,7 +224,7 @@ public class MidiReader {
 				for (int k = i+1; k < (i + markovLength); k++) {
 					intervalScaleDegrees += "," + channel.get(k).scaleDegree;
 					intervalDurations += "," + channel.get(k).noteDuration;	
-					intervalNoteNames += "," + channel.get(i).noteName;
+					intervalNoteNames += "," + channel.get(k).noteName;
 					
 					analyzer.addToScaleDegreeNGramCount(intervalScaleDegrees);
 					analyzer.addToDurationNGramCount(intervalDurations);
