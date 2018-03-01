@@ -76,7 +76,7 @@ public class Node {
 		if (bpm != 0) {
 			this.bpm = bpm;
 		}
-		scaleDegree = getScaleDegree();
+		scaleDegree = -1;
 	}
 
 	/**

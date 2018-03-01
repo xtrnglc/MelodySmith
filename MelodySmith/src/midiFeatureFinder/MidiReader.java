@@ -42,6 +42,7 @@ public class MidiReader {
 	private float currentBPM = 120;
 	private String trackName;
 	private int ticksPerQuarterNote = 0;
+	private int ticksPerBar = 0;
 	private long[] lastTickOfChannel;
 	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
@@ -175,6 +176,7 @@ public class MidiReader {
 			if (currentSequence.getDivisionType() == Sequence.PPQ) {
 				isPPQ = true;
 				ticksPerQuarterNote = currentSequence.getResolution();
+				ticksPerBar = ticksPerQuarterNote * 4;
 			}
 			
 			for (Track track : currentSequence.getTracks()) {
@@ -529,7 +531,10 @@ public class MidiReader {
 					predictions[i] = predictions[i] - 10;
 				}
 				
-				//if ((double) restCount/(double)orderedNotes.get(i).size() > .25)
+				if ((double) restCount/(double)orderedNotes.get(i).size() > .25) {
+					predictions[i] = predictions[i] - 10;
+				}
+				
 			}
 			predictions[indexOfRepeat] = predictions[indexOfRepeat] - 10;
 			
@@ -537,4 +542,101 @@ public class MidiReader {
 		
 		return predictions;
 	}
+	
+	public ArrayList<ArrayList<Phrase>> stitchPhraseByRests(ArrayList<ArrayList<Node>> input, String minRestSize) {
+		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
+		
+		for (ArrayList<Node> channel : input) {
+			ret.add(new ArrayList<Phrase>());
+			Phrase temp = new Phrase();
+			for (Node node : channel) {
+				temp.nodes.add(node);
+				if (node.key == -1 && (!node.noteDuration.contains("/") || Integer.parseInt(node.noteDuration.split("/")[1]) <= Integer.parseInt(minRestSize.split("/")[1]))) {
+					ret.get(ret.size()-1).add(temp);
+					temp = new Phrase();
+				}
+			}
+			if (temp.nodes.size() != 0)
+				ret.get(ret.size()-1).add(temp);
+		}
+		
+		return ret;
+		 
+		 
+	}
+	
+	public ArrayList<ArrayList<Phrase>> stitchPhraseByTonic(ArrayList<ArrayList<Node>> input) {
+		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
+		
+		for (ArrayList<Node> channel : input) {
+			ret.add(new ArrayList<Phrase>());
+			Phrase temp = new Phrase();
+			for (int i = 0; i < channel.size(); i++) {
+				Node node = channel.get(i);
+				temp.nodes.add(node);
+				if (node.scaleDegree == 0) {
+					while (i+1 < channel.size() && channel.get(i+1).startTick == node.startTick) {
+						temp.nodes.add(channel.get(i+1));
+						i++;
+					}
+					ret.get(ret.size()-1).add(temp);
+					temp = new Phrase();
+				}
+			}
+			if (temp.nodes.size() != 0)
+				ret.get(ret.size()-1).add(temp);
+		}
+		
+		return ret;
+		 
+		 
+	}
+	
+	public ArrayList<ArrayList<Phrase>> stitchPhraseByBar(ArrayList<ArrayList<Node>> input, double barSize) {
+		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
+		
+		for (ArrayList<Node> channel : input) {
+			ret.add(new ArrayList<Phrase>());
+			Phrase temp = new Phrase();
+			int bar = 1;
+			for (int i = 0; i < channel.size(); i++) {
+				Node node = channel.get(i);
+				temp.nodes.add(node);
+				if (node.startTick + node.tickDuration >= ticksPerBar * bar * barSize) {
+					while (i+1 < channel.size() && node.startTick + node.tickDuration >= channel.get(i+1).startTick + channel.get(i+1).tickDuration) {
+						temp.nodes.add(channel.get(i+1));
+						i++;
+					}
+					bar = (int) ((node.startTick + node.tickDuration) / (ticksPerBar * barSize)) + 1;
+					ret.get(ret.size()-1).add(temp);
+					temp = new Phrase();
+				}
+			}
+			if (temp.nodes.size() != 0)
+				ret.get(ret.size()-1).add(temp);
+		}
+		
+		return ret;
+		 
+		 
+	}
+	
+//	public ArrayList<ArrayList<Phrase>> stitchPhraseByRythmicCadence(ArrayList<ArrayList<Node>> input) {
+//		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
+//		
+//		for (ArrayList<Node> channel : input) {
+//			ret.add(new ArrayList<Phrase>());
+//			Phrase temp = new Phrase();
+//			for (Node node : channel) {
+//				temp.nodes.add(node);
+//				if (node.key == -1 && (!node.noteDuration.contains("/") || Integer.parseInt(node.noteDuration.split("/")[1]) <= Integer.parseInt(minRestSize.split("/")[1]))) {
+//					ret.get(ret.size()-1).add(temp);
+//					temp = new Phrase();
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
+	
 }

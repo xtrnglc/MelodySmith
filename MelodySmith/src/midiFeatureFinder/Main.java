@@ -12,6 +12,10 @@ public class Main {
 		MidiReader r = new MidiReader(c);
 		r.readSequenceRaw(new File("simple/1.mid"));
 		ArrayList<ArrayList<Node>> test = r.readSequence(new File("simple/1.mid"), 5, true);
+		ArrayList<ArrayList<Phrase>> temp = r.stitchPhraseByRests(test, "1/4");
+		ArrayList<ArrayList<Phrase>> temp1 = r.stitchPhraseByTonic(test);
+		ArrayList<ArrayList<Phrase>> temp2 = r.stitchPhraseByBar(test, .5);
+		
 		System.out.println();
 	}
 }
