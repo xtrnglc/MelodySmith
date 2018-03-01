@@ -24,8 +24,12 @@ public class Composer {
 	double intervalWeight;
 	double durationWeight;
 	MidiReader reader;
+	int speedWeight;
+	double syncopationWeight;
+	int restAmount;
+	boolean constructiveRests;
 	
-	public Composer(String corpusFolderName, String keySig, int nGramLength, int choicesToCompare, double intervalWeight, double durationWeight, HashMap<String, Double> artistWeightings) {
+	public Composer(String corpusFolderName, String keySig, double intervalWeight, double durationWeight, String restType, int restAmount, int syncopation, int nGramLength, int choicesToCompare, int speed, HashMap<String, Double> artistWeightings) {
 		analyzer = new CorpusAnalyzer();
 		reader = new MidiReader(analyzer);
 		network = new AssociationNetwork();
@@ -33,10 +37,15 @@ public class Composer {
 		network.probabilities = analyzer;
 		network.intervalContribution = intervalWeight;
 		network.durationContribution = durationWeight;
+		network.noteLengthWeight = speed;
 		this.intervalWeight = intervalWeight;
 		this.durationWeight = durationWeight;
 		this.choicesToCompare = choicesToCompare;
 		this.nGramLength = nGramLength;
+		this.speedWeight = speed;
+		this.syncopationWeight = 10000/syncopation;
+		this.constructiveRests = (restType.toUpperCase() == "CONSTRUCTIVE");
+		this.restAmount = restAmount;
 		keySignature = keySig;
 		trainNetwork(corpusFolderName, network);
 	}
@@ -52,7 +61,7 @@ public class Composer {
 		
 		ArrayList<Node> alreadyChosen = new ArrayList<Node>();	// I maintain a list of previous choices to avoid repetition
 		Node currentNode = startNode;
-		int distanceToEndOfBar = 63;
+		int distanceToEndOfBar = 15;
 		int distanceFromRest = 0;
 
 		for(int i = 0; i < lengthInNotes; i++) {
@@ -71,7 +80,7 @@ public class Composer {
 				distanceFromRest++;
 			
 			int duration = decodeDuration(nextNode.noteDuration);
-			distanceToEndOfBar = (distanceToEndOfBar - duration) % 64;
+			distanceToEndOfBar = (distanceToEndOfBar - duration) % 16;
 			currentNode = nextNode;
 		}
 		
@@ -88,6 +97,8 @@ public class Composer {
 		int velocity = smoothVelocity(node.velocity);
 		
 		if(isRest(node)){
+			if (duration < 8)
+				duration = 8;
 			mw.addRest(duration);
 			return true;
 		} 
@@ -98,7 +109,7 @@ public class Composer {
 	}
 	
 	private ArrayList<Node> getMostRecentNGram(ArrayList<Node> melodySoFar, int n){
-		ArrayList<Node> nGram = new ArrayList();
+		ArrayList<Node> nGram = new ArrayList<>();
 		int bound = Math.min(n, melodySoFar.size());
 		for(int i = 0; i < bound; i++) {
 			nGram.add(melodySoFar.get(melodySoFar.size()-i-1));
@@ -132,16 +143,14 @@ public class Composer {
 				weight += (durationWeight * analyzer.getDurationNGramProbability(durationNGram));
 			}
 			
-			if(choice.noteName == nGram.get(nGram.size()-1).noteName)
-				weight -= 0;
-			
-			// If distance from rest == avg distance from rest, weight++	
-			if(distanceFromRest < 5 && isRest(choice))
-				weight -= 10;
+			if(distanceToEndOfBar == 63 && isRest(choice))
+				weight -= 20;
+			if(distanceFromRest < restAmount && isRest(choice))
+				weight -= 20;
 			
 			int duration = decodeDuration(choice.noteDuration);
 			if(distanceToEndOfBar - duration == 0) {
-				weight += 10;
+				weight += syncopationWeight;
 			}
 			
 			if(weight > bestWeight) {
@@ -164,7 +173,7 @@ public class Composer {
 	}
 	
 	public ArrayList<String> getScaleDegreeNGramKeys(ArrayList<Node> nGram, Node currentNode){
-		ArrayList<String> nGrams = new ArrayList();
+		ArrayList<String> nGrams = new ArrayList<>();
 		StringBuilder nGramString = new StringBuilder();
 		nGramString.append(currentNode.scaleDegree);
 		for(int i = nGram.size()-1; i >= 0; i--) {
@@ -176,7 +185,7 @@ public class Composer {
 	}
 	
 	public ArrayList<String> getNoteNameNGramKeys(ArrayList<Node> nGram, Node currentNode){
-		ArrayList<String> nGrams = new ArrayList();
+		ArrayList<String> nGrams = new ArrayList<>();
 		StringBuilder nGramString = new StringBuilder();
 		nGramString.append(currentNode.noteName);
 		for(int i = nGram.size()-1; i >= 0; i--) {
@@ -187,7 +196,7 @@ public class Composer {
 	}
 	
 	public ArrayList<String> getDurationNGramStrings(ArrayList<Node> nGram, Node currentNode){
-		ArrayList<String> nGrams = new ArrayList();
+		ArrayList<String> nGrams = new ArrayList<>();
 		StringBuilder nGramString = new StringBuilder();
 		nGramString.append(currentNode.noteDuration);
 		for(int i = nGram.size()-1; i >= 0; i--) {
@@ -221,7 +230,7 @@ public class Composer {
 				alreadyChosen.remove(0);
 			
 			if(currentNode.linkedNodes.size() > 0) {
-				Node nextNode = network.deduceNextNode(currentNode, new ArrayList(), alreadyChosen);
+				Node nextNode = network.deduceNextNode(currentNode, new ArrayList<>(), alreadyChosen);
 				
 				int duration = decodeDuration(nextNode.noteDuration);
 				if(isRest(nextNode)){

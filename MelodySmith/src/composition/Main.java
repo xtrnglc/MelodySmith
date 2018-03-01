@@ -19,16 +19,21 @@ public class Main {
 		String keySig = args[2];
 		double intervalWeight = Double.parseDouble(args[3])/10000;
 		double durationWeight = Double.parseDouble(args[4])/1000;
-		int nGramLength = Integer.parseInt(args[5]);
-		int numberOfComparisons = Integer.parseInt(args[6]);
+		String restType = args[5];
+		int restAmount = Integer.parseInt(args[6]);
+		int syncopation = Integer.parseInt(args[7]);
+		int phraseLength = Integer.parseInt(args[8]);
+		int creativity = Integer.parseInt(args[9]);
+		int speed = Integer.parseInt(args[10]);
+
 		
-		HashMap<String, Double> artistWeights = initializeArtists(args, 7);
+		HashMap<String, Double> artistWeights = initializeArtists(args, 11);
 		
-		Composer composer = new Composer(corpusFolder, keySig, nGramLength, numberOfComparisons, intervalWeight, durationWeight, artistWeights);
+		Composer composer = new Composer(corpusFolder, keySig, intervalWeight, durationWeight, restType, restAmount, syncopation, phraseLength, creativity, speed, artistWeights);
 		composer.composeMelody(outputFileName, 500);
 		
 		}catch(Exception e) {
-			System.out.println("Command arguments are improperly formatted\n\tCorrect format =\n\tcorpusPath outputPath keySignature intervalWeight durationWeight nGramLength numberOfComparisons artist1Name:artist1Weight");
+			System.out.println("Command arguments are improperly formatted.");
 			System.out.println("Your arguments:");
 			for(String arg : args)
 				System.out.println(arg);
@@ -44,11 +49,11 @@ public class Main {
 		HashMap<String, Double> artistWeights = new HashMap<String, Double>();
 		//artistWeights.put("bach", 1.0);
 		//artistWeights.put("beiber", 1.5);
-		//artistWeights.put("bass", 1.0);
-		//artistWeights.put("lead", 2.0);
-		//artistWeights.put("simpleMelodies", 1.0);
+		artistWeights.put("bass", 7.0);
+		artistWeights.put("lead", 2.0);
+		artistWeights.put("simpleMelodies", 5.0);
 		artistWeights.put("simple", 1.0);
-		Composer composer = new Composer("corpus", "CMAJOR", 4, 3, 1, 1, artistWeights);
+		Composer composer = new Composer("corpus", "CMAJOR", 1.0, 3.0, "Constructive", 6, 1, 8, 5, 1, artistWeights);
 		
 		composer.composeMelody("output.mid", 100);
 	}
