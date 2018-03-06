@@ -12,17 +12,22 @@
 #include "PluginEditor.h"
 #include <Windows.h>
 #include <ShellApi.h>
+#include <sstream>
+#include <thread>
+
 
 
 
 //==============================================================================
 MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySmithVSTAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p), tabbedCorpusComponent(TabbedButtonBar::Orientation::TabsAtLeft), managePanel(curr_artist_filename_tuples),
-	influencesPanel(curr_artist_filename_tuples, artists_to_influences)
+	influencesPanel(curr_artist_filename_tuples, artists_to_influences, managePanel), progressBar(progressDouble)
 {
 	audioProcessor = &p;
 	melodysmithDirPath = "C:\\Program Files\\MelodySmith\\";
 	countOfOutputFiles = 0;
+	addAndMakeVisible(progressBar);
+	progressBar.setVisible(false);
 	//String windowsMelodysmithDirPath = "C:/Users/Daniel Mattheiss/Documents/MelodySmith/MelodySmithVST/MelodySmith/MelodySmith - juce/Builds/VisualStudio2017/";
 
 
@@ -66,15 +71,6 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	////reforgeImageBtn.addListener(this);
 	//forgeImageBtn.addListener(this);
 
-	/*addAndMakeVisible(keyKnob);
-	keyKnob.setLookAndFeel(&keyKnobLF);
-	keyKnob.setSliderStyle(Slider::Rotary);
-	keyKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
-	*///keyKnob.textbox
-	//keyKnob.addListener(this);
-	//keyKnob.value
-	//keyKnob.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
-
 	reforgeImageBtn.setButtonText("Recast");
 	reforgeImageBtn.setColour(TextButton::buttonColourId, Colours::blue);
 	reforgeImageBtn.setColour(TextButton::textColourOffId, Colours::white);
@@ -98,11 +94,11 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	addAndMakeVisible(exportBtn);
 
 	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
-	tabbedCorpusComponent.addTab("Manage", Colours::red, &managePanel, false);
-	tabbedCorpusComponent.addTab("Influences", Colours::red, &influencesPanel, false);
+	tabbedCorpusComponent.addTab("Manage", Colours::deepskyblue, &managePanel, false);
+	tabbedCorpusComponent.addTab("Influences", Colours::deepskyblue, &influencesPanel, false);
 	//tabbedCorpusComponent.setTabBackgroundColour(0, Colours::aliceblue);
 	//tabbedCorpusComponent.setTabBackgroundColour()
-	tabbedCorpusComponent.setColour(TabbedComponent::backgroundColourId, Colours::red.brighter(0.4f));
+	tabbedCorpusComponent.setColour(TabbedComponent::backgroundColourId, Colours::deepskyblue.darker(0.6f));
 	//tabbedCorpusComponent.setColour()
 	addAndMakeVisible(tabbedCorpusComponent);
 
@@ -117,7 +113,8 @@ MelodySmithVSTAudioProcessorEditor::~MelodySmithVSTAudioProcessorEditor()
 void MelodySmithVSTAudioProcessorEditor::paint (Graphics& g)
 {
 	// fill the whole window white
-	g.fillAll(Colours::black.brighter(0.2f));
+	//g.fillAll(Colours::black.brighter(0.2f));
+	g.fillAll(Colours::deepskyblue.darker(2.0f));   // clear the background
 
 	// set the current drawing colour to black
 	//g.setColour(Colours::white);
@@ -158,13 +155,15 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 	juce::Rectangle<int> fourthRow = rightCol.removeFromTop(rightColHeight / 4);
 
 	basicParamsPanel.setBounds(firstRow.removeFromLeft(firstRow.getWidth() - 10).reduced(0, 10));
-	advancedParamsPanel.setBounds(secondRow.removeFromLeft(secondRow.getWidth() - 10).reduced(0, 10));
-	scaleParamsPanel.setBounds(thirdRow.removeFromLeft(thirdRow.getWidth() - 10).reduced(0, 10));
+	scaleParamsPanel.setBounds(secondRow.removeFromLeft(secondRow.getWidth() - 10).reduced(0, 10));
+	advancedParamsPanel.setBounds(thirdRow.removeFromLeft(thirdRow.getWidth() - 10).reduced(0, 10));
 
 	//rightCol.removeFromTop(rightColHeight / 12);
 	reforgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
 	forgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
 	exportBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
+
+	//progressBar.setBounds(rightCol);
 	//txbtn.setBounds(rightCol);
 	//corpusListBox.setBounds(tempArea);
 
@@ -175,10 +174,15 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 void MelodySmithVSTAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
 	//processor.noteOnVel = midiVolume.getValue();
-	if (slider == &keyKnob)
-	{
+	//if (slider == &keyKnob)
+	//{
 
-	}
+	//}
+}
+
+void MelodySmithVSTAudioProcessorEditor::updateProgressBar()
+{
+	progressBar.setVisible(true);
 }
 
 void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
@@ -213,15 +217,41 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 	}
 	else if (btn == &forgeImageBtn)
 	{
-		std::string keyValue = scaleParamsPanel.keySelect.getText().toStdString();
+		//std::thread t1(&MelodySmithVSTAudioProcessorEditor::updateProgressBar, this);
+		//t1.join();
+		//progressBar.launc
+		//MessageManager::
+		/*MessageManager::callAsync(
+			[=]() {
+			progressBar.setVisible(true);
+		}
+		);*/
+
+		//Old way
+		/*std::string keyValue = scaleParamsPanel.keySelect.getText().toStdString();
 		keyValue.erase(std::remove(keyValue.begin(), keyValue.end(), ' '), keyValue.end());
-		//int keyIndex = keySelect.getItemId();
-		//if(keyIndex == 0)*/
 		double intervalWeight = basicParamsPanel.invervalWeightSlider.getValue();
 		double durationWeight = basicParamsPanel.durationWeightSlider.getValue();
 		double nGramLength = advancedParamsPanel.nGramLengthSlider.getValue();
 		double numberOfComparisons = advancedParamsPanel.numberOfComparisonsSlider.getValue();
 		String clParamsStr = "\"" + keyValue + "\" " + String(intervalWeight) + " " + String(durationWeight) + " " + String(nGramLength) + " " + String(numberOfComparisons) + " ";
+		*/
+
+		//New way
+		std::string keyValue = scaleParamsPanel.keySelect.getText().toStdString();
+		keyValue.erase(std::remove(keyValue.begin(), keyValue.end(), ' '), keyValue.end());
+		double rhythmicImportance = advancedParamsPanel.nGramLengthSlider.getValue() * 10;
+		double melodicImportance = advancedParamsPanel.numberOfComparisonsSlider.getValue() * 10; 
+		String restType = scaleParamsPanel.restTypeSelect.getText().toStdString();
+		double restAmount = scaleParamsPanel.restAmntSlider.getValue() * 2;
+		double syncopation = scaleParamsPanel.syncopationSlider.getValue() * 10;
+		double phraseLength = basicParamsPanel.durationWeightSlider.getValue() * 2;
+		double creativity = basicParamsPanel.creativityWeightSlider.getValue();
+		double speed = basicParamsPanel.invervalWeightSlider.getValue() * 10;
+		String clParamsStr = "\"" + keyValue + "\" " + String(rhythmicImportance) + " " + String(melodicImportance) +
+			" " + "\"" + restType + "\" " + String(restAmount) + " " + String(syncopation) + " " + String(phraseLength) + " "
+			+ String(creativity) + " " + String(speed) + " ";
+		
 		//Create master directory
 		File f(melodysmithDirPath + "artists");
 		f.deleteRecursively();
@@ -268,7 +298,81 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		//String outputFilename = exportFolder.getFullPathName() + "\\output" + String(countOfOutputFiles++) + ".mid";
 		String outputFilename = /*"C:\\Users\\Daniel Mattheiss\\Documents\\Ableton\\User Library\\Clips\\melodysmith"*/ "C:\\Program Files\\MelodySmith\\melodysmith" + String(countOfOutputFiles++) + ".mid";
 
-		String clStr = "java -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
+		//String clStr = "javaw -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
+		String clStr = " -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
+
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+
+		si.dwFlags = STARTF_USESHOWWINDOW;
+		si.wShowWindow = SW_HIDE;
+
+		// Start the child process. 
+		if (!CreateProcessA(std::string("C:\\jre1.8.0_121\\bin\\java.exe").c_str(),   // No module name (use command line)
+			&clStr.toStdString()[0],        // Command line
+			NULL,           // Process handle not inheritable
+			NULL,           // Thread handle not inheritable
+			FALSE,          // Set handle inheritance to FALSE
+			CREATE_NO_WINDOW,              // No creation flags
+			NULL,           // Use parent's environment block
+			NULL,           // Use parent's starting directory 
+			&si,            // Pointer to STARTUPINFO structure
+			&pi)            // Pointer to PROCESS_INFORMATION structure
+			)
+		{
+			std::ostringstream os;
+			os << GetLastError();
+			String str = os.str();
+			//printf("CreateProcess failed (%d).\n", GetLastError());
+			//return 1;
+		}
+
+		// Wait until child process exits.
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		// Close process and thread handles. 
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+		//progressBar.setVisible(false);
+		//progressBar.repaint();
+		//;
+
+		/*MessageManager::callAsync(
+			[=]() {
+			progressBar.setVisible(false);
+		}
+		);*/
+
+
+
+
+
+		//return 0;
+		//FreeConsole();
+		//i = system(clStr.toStdString().c_str());
+
+		//WinExec(clStr.toStdString().c_str(), SW_HIDE);
+		/*STARTUPINFOW si;
+		PROCESS_INFORMATION pi;
+
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+
+		if (CreateProcess(TEXT("java"), TEXT(" -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr + "& pause"), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+		{
+			WaitForSingleObject(pi.hProcess, INFINITE);
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+			//progressBar.setVisible(false);
+		}*/
+
+		//hide
+
 		//printf("Executing command DIR...\n");
 		//system("pause");
 		//STARTUPINFOW si;
@@ -333,7 +437,6 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		//CloseHandle(hStdOutWr);
 		//CloseHandle(hStdErrRd);
 		//CloseHandle(hStdErrWr);
-		i = system(clStr.toStdString().c_str());
 		//WinExec(clStr.toStdString().c_str(), SW_HIDE);
 		//ShellExecute(GetDesktopWindow(), "")
 		//system("pause");

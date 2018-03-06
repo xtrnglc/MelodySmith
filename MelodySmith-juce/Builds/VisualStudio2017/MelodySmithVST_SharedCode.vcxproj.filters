@@ -391,6 +391,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\ForgeTask.cpp">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\CorpusPanel.cpp">
       <Filter>MelodySmithVST\Source</Filter>
     </ClCompile>
@@ -2277,6 +2280,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\ForgeTask.h">
+      <Filter>MelodySmithVST\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\CorpusPanel.h">
       <Filter>MelodySmithVST\Source</Filter>
     </ClInclude>

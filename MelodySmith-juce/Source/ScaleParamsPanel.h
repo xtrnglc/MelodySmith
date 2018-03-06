@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "MyKnobLF.h"
 
 //==============================================================================
 /*
@@ -26,6 +27,16 @@ public:
 
 	ComboBox keySelect;
 	Label scaleLabel;
+
+	Label syncopationLabel, restAmntLabel;
+	Slider syncopationSlider, restAmntSlider;
+
+	//TextButton restTypeBtnDes, restTypeBtnCon;
+	Label restTypeLabel;
+	ComboBox restTypeSelect;
+
+	Label restControls;
+	MyKnobLF keyKnobLF;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScaleParamsPanel)

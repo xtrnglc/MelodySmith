@@ -17,22 +17,40 @@ BasicParamsPanel::BasicParamsPanel()
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 
-	addAndMakeVisible(invervalWeightSlider);
-	invervalWeightSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
-	invervalWeightSlider.setRange(0, 10, 1.0);
-	//Slider::setSliderSnapsToMousePosition
+	addAndMakeVisible(melodyControls);
+	melodyControls.setText("Melody", NotificationType::dontSendNotification);
+	melodyControls.setFont(Font("Avenir", 16.0f, Font::bold));
+	melodyControls.setJustificationType(Justification::centred);
 
-	addAndMakeVisible(durationWeightSlider);
-	durationWeightSlider.setRange(0, 10, 1.0);
-	durationWeightSlider.setTextBoxStyle(Slider::TextBoxRight, false, 50, 20);
-
-	intervalWeightLabel.setText("Interval", NotificationType::dontSendNotification);
+	intervalWeightLabel.setText("Speed", NotificationType::dontSendNotification);
 	intervalWeightLabel.setJustificationType(Justification::centred);
 	addAndMakeVisible(intervalWeightLabel);
 
-	durationWeightLabel.setText("Duration", NotificationType::dontSendNotification);
+	addAndMakeVisible(invervalWeightSlider);
+	invervalWeightSlider.setLookAndFeel(&keyKnobLF);
+	invervalWeightSlider.setSliderStyle(Slider::Rotary);
+	invervalWeightSlider.setRange(1, 10, 1.0);
+	invervalWeightSlider.setTextBoxStyle(Slider::NoTextBox, false, 50, 20);
+
+	durationWeightLabel.setText("Phrase Length", NotificationType::dontSendNotification);
 	durationWeightLabel.setJustificationType(Justification::centred);
 	addAndMakeVisible(durationWeightLabel);
+
+	addAndMakeVisible(durationWeightSlider);
+	durationWeightSlider.setLookAndFeel(&keyKnobLF);
+	durationWeightSlider.setSliderStyle(Slider::Rotary);
+	durationWeightSlider.setRange(1, 10, 1.0);
+	durationWeightSlider.setTextBoxStyle(Slider::NoTextBox, false, 50, 20);
+
+	creativityLabel.setText("Creativity", NotificationType::dontSendNotification);
+	creativityLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(creativityLabel);
+
+	addAndMakeVisible(creativityWeightSlider);
+	creativityWeightSlider.setLookAndFeel(&keyKnobLF);
+	creativityWeightSlider.setSliderStyle(Slider::Rotary);
+	creativityWeightSlider.setRange(1, 10, 1.0);
+	creativityWeightSlider.setTextBoxStyle(Slider::NoTextBox, false, 50, 20);
 
 }
 
@@ -49,7 +67,7 @@ void BasicParamsPanel::paint (Graphics& g)
        drawing code..
     */
 
-    g.fillAll (Colours::tan);   // clear the background
+    g.fillAll (Colours::deepskyblue.darker(0.6f));   // clear the background
 
    /* g.setColour (Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
@@ -65,15 +83,22 @@ void BasicParamsPanel::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 	juce::Rectangle<int> area(getLocalBounds());
+	melodyControls.setBounds(area.removeFromTop(melodyControls.getHeight() + 20).reduced(0, 2));
+	int areaWidth = area.getWidth() / 3;
 	{
-		juce::Rectangle<int> col = area.removeFromLeft(area.getWidth() / 2);
-		int heightPartition = col.getHeight() / 5;
-		col = col.reduced(0, heightPartition);
+		int heightPartition = area.getHeight() / 5;
+
+		juce::Rectangle<int> col = area.removeFromLeft(areaWidth);
 		intervalWeightLabel.setBounds(col.removeFromTop(heightPartition));
-		invervalWeightSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
-		col = area;
-		col = col.reduced(0, heightPartition);
+		invervalWeightSlider.setBounds(col.reduced(10, 0));
+
+		col = area.removeFromLeft(areaWidth);
 		durationWeightLabel.setBounds(col.removeFromTop(heightPartition));
-		durationWeightSlider.setBounds(col.removeFromTop(heightPartition).reduced(10, 0));
+		durationWeightSlider.setBounds(col.reduced(10, 0));
+		//durationWeightSlider.setBounds(col);
+
+		col = area.removeFromLeft(areaWidth);
+		creativityLabel.setBounds(col.removeFromTop(heightPartition));
+		creativityWeightSlider.setBounds(col.reduced(10, 0));
 	}
 }

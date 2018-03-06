@@ -12,13 +12,13 @@
 #include "CorpusPanel.h"
 
 //==============================================================================
-CorpusPanel::CorpusPanel(Array<std::tuple<String, String>>& artist_filename_tuples, Array<std::tuple<String, double>>& artists_to_influences_c) : tabbedCorpusComponent(TabbedButtonBar::Orientation::TabsAtLeft), managePanel(*curr_artist_filename_tuples),
-influencesPanel(*curr_artist_filename_tuples, *artists_to_influences)
+CorpusPanel::CorpusPanel()/*(Array<std::tuple<String, String>>& artist_filename_tuples, Array<std::tuple<String, double>>& artists_to_influences_c: tabbedCorpusComponent(TabbedButtonBar::Orientation::TabsAtLeft), managePanel(*curr_artist_filename_tuples),
+influencesPanel(*curr_artist_filename_tuples, *artists_to_influences)*/
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 
-	curr_artist_filename_tuples = &artist_filename_tuples;
+	/*curr_artist_filename_tuples = &artist_filename_tuples;
 	artists_to_influences = &artists_to_influences_c;
 
 	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
@@ -30,6 +30,7 @@ influencesPanel(*curr_artist_filename_tuples, *artists_to_influences)
 	//tabbedCorpusComponent.setColour()
 	addAndMakeVisible(tabbedCorpusComponent);
 
+	*/
 }
 
 CorpusPanel::~CorpusPanel()
@@ -61,6 +62,6 @@ void CorpusPanel::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 	Rectangle<int> area = getLocalBounds();
-	tabbedCorpusComponent.setBounds(area);
+	//tabbedCorpusComponent.setBounds(area);
 
 }

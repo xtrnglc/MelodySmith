@@ -11,6 +11,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "MyKnobLF.h"
+
 
 //==============================================================================
 /*
@@ -24,8 +26,12 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
-	Label intervalWeightLabel, durationWeightLabel;
-	Slider invervalWeightSlider, durationWeightSlider;
+	Label intervalWeightLabel, durationWeightLabel, creativityLabel;
+	Slider invervalWeightSlider, durationWeightSlider, creativityWeightSlider;
+
+	Label melodyControls;
+
+	MyKnobLF keyKnobLF;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicParamsPanel)

@@ -12,7 +12,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "MyKnobLF.h"
 #include "ScaleParamsPanel.h"
 #include "BasicParamsPanel.h";
 #include "AdvancedParamsPanel.h"
@@ -64,13 +63,14 @@ private:
 
 	void buttonClicked(Button* btn) override;
 
+	void updateProgressBar();
+
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     MelodySmithVSTAudioProcessor& processor;
 
 	Slider midiVolume;
-	Slider keyKnob;
-	MyKnobLF keyKnobLF;
+
 
 	String melodysmithDirPath;
 
@@ -80,6 +80,9 @@ private:
 
 	TextButton exportBtn;
 	File exportFolder;
+
+	double progressDouble = 2.0;
+	ProgressBar progressBar;
 
 	std::shared_ptr<MidiMessageSequence> MidiSequence = std::make_shared<MidiMessageSequence>();
 

@@ -12,6 +12,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "InfluencesListBoxModel.h"
+#include "ManagePanel.h"
+
 
 //==============================================================================
 /*
@@ -19,7 +21,7 @@
 class InfluencesPanel    : public Component
 {
 public:
-    InfluencesPanel(Array<std::tuple<String, String>>& artist_filename_tuples, Array<std::tuple<String, double>>& artists_to_influences_c);
+    InfluencesPanel(Array<std::tuple<String, String>>& artist_filename_tuples, Array<std::tuple<String, double>>& artists_to_influences_c, ManagePanel& managePanelc);
     ~InfluencesPanel();
 
     void paint (Graphics&) override;
@@ -29,6 +31,8 @@ public:
 
 	Array<std::tuple<String, String>> *curr_artist_filename_tuples;
 	Array<std::tuple<String, double>>* artists_to_influences;
+
+	ManagePanel* managePanel;
 
 
 	InfluencesListBoxModel influencesListBox;

@@ -16,17 +16,18 @@ ManagePanel::ManagePanel(Array<std::tuple<String, String>>& artist_filename_tupl
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
-	corpusListBox.setColour(ListBox::backgroundColourId, Colours::black.brighter(0.2f));
+	corpusListBox.setColour(ListBox::backgroundColourId, Colours::deepskyblue.darker(2.0f));
 	addAndMakeVisible(corpusListBox);
 
-	addSongsBtn.setColour(TextButton::buttonColourId, Colours::red);
+	addSongsBtn.setColour(TextButton::buttonColourId, Colours::deepskyblue);
+	addSongsBtn.setColour(TextButton::textColourOffId, Colours::black.brighter(0.2f));
 	addSongsBtn.setButtonText("Add Songs");
 	addAndMakeVisible(addSongsBtn);
 	addSongsBtn.addListener(this);
 
-	saveSongsBtn.setColour(TextButton::buttonColourId, Colours::red);
+	/*saveSongsBtn.setColour(TextButton::buttonColourId, Colours::deepskyblue);
 	saveSongsBtn.setButtonText("Save");
-	addAndMakeVisible(saveSongsBtn);
+	addAndMakeVisible(saveSongsBtn);*/
 	saveSongsBtn.addListener(this);
 
 	curr_artist_filename_tuples = &artist_filename_tuples;
@@ -91,7 +92,7 @@ void ManagePanel::resized()
 	Rectangle<int> area(getLocalBounds());
 	//area = area.reduced(10);
 	int areaHeight = area.getHeight();
-	saveSongsBtn.setBounds(area.removeFromBottom(areaHeight / 12));
+	//saveSongsBtn.setBounds(area.removeFromBottom(areaHeight / 12));
 	addSongsBtn.setBounds(area.removeFromBottom(areaHeight / 12));
 	corpusListBox.setBounds(area);
 

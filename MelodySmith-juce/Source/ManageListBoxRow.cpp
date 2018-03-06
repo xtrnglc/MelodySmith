@@ -31,7 +31,7 @@ void ManageListBoxRow::paint(Graphics &g)
 	//Rectangle<int> totalArea(0, 0, width, height);
 	//Rectangle<int> leftCol(totalArea.removeFromLeft(totalArea.getWidth() / 2));
 	//g.drawFittedText(fileName, getLocalBounds(), Justification::centred, 1);
-	g.fillAll(Colours::black.brighter(0.2f));
+	g.fillAll(Colours::deepskyblue.darker(2.0f));
 
 }
 

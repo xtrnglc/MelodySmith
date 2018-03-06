@@ -11,6 +11,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "MyKnobLF.h"
+
 
 //==============================================================================
 /*
@@ -26,6 +28,10 @@ public:
 
 	Label nGramLengthLabel, numberOfComparisonsLabel;
 	Slider nGramLengthSlider, numberOfComparisonsSlider;
+
+	Label analysisControls;
+	MyKnobLF keyKnobLF;
+
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AdvancedParamsPanel)
