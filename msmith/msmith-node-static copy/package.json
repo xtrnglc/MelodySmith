@@ -1,0 +1,19 @@
+{
+  "name": "MelodySmith",
+  "version": "1.0.0",
+  "description": "Music Composition",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "audioMIDIum",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "d3": "^4.13.0",
+    "datauri": "^1.0.5",
+    "express": "^4.13.3",
+    "formidable": "^1.0.17"
+  }
+}

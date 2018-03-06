@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="MelodySmith" />
+    <meta name="keywords" content="MIDI, music, player, javascript" />
+    <title>MelodySmith</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+    <link rel="shortcut icon" type="image/png" href="icon.png"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+    <style type="text/css">
+        body {background:#f8f8f9;}
+        h1 {text-shadow:2px 3px 1px #ccc;}
+        h1,h2,h3,h4 {font-family: 'Bree Serif', serif;}
+        #select-file {display:none;}
+    </style>
+</head>
+<body>
+
+<div class="container" style="padding-top:12px;">
+    <h1>&#9836; MelodySmith</h1>
+    <div class="row">
+        <div class="four columns">
+            <h4>Artists</h4>
+            <div class="tooltip">Justin Bieber
+                <span class="tooltiptext">Give this artist more influence in the composition</span>
+            </div>
+            <p> </p>
+            <input type="range" id="artist-slider1" min="0" max="100">
+            <p>Bach</p>
+            <input type="range" id="artist-slider2" min="0" max="100">
+            <p>Beatles</p>
+            <input type="range" id="artist-slider3" min="0" max="100">
+        </div>
+        <div class="eight columns">
+            <h4>Parameters</h4>
+            <div class="four columns">
+                <!--<p>Chaos</p>-->
+                <!--<input type="range" id="chaos-slider" min="0" max="100">-->
+
+                <div class="tooltip">Focus on Rhythm
+                    <span class="tooltiptext">How important are rhythymic details?</span>
+                </div>
+                <p></p>
+                <input type="range" id="durationOfNotes-slider" min="0" max="100">
+                <div class="tooltip">N-gram(s)
+                    <span class="tooltiptext">What is the length of phrases analyzed?</span>
+                </div>
+                <p></p>
+                <div class="input-group input-number-group">
+                    <input class="input-number" id="n-gram-selector" type="number" value="2" min="2" max="10">
+
+                </div>
+                <div class="tooltip">Decisions to Compare
+                    <span class="tooltiptext">How important is the current context?</span>
+                </div>
+                <p></p>
+                <radioform action="#">
+                    <div>
+                        <fieldset>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(2)" id="radio-choice-8" value="choice-8" />
+                            <label for="radio-choice-8">2</label>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(3)" id="radio-choice-7" value="choice-7" />
+                            <label for="radio-choice-7">3</label>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(4)" id="radio-choice-1" value="choice-1" />
+                            <label for="radio-choice-1">4</label>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(5)" id="radio-choice-2" value="choice-2" />
+                            <label for="radio-choice-2">5</label>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(6)" id="radio-choice-3" value="choice-3" />
+                            <label for="radio-choice-3">6</label>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(7)" id="radio-choice-4" value="choice-4" />
+                            <label for="radio-choice-4">7</label>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(8)" id="radio-choice-5" value="choice-5" />
+                            <label for="radio-choice-5">8</label>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(9)" id="radio-choice-6" value="choice-6" />
+                            <label for="radio-choice-6">9</label>
+                            <input type="radio" name="radio-choice" onclick="changeNumComparisons(10)" id="radio-choice-9" value="choice-9" />
+                            <label for="radio-choice-9">10</label>
+                            <div class="dial">▲</div>
+                        </fieldset>
+                    </div>
+                </radioform>
+            </div>
+
+            <div class="four columns">
+                <!--<p>Chaos</p>-->
+                <!--<input type="range" id="chaos-slider" min="0" max="100">-->
+                <div class="tooltip">Focus on Intervals
+                    <span class="tooltiptext">How important are melodic details?</span>
+                </div>
+                <p></p>
+                <input type="range" id="intervalOfNote-slider" min="0" max="100">
+
+
+                <p>Scale</p>
+                <div class="c-dropdown js-dropdown">
+                    <input type="hidden" name="Framework" id="keysigdropdown" class="js-dropdown__input">
+                    <span class="c-button c-button--dropdown js-dropdown__current">G Chromatic</span>
+                    <ul class="c-dropdown__list">
+                        <li class="c-dropdown__item" data-dropdown-value="cGypsy">c Gypsy</li>
+                        <li class="c-dropdown__item" data-dropdown-value="aMinor">a Minor</li>
+                        <li class="c-dropdown__item" data-dropdown-value="DBlues">D Blues</li>
+                        <li class="c-dropdown__item" data-dropdown-value="fHarmonic">f Harmonic</li>
+                        <li class="c-dropdown__item" data-dropdown-value="GChromatic">G Chromatic</li>
+                        <li class="c-dropdown__item" data-dropdown-value="cMajor">C Major</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <button class="button button-primary"   onClick="forge()" id="forge-button">Forge</button>
+
+    <hr/>
+    <p id="loading">Hit forge when you are ready to listen to some new music!</p>
+
+    <div id="canvas" style="display: none">
+
+    </div>
+    <div id="loadingcube" class="sk-folding-cube" style="display: none">
+        <div class="sk-cube1 sk-cube"></div>
+        <div class="sk-cube2 sk-cube"></div>
+        <div class="sk-cube4 sk-cube"></div>
+        <div class="sk-cube3 sk-cube"></div>
+    </div>
+
+    <div id="play-bar-button" style="display: none; border:1px solid #ccc;margin-bottom:12px;background:#f7f7f7;">
+        <div id="play-bar" style="height:20px;background:#33C3F0;width:0%;"></div>
+    </div>
+
+    <p id="music-controls" style="display: none">
+
+        <button class="button button-primary" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled">Play</button>
+        <button class="button" id="stop-button" onclick="stop()">Stop</button>
+
+    <div class="c-dropdown js-dropdown">
+        <input type="hidden" name="Framework" id="instrument-dropdown" class="js-dropdown__input">
+        <span class="c-button c-button--dropdown js-dropdown__current">Grand Piano</span>
+        <ul class="c-dropdown__list">
+            <li class="c-dropdown__item" data-dropdown-value="acousticGuitar" onClick="changeInstrument('acousticGuitar')">Acoustic Guitar</li>
+            <li class="c-dropdown__item" data-dropdown-value="churchOrgan" onClick="changeInstrument('musicBox')">Music Box</li>
+            <li class="c-dropdown__item" data-dropdown-value="grandPiano" onClick="changeInstrument('grandPiano')">Grand Piano</li>
+            <li class="c-dropdown__item" data-dropdown-value="electricGuitar" onClick="changeInstrument('electricGuitar')">Electric Guitar</li>
+        </ul>
+    </div>
+
+    </p>
+    <p id="tempo-div" style="display: none">
+
+        Tempo: <span id="tempo-display"></span> bpm<br />
+        <input type="range" onchange="Player.pause();Player.setTempo(this.value);Player.play()" min="50" max="200">
+        <br />
+    </p>
+
+    <div id="events" class="well"></div>
+    </div>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+<script src="javascripts/browser/midiplayer.min.js"></script>
+<script src="javascripts/soundfont-player.min.js"></script>
+
+<script src="javascripts/app.js"></script>
+<script src="javascripts/styles.js"></script>
+
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-1454657-6', 'auto');
+    ga('send', 'pageview');
+</script>
+</body>
+</html>
