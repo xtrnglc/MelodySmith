@@ -186,7 +186,7 @@ public class MidiReader {
 			}
 			
 			if (markovLength > 0) {
-				recordIntervals(markovLength);
+				recordIntervals(markovLength, withRests);
 			}
 
 		} catch (InvalidMidiDataException e) {
@@ -209,8 +209,14 @@ public class MidiReader {
 	 * currently ignores rests
 	 * @param markovLength
 	 */
-	private void recordIntervals(int markovLength) {		
-		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
+	private void recordIntervals(int markovLength, boolean withRests) {	
+		ArrayList<ArrayList<Node>> orderedNotes;
+		if (withRests) {
+			orderedNotes = getOrderedNotes();
+		}
+		else {
+			orderedNotes = getOrderedNotesWithoutRests();
+		}
 		
 		for (ArrayList<Node> channel : orderedNotes) {
 			for (int i = 0; i < channel.size() - markovLength; i++) {
