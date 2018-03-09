@@ -47,7 +47,7 @@ public class MidiReader {
 	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
 	
-	public ArrayList<Integer> lowestTonic = new ArrayList<Integer>();
+	public ArrayList<Integer> lowestTonicOctave = new ArrayList<Integer>();
 
 	
 	public MidiReader(CorpusAnalyzer c) {
@@ -175,7 +175,7 @@ public class MidiReader {
 			isPPQ = false;
 			
 			for (int i = 0; i < currentSequence.getTracks().length; i++) {
-				lowestTonic.add(Integer.MAX_VALUE);
+				lowestTonicOctave.add(Integer.MAX_VALUE);
 			}
 
 
@@ -193,6 +193,15 @@ public class MidiReader {
 					processEvent(track, currentNotes, i);
 				}
 			}
+			
+			ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
+
+			for (int i = 0; i < orderedNotes.size(); i++) {
+				for (int k = 0; k < orderedNotes.get(i).size(); k++) {
+					orderedNotes.get(i).get(k).setScaleDegree(lowestTonicOctave.get(i), scaleDegreeSize);
+				}
+			}
+			
 			
 			if (markovLength > 0) {
 				recordIntervals(markovLength, withRests, scaleDegreeSize);
@@ -232,12 +241,8 @@ public class MidiReader {
 				if (i < channel.size() - 1) {
 					analyzer.addToIntervalCount(channel.get(i+1).key - channel.get(i).key);
 				}
-				int scaleDegree = channel.get(i).key - lowestTonic.get(channel.get(i).channel);
 				
-				scaleDegree = scaleDegree % (scaleDegreeSize - 1);
-				
-				
-				String intervalScaleDegrees = scaleDegree + "";
+				String intervalScaleDegrees = channel.get(i).scaleDegree + "";
 				String intervalDurations = channel.get(i).noteDuration;
 				String intervalNoteNames = channel.get(i).noteName;
 
@@ -303,8 +308,8 @@ public class MidiReader {
 				Node n = new Node(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
 						currentInstrument, currentKey, currentTime, currentBPM);
 				
-				if (n.scaleDegree == 0 && n.key < lowestTonic.get(n.channel)) {
-					lowestTonic.set(n.channel, n.key);
+				if (n.distanceFromTonic == 0 && n.octave < lowestTonicOctave.get(n.channel)) {
+					lowestTonicOctave.set(n.channel, n.octave);
 				}
 				
 				currentNotes.get(sMessage.getChannel()).add(n);

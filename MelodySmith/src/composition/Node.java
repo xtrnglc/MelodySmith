@@ -112,7 +112,7 @@ public class Node {
 		if (bpm != 0) {
 			this.bpm = bpm;
 		}
-		scaleDegree = getScaleDegree();
+		distanceFromTonic = getDistanceFromTonic();
 	}
 	
 	/**
@@ -163,7 +163,7 @@ public class Node {
 	 * 
 	 * @return
 	 */
-	private int getScaleDegree() {
+	private int getDistanceFromTonic() {
 		String note = noteName.substring(0, 1);
 		String start = keySignature.substring(0, 1);
 
@@ -181,6 +181,22 @@ public class Node {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Helper method to process the scale degree from the note name and Key
+	 * Signature
+	 * 
+	 * @return
+	 */
+	public void setScaleDegree(int lowestTonicOctave, int scaleDegreeSize) {
+
+		int temp = 8 * (octave - lowestTonicOctave) + distanceFromTonic;
+		if (temp >= 0) {
+			temp = temp  % (scaleDegreeSize - 1);
+		}
+		
+		scaleDegree = temp;
 	}
 	// end from Note
 	
