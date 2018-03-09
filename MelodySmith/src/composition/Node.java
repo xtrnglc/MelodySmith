@@ -37,14 +37,14 @@ public class Node {
 	public String timeSignature = "4/4";
 
 	public int index = 0;
+	public int timesPlayed = 0;
 	
 	public String pattern = "";
 	public String artist = "";
 	
 	ArrayList<Node> concurrentNodes = new ArrayList<Node>();
 	ArrayList<Link> linkedNodes = new ArrayList<Link>();
-	
-	// Code from Note
+
 	/**
 	 * A Node constructed with no key is a rest (key is set to -1)
 	 * 
@@ -182,7 +182,14 @@ public class Node {
 
 		return 0;
 	}
-	// end from Note
+	
+	/**
+	 * Returns whether or not other node encodes the same type of musical event
+	 * @param otherNode
+	 */
+	public boolean equivalentNodes(Node otherNode) {
+		return (this.noteDuration == otherNode.noteDuration && this.scaleDegree == otherNode.scaleDegree && this.noteName == otherNode.noteName);
+	}
 	
 	void addConcurrentNode(Node concurrentNode) {
 		concurrentNodes.add(concurrentNode);
@@ -198,7 +205,7 @@ public class Node {
 	
 	@Override
 	public String toString() {
-		String result = this.noteName + " " + this.scaleDegree + " " + this.noteDuration;
+		String result = this.noteName + " " + this.scaleDegree + " " + this.noteDuration + " " + this.timesPlayed;
 		return result;
 	}
 }
