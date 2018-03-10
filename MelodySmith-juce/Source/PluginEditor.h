@@ -88,5 +88,8 @@ private:
 
 	int countOfOutputFiles;
 
+	String platform;
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessorEditor)
 };

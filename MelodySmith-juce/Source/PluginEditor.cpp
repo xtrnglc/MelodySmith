@@ -24,7 +24,15 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	influencesPanel(curr_artist_filename_tuples, artists_to_influences, managePanel), progressBar(progressDouble)
 {
 	audioProcessor = &p;
-	melodysmithDirPath = "C:\\Program Files\\MelodySmith\\";
+
+	//OperatingSystem
+	platform = SystemStats::getOperatingSystemName();
+	platform = platform.toLowerCase();
+	if (platform.contains("mac"))
+		melodysmithDirPath = "/Applications/MelodySmith/";
+	else
+		melodysmithDirPath = "C:\\Program Files\\MelodySmith\\";
+
 	countOfOutputFiles = 0;
 	addAndMakeVisible(progressBar);
 	progressBar.setVisible(false);
@@ -249,7 +257,7 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		double creativity = basicParamsPanel.creativityWeightSlider.getValue();
 		double speed = basicParamsPanel.invervalWeightSlider.getValue() * 10;
 		String clParamsStr = "\"" + keyValue + "\" " + String(rhythmicImportance) + " " + String(melodicImportance) +
-			" " + "\"" + restType + "\" " + String(restAmount) + " " + String(syncopation) + " " + String(phraseLength) + " "
+			" " + "\"" + restType + "\" " + String(restAmount) + " " + String(syncopation) + " x" + String(phraseLength) + " "
 			+ String(creativity) + " " + String(speed) + " ";
 		
 		//Create master directory
@@ -292,218 +300,73 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		if (system(NULL)) puts("Ok");
 		else exit(EXIT_FAILURE);
 
-		//String melodySmithJarStr = File::getCurrentWorkingDirectory().getChildFile("MelodySmith.jar").getFullPathName();
 		String melodySmithJarStr = melodysmithDirPath + "MelodySmith.jar";
 		String artistsStr = melodysmithDirPath + "artists";
-		//String outputFilename = exportFolder.getFullPathName() + "\\output" + String(countOfOutputFiles++) + ".mid";
-		String outputFilename = /*"C:\\Users\\Daniel Mattheiss\\Documents\\Ableton\\User Library\\Clips\\melodysmith"*/ "C:\\Program Files\\MelodySmith\\melodysmith" + String(countOfOutputFiles++) + ".mid";
+		String outputFilename = melodysmithDirPath + "melodysmith" + String(countOfOutputFiles++) + ".mid";
 
-		//String clStr = "javaw -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
 		String clStr = " -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
 
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
+		//String javaExePath = "\"" + melodysmithDirPath + "java.exe" + "\"";
+		String javaExePath = "java";
 
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
-
-		si.dwFlags = STARTF_USESHOWWINDOW;
-		si.wShowWindow = SW_HIDE;
-
-		// Start the child process. 
-		if (!CreateProcessA(std::string("C:\\jre1.8.0_121\\bin\\java.exe").c_str(),   // No module name (use command line)
-			&clStr.toStdString()[0],        // Command line
-			NULL,           // Process handle not inheritable
-			NULL,           // Thread handle not inheritable
-			FALSE,          // Set handle inheritance to FALSE
-			CREATE_NO_WINDOW,              // No creation flags
-			NULL,           // Use parent's environment block
-			NULL,           // Use parent's starting directory 
-			&si,            // Pointer to STARTUPINFO structure
-			&pi)            // Pointer to PROCESS_INFORMATION structure
-			)
+		if (platform.contains("windows"))
 		{
-			std::ostringstream os;
-			os << GetLastError();
-			String str = os.str();
-			//printf("CreateProcess failed (%d).\n", GetLastError());
-			//return 1;
-		}
+			STARTUPINFO si;
+			PROCESS_INFORMATION pi;
 
-		// Wait until child process exits.
-		WaitForSingleObject(pi.hProcess, INFINITE);
+			ZeroMemory(&si, sizeof(si));
+			si.cb = sizeof(si);
+			ZeroMemory(&pi, sizeof(pi));
 
-		// Close process and thread handles. 
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-		//progressBar.setVisible(false);
-		//progressBar.repaint();
-		//;
+			si.dwFlags = STARTF_USESHOWWINDOW;
+			si.wShowWindow = SW_HIDE;
 
-		/*MessageManager::callAsync(
+			// Start the child process. 
+			if (!CreateProcessA(javaExePath.toStdString().c_str(),   // No module name (use command line)
+				&clStr.toStdString()[0],        // Command line
+				NULL,           // Process handle not inheritable
+				NULL,           // Thread handle not inheritable
+				FALSE,          // Set handle inheritance to FALSE
+				CREATE_NO_WINDOW,              // No creation flags
+				NULL,           // Use parent's environment block
+				NULL,           // Use parent's starting directory 
+				&si,            // Pointer to STARTUPINFO structure
+				&pi)            // Pointer to PROCESS_INFORMATION structure
+				)
+			{
+				std::ostringstream os;
+				os << GetLastError();
+				String str = os.str();
+				//printf("CreateProcess failed (%d).\n", GetLastError());
+				//return 1;
+			}
+
+			// Wait until child process exits.
+			WaitForSingleObject(pi.hProcess, INFINITE);
+
+			// Close process and thread handles. 
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+			//progressBar.setVisible(false);
+			//progressBar.repaint();
+			//;
+
+			/*MessageManager::callAsync(
 			[=]() {
 			progressBar.setVisible(false);
+			}
+			);*/
 		}
-		);*/
-
-
-
-
+		else if (platform.contains("mac"))
+		{
+			String fullClStr = javaExePath + clStr;
+			system(fullClStr.toStdString().c_str());
+		}
 
 		//return 0;
 		//FreeConsole();
 		//i = system(clStr.toStdString().c_str());
 
-		//WinExec(clStr.toStdString().c_str(), SW_HIDE);
-		/*STARTUPINFOW si;
-		PROCESS_INFORMATION pi;
-
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
-
-		if (CreateProcess(TEXT("java"), TEXT(" -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr + "& pause"), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
-		{
-			WaitForSingleObject(pi.hProcess, INFINITE);
-			CloseHandle(pi.hProcess);
-			CloseHandle(pi.hThread);
-			//progressBar.setVisible(false);
-		}*/
-
-		//hide
-
-		//printf("Executing command DIR...\n");
-		//system("pause");
-		//STARTUPINFOW si;
-		//PROCESS_INFORMATION pi;
-
-		//ZeroMemory(&si, sizeof(si));
-		//si.cb = sizeof(si);
-		//ZeroMemory(&pi, sizeof(pi));
-
-		//if (CreateProcessW(command, arg, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
-		//{
-		//	WaitForSingleObject(pi.hProcess, INFINITE);
-		//	CloseHandle(pi.hProcess);
-		//	CloseHandle(pi.hThread);
-		//}
-
-		//LPWSTR cmdLine[] = clStr.toStdString().c_str();
-
-		//SECURITY_ATTRIBUTES sa = { 0 };
-		//sa.nLength = sizeof(sa);
-		//sa.lpSecurityDescriptor = NULL;
-		//sa.bInheritHandle = TRUE;
-
-		//HANDLE hStdOutRd, hStdOutWr;
-		//HANDLE hStdErrRd, hStdErrWr;
-
-		//if (!CreatePipe(&hStdOutRd, &hStdOutWr, &sa, 0))
-		//{
-		//	// error handling...
-		//}
-
-		//if (!CreatePipe(&hStdErrRd, &hStdErrWr, &sa, 0))
-		//{
-		//	// error handling...
-		//}
-
-		//SetHandleInformation(hStdOutRd, HANDLE_FLAG_INHERIT, 0);
-		//SetHandleInformation(hStdErrRd, HANDLE_FLAG_INHERIT, 0);
-
-		//STARTUPINFO si = { 0 };
-		//si.cbSize = sizeof(si);
-		//si.dwFlags = STARTF_USESTDHANDLES;
-		//si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-		//si.hStdOutput = hStdOutWr;
-		//si.hStdError = hStdErrWr;
-
-		//PROCESS_INFORMATION pi = { 0 };
-
-		//if (!CreateProcessW(NULL, cmdLine, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
-		//{
-		//	// error handling...
-		//}
-		//else
-		//{
-		//	// read from hStdOutRd and hStdErrRd as needed until the process is terminated...
-
-		//	CloseHandle(pi.hThread);
-		//	CloseHandle(pi.hProcess);
-		//}
-
-		//CloseHandle(hStdOutRd);
-		//CloseHandle(hStdOutWr);
-		//CloseHandle(hStdErrRd);
-		//CloseHandle(hStdErrWr);
-		//WinExec(clStr.toStdString().c_str(), SW_HIDE);
-		//ShellExecute(GetDesktopWindow(), "")
-		//system("pause");
-		//printf("The value returned was: %d.\n", i);
-
-
-		//File F = File::getCurrentWorkingDirectory().getChildFile("output.mid");
-		//File F("C:\\Users\\Daniel Mattheiss\\Documents\\MelodySmith\\MelodySmithVST\\MelodySmith\\MelodySmith - juce\\Builds\\VisualStudio2017\\output.mid");
-		//FileInputStream S(F);
-		//MidiFile midifile;
-		//midifile.readFrom(S);
-		//midifile.convertTimestampTicksToSeconds();
-
-		//MidiMessageSequence seq;
-		//seq.clear();
-		//for (int t = 0; t < midifile.getNumTracks(); t++)
-		//	seq.addSequence(*midifile.getTrack(t), 0.0 /*timeAdjustmentDelta*/);
-		//seq.updateMatchedPairs();
-		//system("pause");
-		//String r = F.getCurrentWorkingDirectory().getFullPathName();
-
-		//MidiSequence->clear();
-		////file input
-		//ScopedPointer<MidiOutput> OutputController = MidiOutput::openDevice(0);
-		//File* ReadFile(&F);
-		//FileInputStream* ReadFileStream(new FileInputStream(*ReadFile));
-		////String e = ReadFileStream->getStatus().getErrorMessage();
-		//MidiFile* ReadMIDIFile(new MidiFile());
-		//ReadMIDIFile->readFrom(*ReadFileStream);
-		////ScopedPointer<MidiMessageSequence> MidiSequence(new MidiMessageSequence());
-		//MidiMessage* msg(new MidiMessage());
-
-		////get all tracks together
-		//for (int track = 0; track < ReadMIDIFile->getNumTracks(); track++)
-		//{
-		//	const MidiMessageSequence* CurrentTrack = ReadMIDIFile->getTrack(track);
-		//	MidiSequence->addSequence(*CurrentTrack, 0, 0, CurrentTrack->getEndTime());
-		//}
-
-		////should keep note ons and note offs matched?
-		//MidiSequence->updateMatchedPairs();
-		//int numEvents = MidiSequence->getNumEvents();
-		//double TPQN = ReadMIDIFile->getTimeFormat();
-		//int currentPosition = 0;
-		//double NextEventTime = 0.;
-		//double PrevTimestamp = 0.;
-		//double msPerTick = 250. / TPQN; //set BPM
-		//								//sending messages to output device in loop
-
-		//system("pause");
-		//while ((currentPosition < numEvents))
-		//{
-		//	//getting next message
-		//	*msg = MidiSequence->getEventPointer(currentPosition)->message;
-		//	//time left to reach next message
-		//	NextEventTime = msPerTick * (msg->getTimeStamp() - PrevTimestamp);
-		//	//wait for it 
-		//	Time::waitForMillisecondCounter(Time::getMillisecondCounter() + NextEventTime);
-		//	//play it
-		//	OutputController->sendMessageNow(*msg);
-		//	//store previous message timestamp
-		//	PrevTimestamp = msg->getTimeStamp();
-		//	//moving to next message
-		//	currentPosition++;
-		//}
-
-		//audioProcessor->setMidiSequenceAndReadMIDIFile(MidiSequence, TPQN);
 	}
 } 
 
