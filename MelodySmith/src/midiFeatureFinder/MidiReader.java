@@ -174,7 +174,7 @@ public class MidiReader {
 			ticksPerQuarterNote = 0;
 			isPPQ = false;
 			
-			for (int i = 0; i < currentSequence.getTracks().length; i++) {
+			for (int i = 0; i < maxChannels; i++) {
 				lowestTonicOctave.add(Integer.MAX_VALUE);
 			}
 
