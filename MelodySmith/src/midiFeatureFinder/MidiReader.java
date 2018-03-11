@@ -47,6 +47,9 @@ public class MidiReader {
 	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
 	
+	public ArrayList<Integer> lowestTonicOctave = new ArrayList<Integer>();
+
+	
 	public MidiReader(CorpusAnalyzer c) {
 		analyzer = c;
 	}
@@ -153,12 +156,13 @@ public class MidiReader {
 	 * @param withRests
 	 * @return getOrderedNotes()
 	 */
-	public ArrayList<ArrayList<Node>> readSequence(File midiFile, int markovLength, boolean withRests) {
+	public ArrayList<ArrayList<Node>> readSequence(File midiFile, int markovLength, boolean withRests, int scaleDegreeSize) {
 		try {
 			// Rest Logic
 			lastTickOfChannel = new long[maxChannels];
 			Hashtable<Integer, ArrayList<Node>> currentNotes = getCurrentNotes();
-
+			
+			
 			// Reset the fields
 			currentSequence = MidiSystem.getSequence(midiFile);
 			
@@ -169,6 +173,11 @@ public class MidiReader {
 			trackName = "";
 			ticksPerQuarterNote = 0;
 			isPPQ = false;
+			
+			for (int i = 0; i < currentSequence.getTracks().length; i++) {
+				lowestTonicOctave.add(Integer.MAX_VALUE);
+			}
+
 
 			// Currently the logic will only handle MIDI with PPQ division type
 			// This should not be a problem for the prototype as the SMPTE is
@@ -185,8 +194,17 @@ public class MidiReader {
 				}
 			}
 			
+			ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
+
+			for (int i = 0; i < orderedNotes.size(); i++) {
+				for (int k = 0; k < orderedNotes.get(i).size(); k++) {
+					orderedNotes.get(i).get(k).setScaleDegree(lowestTonicOctave.get(i), scaleDegreeSize);
+				}
+			}
+			
+			
 			if (markovLength > 0) {
-				recordIntervals(markovLength, withRests);
+				recordIntervals(markovLength, withRests, scaleDegreeSize);
 			}
 
 		} catch (InvalidMidiDataException e) {
@@ -209,7 +227,7 @@ public class MidiReader {
 	 * currently ignores rests
 	 * @param markovLength
 	 */
-	private void recordIntervals(int markovLength, boolean withRests) {	
+	private void recordIntervals(int markovLength, boolean withRests, int scaleDegreeSize) {	
 		ArrayList<ArrayList<Node>> orderedNotes;
 		if (withRests) {
 			orderedNotes = getOrderedNotes();
@@ -223,6 +241,7 @@ public class MidiReader {
 				if (i < channel.size() - 1) {
 					analyzer.addToIntervalCount(channel.get(i+1).key - channel.get(i).key);
 				}
+				
 				String intervalScaleDegrees = channel.get(i).scaleDegree + "";
 				String intervalDurations = channel.get(i).noteDuration;
 				String intervalNoteNames = channel.get(i).noteName;
@@ -288,6 +307,11 @@ public class MidiReader {
 				
 				Node n = new Node(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
 						currentInstrument, currentKey, currentTime, currentBPM);
+				
+				if (n.distanceFromTonic == 0 && n.octave < lowestTonicOctave.get(n.channel)) {
+					lowestTonicOctave.set(n.channel, n.octave);
+				}
+				
 				currentNotes.get(sMessage.getChannel()).add(n);
 				
 				if (notes.get(event.getTick()) == null) {

@@ -28,7 +28,7 @@ public class AssociationNetwork {
 	CorpusAnalyzer probabilities;
 	
 	double sameScaleDegreePenalty = 1.5;
-	double sameDurationPenalty = 1.5;
+	double sameDurationPenalty = 0;
 	
 	public void linkNetwork() {
 		matrix = new Link[allNodes.size()][allNodes.size()];
@@ -109,6 +109,15 @@ public class AssociationNetwork {
 		return null;
 	}
 	
+	ArrayList<Node> deduceBestNextNodes(Node currentNode, int numberToCollect){
+		ArrayList<Node> bestNodes = new ArrayList<>();
+		for(int i = 0; i < numberToCollect; i++) {
+			Node bestNode = deduceNextNode(currentNode, bestNodes, bestNodes);
+			bestNodes.add(bestNode);
+		}
+		return bestNodes;
+	}
+	
 	ArrayList<Node> deduceBestNextNodes(Node currentNode, int numberToCollect, ArrayList<Node> alreadyChosen) {
 		ArrayList<Node> bestNodes = new ArrayList<>();
 		ArrayList<Node> chosen = new ArrayList<>();
@@ -141,7 +150,7 @@ public class AssociationNetwork {
 	
 	boolean equivalentNodeInList(Node node, ArrayList<Node> listOfNodes) {
 		for(Node node2 : listOfNodes) {
-			if(node.noteName == node2.noteName)
+			if(node.noteName.equals(node2.noteName) && node.noteDuration.equals(node2.noteDuration))
 				return true;
 		}
 		return false;

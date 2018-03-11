@@ -3,6 +3,7 @@ package composition;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Set;
 
 import midiFeatureFinder.MidiReader;
@@ -21,6 +22,7 @@ public class Composer {
 	String keySignature;
 	int nGramLength;
 	int choicesToCompare;
+	double repetitionPenalty;
 	CorpusAnalyzer analyzer;
 	double intervalWeight;
 	double durationWeight;
@@ -29,11 +31,15 @@ public class Composer {
 	double syncopationWeight;
 	int restAmount;
 	boolean constructiveRests;
+	Random random;
+	HashMap<String, Integer> durationCounts;
 	
 	public Composer(String corpusFolderName, String keySig, double intervalWeight, double durationWeight, String restType, int restAmount, int syncopation, int nGramLength, int choicesToCompare, int speed, HashMap<String, Double> artistWeightings) {
 		analyzer = new CorpusAnalyzer();
+		random = new Random();
 		reader = new MidiReader(analyzer);
 		network = new AssociationNetwork();
+		durationCounts = new HashMap<>();
 		network.artistWeightings = artistWeightings;
 		network.probabilities = analyzer;
 		network.intervalContribution = intervalWeight;
@@ -44,11 +50,71 @@ public class Composer {
 		this.choicesToCompare = choicesToCompare;
 		this.nGramLength = nGramLength;
 		this.speedWeight = speed;
-		this.syncopationWeight = 10000/syncopation;
+		this.syncopationWeight = 100/syncopation;
 		this.constructiveRests = (restType.toUpperCase() == "CONSTRUCTIVE");
 		this.restAmount = restAmount;
+		this.repetitionPenalty = 1.5;
 		keySignature = keySig;
 		trainNetwork(corpusFolderName, network);
+	}
+	
+	public void composeNBars(String outputFilename, int n) {
+		MidiWriter mw = new MidiWriter();
+		int[] scale = getScaleMidiKeys(keySignature);
+		int tonic = scale[0];
+		ArrayList<Node> alreadyChosen = new ArrayList<>();
+		ArrayList<Node> composition = new ArrayList<>();
+		
+		int lengthToEnd = 64*n;
+		int distanceToEndOfBar = 63;
+		int distanceFromRest = 0;
+		
+		Node currentNode = network.getTonic();
+		writeNodeToMidi(currentNode, mw, tonic, scale);
+		lengthToEnd -= decodeDuration(currentNode.noteDuration);
+		distanceToEndOfBar = (distanceToEndOfBar - decodeDuration(currentNode.noteDuration))%64;
+		
+		while(lengthToEnd > 0) {
+			ArrayList<Node> choices = network.deduceBestNextNodes(currentNode, choicesToCompare, composition);
+			
+			Node bestNode = choices.get(0);
+			ArrayList<Node> nGram = getMostRecentNGram(composition, nGramLength);
+			double bestWeight = weightNodeInCurrentComposition(bestNode, nGram, alreadyChosen, distanceToEndOfBar, distanceFromRest);
+			for(Node choice : choices) {
+				double choiceWeight = weightNodeInCurrentComposition(choice, nGram, alreadyChosen, distanceToEndOfBar, distanceFromRest);
+				if(choiceWeight > bestWeight) {
+					bestWeight = choiceWeight;
+					bestNode = choice;
+				}
+			}
+			
+			boolean foundEquivalentNode = false;
+			for(Node nodeInComposition : alreadyChosen) {
+				if(nodeInComposition.equivalentNodes(bestNode)) {
+					nodeInComposition.timesPlayed++;
+					foundEquivalentNode = true;
+				}
+			}
+			
+			if(!foundEquivalentNode) {
+				for(Node nodeInComposition : alreadyChosen) {
+					nodeInComposition.timesPlayed--;
+				}
+				bestNode.timesPlayed += 1;
+				alreadyChosen.add(bestNode);
+			}
+			
+			if(writeNodeToMidi(bestNode, mw, tonic, scale, lengthToEnd)) {
+				distanceFromRest++;
+			} else {
+				distanceFromRest = 0;
+			}
+			
+			currentNode = bestNode;
+			lengthToEnd -= decodeDuration(currentNode.noteDuration);
+			distanceToEndOfBar = (distanceToEndOfBar - decodeDuration(currentNode.noteDuration))%64;
+		}
+		writeMidi(mw, outputFilename);
 	}
 	
 	public void composeMelody(String outputFilename, int lengthInNotes) {
@@ -66,7 +132,7 @@ public class Composer {
 		int distanceFromRest = 0;
 
 		for(int i = 0; i < lengthInNotes; i++) {
-			alreadyChosen.add(currentNode);
+			
 			if(alreadyChosen.size() > nGramLength * 5)
 				alreadyChosen.remove(0);
 			
@@ -75,10 +141,19 @@ public class Composer {
 			
 			Node nextNode = getBestSelection(distanceToEndOfBar, distanceFromRest, nGram, choices);
 			
-			if(writeNodeToMidi(nextNode, mw, midiOffset, scale))
-				distanceFromRest = 0;
-			else
-				distanceFromRest++;
+			if(constructiveRests) {
+				if(writeNodeToMidi(nextNode, mw, midiOffset, scale))
+					distanceFromRest = 0;
+				else
+					distanceFromRest++;
+			} else {
+				if (distanceFromRest < restAmount) {
+					writeNodeToMidi(nextNode, mw, midiOffset, scale);
+					distanceFromRest++;
+				} else {
+					distanceFromRest = restAmount - random.nextInt(2*restAmount);
+				}
+			}
 			
 			int duration = decodeDuration(nextNode.noteDuration);
 			distanceToEndOfBar = (distanceToEndOfBar - duration) % 16;
@@ -109,6 +184,27 @@ public class Composer {
 		}	
 	}
 	
+	private boolean writeNodeToMidi(Node node, MidiWriter mw, int midiOffset, int[] scale, int lengthTillEnd) {
+		int duration = decodeDuration(node.noteDuration);
+		if(duration > lengthTillEnd)
+			duration = lengthTillEnd;
+		int midiKey = getTransposedScaleDegree(node.scaleDegree+midiOffset, scale);
+		int velocity = smoothVelocity(node.velocity);
+		
+		if(isRest(node)){
+			if (duration < 8) {
+				duration = 8;
+				node.noteDuration = "1/8";
+			}
+			mw.addRest(duration);
+			return true;
+		} 
+		else{
+			mw.noteOnOffNow(duration, midiKey, velocity);
+			return false;
+		}	
+	}
+	
 	private ArrayList<Node> getMostRecentNGram(ArrayList<Node> melodySoFar, int n){
 		ArrayList<Node> nGram = new ArrayList<>();
 		int bound = Math.min(n, melodySoFar.size());
@@ -125,6 +221,37 @@ public class Composer {
 		} catch(Exception e) {
 			System.out.println("Error writing to output file: " + fileName + "\nError Message: " + e.getMessage());
 		}
+	}
+	
+	private double weightNodeInCurrentComposition(Node node, ArrayList<Node> nGram, ArrayList<Node> nodesInComposition, int distanceToEndOfBar, int distanceFromRest) {
+		double weight = 0.0;
+		for(String scaleDegreeNGram : getScaleDegreeNGramKeys(nGram, node)) {
+			weight += (intervalWeight * analyzer.getScaleDegreeNGramProbability(scaleDegreeNGram));
+		}
+		
+		for(String noteNameNGram : getNoteNameNGramKeys(nGram, node)) {
+			weight += (intervalWeight * analyzer.getNoteNameNGramProbability(noteNameNGram));
+		}
+		
+		for(String durationNGram : getDurationNGramStrings(nGram, node)) {
+			weight += (durationWeight * analyzer.getDurationNGramProbability(durationNGram));
+		}
+		
+		for(Node alreadyPlayed : nodesInComposition) {
+			if(alreadyPlayed.equivalentNodes(node))
+				weight -= repetitionPenalty*alreadyPlayed.timesPlayed;
+		}
+		
+		if(distanceToEndOfBar == 63 && isRest(node))
+			weight -= 20;
+		if(distanceFromRest < restAmount && isRest(node))
+			weight -= 20;
+		
+		int duration = decodeDuration(node.noteDuration);
+		if(distanceToEndOfBar - duration == 0) {
+			weight += syncopationWeight;
+		}
+		return weight;
 	}
 	
 	private Node getBestSelection(int distanceToEndOfBar, int distanceFromRest, ArrayList<Node> nGram, ArrayList<Node> choices) {
@@ -208,58 +335,6 @@ public class Composer {
 		return nGrams;
 	}
 	
-	
-	public void composeMelody(String outputFilename, int lengthInNotes, boolean major) {
-		Node startNode = network.getTonic();
-		MidiWriter mw = new MidiWriter();
-		
-		int[] scale;
-		if(major)
-			scale = CMAJOR;
-		else
-			scale = AMINOR;
-		
-		int midiOffset = scale[0]; // This ensures that the notes are being played relative to the correct tonic
-		
-		mw.noteOnOffNow(8, startNode.scaleDegree+midiOffset, 120);
-		
-		ArrayList<Node> alreadyChosen = new ArrayList<Node>();	// I maintain a list of previous choices to avoid repetition
-		Node currentNode = startNode;
-		for(int i = 0; i < lengthInNotes; i++) {
-			alreadyChosen.add(currentNode);
-			if(alreadyChosen.size() > network.size/2)
-				alreadyChosen.remove(0);
-			
-			if(currentNode.linkedNodes.size() > 0) {
-				Node nextNode = network.deduceNextNode(currentNode, new ArrayList<>(), alreadyChosen);
-				
-				int duration = decodeDuration(nextNode.noteDuration);
-				if(isRest(nextNode)){
-					mw.addRest(duration);
-				} 
-				else{
-					int midiKey = getTransposedScaleDegree(nextNode.scaleDegree+midiOffset, scale);
-					int velocity = smoothVelocity(nextNode.velocity);
-					mw.noteOnOffNow(duration, midiKey, velocity);
-				}				
-				currentNode = nextNode;
-			}
-			else {
-				currentNode = network.getTonic(3);
-			}
-		}
-		
-		currentNode = network.getTonic();
-		mw.noteOnOffNow(16, startNode.scaleDegree+midiOffset, 120);
-		
-		try {
-			mw.writeToFile(outputFilename);
-		}catch(Exception e) {
-			System.out.println("Error writing to output file: " + outputFilename + "\nError Message: " + e.getMessage());
-		}
-			
-	}
-	
 	private boolean isRest(Node note) {
 		return note.noteName == "Rest";
 	}
@@ -274,7 +349,7 @@ public class Composer {
 			for(File midiFile : folder.listFiles()) {
 				if(midiFile.getName().startsWith("."))
 					continue;
-				for(ArrayList<Node> channel : reader.readSequence(midiFile, nGramLength, true)) {
+				for(ArrayList<Node> channel : reader.readSequence(midiFile, nGramLength, constructiveRests, 16)) {
 					for(Node note : channel) {
 						note.artist = folder.getName();
 						note.song = midiFile.getName();

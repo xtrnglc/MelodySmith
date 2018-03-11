@@ -38,7 +38,10 @@ public class CorpusAnalyzer {
 			}
 			for(String note2Name : noteNameVocab.keySet()) {
 				String key = noteName+","+note2Name;
-				bigramProbabilities.put(key, bigramProbabilities.get(key)/total);
+				if(total == 0)
+					bigramProbabilities.put(key, 0.0);
+				else
+					bigramProbabilities.put(key, bigramProbabilities.get(key)/total);
 			}
 		}
 		return bigramProbabilities;
