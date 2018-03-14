@@ -49,6 +49,8 @@ void InfluencesListBoxModel::generateArtistFileMap()
 	if (curr_artist_filename_tuples == nullptr)
 		return;
 
+	artists_to_influences->clear();
+
 	for (int i = 0; i < curr_artist_filename_tuples->size(); i++)
 	{
 		//If artist does not exist create a mapping

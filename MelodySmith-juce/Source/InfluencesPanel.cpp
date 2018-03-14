@@ -46,7 +46,7 @@ void InfluencesPanel::resized()
 
 void InfluencesPanel::visibilityChanged()
 {
+	managePanel->buttonClicked(&(managePanel->saveSongsBtn));
 	influencesListBox.generateArtistFileMap();
 	influencesListBox.updateContent();
-	managePanel->buttonClicked(&(managePanel->saveSongsBtn));
 }

@@ -14,6 +14,8 @@
 #include <ShellApi.h>
 #include <sstream>
 #include <thread>
+#include "ForgeTask.h"
+
 
 
 
@@ -257,8 +259,8 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		double creativity = basicParamsPanel.creativityWeightSlider.getValue();
 		double speed = basicParamsPanel.invervalWeightSlider.getValue() * 10;
 		String clParamsStr = "\"" + keyValue + "\" " + String(rhythmicImportance) + " " + String(melodicImportance) +
-			" " + "\"" + restType + "\" " + String(restAmount) + " " + String(syncopation) + " x" + String(phraseLength) + " "
-			+ String(creativity) + " " + String(speed) + " ";
+			" " + "\"" + restType + "\" " + String(restAmount) + " " + String(syncopation) + " " +  String(phraseLength) + " "
+			+ String(creativity) + " " + String(speed) + " phrased " ;
 		
 		//Create master directory
 		File f(melodysmithDirPath + "artists");
@@ -307,11 +309,19 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		String clStr = " -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
 
 		//String javaExePath = "\"" + melodysmithDirPath + "java.exe" + "\"";
-		String javaExePath = "java";
+		//String javaExePath = "java";
+		String javaExePath = "C:\\jre1.8.0_121\\bin\\java.exe";
 
-		if (platform.contains("windows"))
-		{
-			STARTUPINFO si;
+		//system(String(javaExePath + clStr + "& pause").toStdString().c_str());
+
+		/*if (platform.contains("windows"))
+		{*/
+			ForgeTask forgeTask;
+			forgeTask.clStr = clStr;
+			//f.javaExePath = javaExePath;
+			forgeTask.runThread();
+
+			/*STARTUPINFO si;
 			PROCESS_INFORMATION pi;
 
 			ZeroMemory(&si, sizeof(si));
@@ -356,12 +366,12 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 			progressBar.setVisible(false);
 			}
 			);*/
-		}
+		/*}
 		else if (platform.contains("mac"))
 		{
 			String fullClStr = javaExePath + clStr;
 			system(fullClStr.toStdString().c_str());
-		}
+		}*/
 
 		//return 0;
 		//FreeConsole();
