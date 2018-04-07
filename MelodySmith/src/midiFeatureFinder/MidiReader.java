@@ -46,6 +46,7 @@ public class MidiReader {
 	private long[] lastTickOfChannel;
 	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
+	public ArrayList<Node> lastOutputComposition = new ArrayList<Node>();
 	
 	public ArrayList<Integer> lowestTonicOctave = new ArrayList<Integer>();
 
