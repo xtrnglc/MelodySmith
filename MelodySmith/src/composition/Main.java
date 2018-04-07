@@ -11,7 +11,7 @@ public class Main {
 	static int[] AMINOR = {57, 59, 60, 62, 64, 65, 67, 69};
 	
 	public static void main(String[] args) {
-		composeLocalCorpus();
+		//composeLocalCorpus();
 		
 		try {
 		String corpusFolder = args[0];
@@ -62,9 +62,10 @@ public class Main {
 		artistWeights.put("simple", 1.0);
 		artistWeights.put("folkSongs", 2.0);
 		artistWeights.put("fourBarLoops", 1.0);
-		Composer composer = new Composer("corpus3", "cMajor", 0.00001, 0.0001, "CONSTRUCTIVE", 1, 5, 25, 10, 10, artistWeights);
+		artistWeights.put("folkMelodies", 1.0);
+		Composer composer = new Composer("corpus4", "cMajor", 0.001, 0.01, "CONSTRUCTIVE", 5, 100, 25, 20, 10, artistWeights);
 		
-		//composer.composeMelody("output.mid", 100);
+		composer.composeMelody("output.mid", 100);
 		composer.composeNBars("fourBars.mid", 4);
 		composer.composeNBars("sixteenBars.mid", 16);
 		composer.composeNBars("sixtyFourBars.mid", 64);

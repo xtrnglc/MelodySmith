@@ -114,6 +114,7 @@ public class Composer {
 			lengthToEnd -= decodeDuration(currentNode.noteDuration);
 			distanceToEndOfBar = (distanceToEndOfBar - decodeDuration(currentNode.noteDuration))%64;
 		}
+		reader.lastOutputComposition = composition;
 		writeMidi(mw, outputFilename);
 	}
 	
@@ -127,12 +128,13 @@ public class Composer {
 		mw.noteOnOffNow(decodeDuration(startNode.noteDuration), startNode.scaleDegree+midiOffset, smoothVelocity(startNode.velocity));
 		
 		ArrayList<Node> alreadyChosen = new ArrayList<Node>();	// I maintain a list of previous choices to avoid repetition
+		ArrayList<Node> composition = new ArrayList<Node>();
 		Node currentNode = startNode;
 		int distanceToEndOfBar = 15;
 		int distanceFromRest = 0;
 
 		for(int i = 0; i < lengthInNotes; i++) {
-			
+			composition.add(currentNode);
 			if(alreadyChosen.size() > nGramLength * 5)
 				alreadyChosen.remove(0);
 			
@@ -159,7 +161,8 @@ public class Composer {
 			distanceToEndOfBar = (distanceToEndOfBar - duration) % 16;
 			currentNode = nextNode;
 		}
-		
+		composition.add(currentNode);
+		reader.lastOutputComposition = composition;
 		writeMidi(mw, outputFilename);
 	}
 	
