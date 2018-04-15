@@ -302,7 +302,9 @@ public class MidiReader {
 						notes.put(lastTickOfChannel[sMessage.getChannel()], new ArrayList<Node>());
 					}
 					
-					notes.get(lastTickOfChannel[sMessage.getChannel()]).add(n);
+					if (n.tickDuration >= 5) {
+						notes.get(lastTickOfChannel[sMessage.getChannel()]).add(n);
+					}
 					lastTickOfChannel[sMessage.getChannel()] = -1;
 				}
 				
@@ -648,9 +650,113 @@ public class MidiReader {
 		}
 		
 		return ret;
+	}
+	
+	public ArrayList<Phrase> stitchOutputByBar() {
+		ArrayList<Phrase> ret = new ArrayList<Phrase>();
+
+		
+		Phrase temp = new Phrase();
+		int bar = 1;
+		for (int i = 0; i < lastOutputComposition.size(); i++) {
+			Node node = lastOutputComposition.get(i);
+			temp.nodes.add(node);
+			if (node.startTick + node.tickDuration >= ticksPerBar * bar) {
+				while (i+1 < lastOutputComposition.size() && node.startTick + node.tickDuration >= lastOutputComposition.get(i+1).startTick + lastOutputComposition.get(i+1).tickDuration) {
+					temp.nodes.add(lastOutputComposition.get(i+1));
+					i++;
+				}
+				
+				long total = ticksPerBar;
+				for (Node n : temp.nodes) {
+					if (total > n.tickDuration) 
+					{
+						total -= n.tickDuration;
+					}
+					else {
+						n.turnOff(n.startTick + total, ticksPerBar / 4);
+					}
+				}
+				
+				bar = (int) ((node.startTick + node.tickDuration) / (ticksPerBar)) + 1;
+				ret.add(temp);
+				temp = new Phrase();
+			}
+		}
+		if (temp.nodes.size() != 0)
+			ret.add(temp);
+		
+		return ret;
 		 
 		 
 	}
+	
+	// Need to add triplet logic and work on notes across bars
+	public String compositionToABCJS() {
+		StringBuilder ret = new StringBuilder();
+		if (lastOutputComposition.size() != 0) {
+			ArrayList<Phrase> temp = stitchOutputByBar();
+			ret.append("X: " + temp.size() + '\n');
+			ret.append("T: Composition\n");
+			ret.append("M: 4/4\n");
+			ret.append("L: 1/4\n");
+			ret.append("Q: 1/4=120\n");
+			ret.append("K: C\n");
+			for (int i = 0; i < temp.size(); i++) {
+				Phrase phrase = temp.get(i);
+				
+				ret.append("|");
+				for (Node node : phrase.nodes) {
+					if (node.noteName.contains("#")) {
+						ret.append("^");
+					}
+					else if (node.noteName.contains("b")) {
+						ret.append("_");
+					}
+					
+					if (node.key != -1) 
+					{
+						ret.append(node.noteName.substring(0, 1));
+						if (node.octave > 4) {
+							for (int k = 0; k < node.octave - 4; k++) {
+								ret.append("'");
+							}
+						}
+						else if (node.octave < 4) {
+							for (int k = 0; k < 4 - node.octave; k++) {
+								ret.append(",");
+							}
+						}
+					}
+					else {
+						ret.append(" z");
+					}
+					
+					if (node.noteDuration.contains("32")) {
+						ret.append("/8");
+					}
+					else if (node.noteDuration.contains("16")) {
+						ret.append("/4");
+					}
+					else if (node.noteDuration.contains("8")) {
+						ret.append("/2");
+					}
+					else if (node.noteDuration.contains("/4")) {
+						ret.append("1");
+					}
+					else if (node.noteDuration.contains("/2")) {
+						ret.append("2");
+					}
+					else {
+						ret.append("4");
+					}
+				}
+			}
+			ret.append("|");
+		}
+		return ret.toString();
+	}
+
 	
 //	public ArrayList<ArrayList<Phrase>> stitchPhraseByRythmicCadence(ArrayList<ArrayList<Node>> input) {
 //		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
