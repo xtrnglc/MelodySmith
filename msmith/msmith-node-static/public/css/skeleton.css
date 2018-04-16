@@ -1139,7 +1139,7 @@ footer a {
 }
 .tooltip:after {
   border-right: 6px solid transparent;
-  border-bottom: 6px solid rgba(0,0,0,.75);
+
   border-left: 6px solid transparent;
   content: '';
   height: 0;
@@ -1330,12 +1330,10 @@ footer a {
   60% {height: 5px; background:#05B8CC}
 }
 
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
-@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 section {
   display: none;
   padding: 20px 0 0;
-  border-top: 1px solid #ddd;
+
 }
 input {
   display: none;
@@ -1344,25 +1342,30 @@ label {
   display: inline-block;
   margin: 0 0 -1px;
   padding: 2px 22px;
+  font-size: 12px;
   text-align: center;
-  color: whitesmoke;
+  color: #bbb;
   border: 1px solid transparent;
 }
 label:before {
-  font-family: fontawesome;
   font-weight: normal;
   margin-right: 10px;
 }
 label:hover {
-  color: #bbb;
+  color: whitesmoke;
   cursor: pointer;
 }
 input:checked + label {
-  color: #bbb;
+  color: whitesmoke;
 }
 #tab1:checked ~ #content1, #tab2:checked ~ #content2, #tab3:checked ~ #content3, #tab4:checked ~ #content4 {
   display: block;
 }
+
+#vis-tab1:checked ~ #vis-content1, #vis-tab2:checked ~ #vis-content2, #vis-tab3:checked ~ #vis-content3,  #vis-tab4:checked ~ #vis-content4{
+  display: block;
+}
+
 @media screen and (max-width: 650px) {
   label {
     font-size: 0;

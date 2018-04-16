@@ -9,6 +9,7 @@ import PostsIndex from './components/post_index';
 import PostsNew from './components/post_new';
 import PostShow from './components/post_show';
 import Dashboard from './components/dashboard';
+import Landing from './components/landing'
 
 import promise from 'redux-promise';
 
@@ -20,10 +21,8 @@ ReactDOM.render(
     <BrowserRouter>
       <div>
         <Switch>
-            <Route path="/posts/new" component={PostsNew} />
-            <Route path="/posts/:id" component={PostShow} />
             <Route path="/forge" component={Dashboard} />
-            <Route path="/" component={PostsIndex} />
+            <Route path="/" component={Landing} />
         </Switch>
       </div>
     </BrowserRouter>
