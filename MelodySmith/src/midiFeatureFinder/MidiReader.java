@@ -694,6 +694,10 @@ public class MidiReader {
 	// Need to add triplet logic and work on notes across bars
 	public String compositionToABCJS() {
 		StringBuilder ret = new StringBuilder();
+		int barCount = 0;
+		String lastDuration = "placeholder";
+		int lastDurationCount = 0;
+		
 		if (lastOutputComposition.size() != 0) {
 			ArrayList<Phrase> temp = stitchOutputByBar();
 			ret.append("X: " + temp.size() + '\n');
@@ -706,6 +710,16 @@ public class MidiReader {
 				Phrase phrase = temp.get(i);
 				
 				ret.append("|");
+				
+				barCount++;
+				if (barCount >= 4) {
+					ret.append('\n');
+					barCount = 0;
+				}
+				
+				lastDuration = "placeholder";
+				lastDurationCount = 0;
+				
 				for (Node node : phrase.nodes) {
 					if (node.noteName.contains("#")) {
 						ret.append("^");
@@ -713,6 +727,7 @@ public class MidiReader {
 					else if (node.noteName.contains("b")) {
 						ret.append("_");
 					}
+					
 					
 					if (node.key != -1) 
 					{
@@ -732,24 +747,50 @@ public class MidiReader {
 						ret.append(" z");
 					}
 					
+					String durationString = "";
+					
 					if (node.noteDuration.contains("32")) {
-						ret.append("/8");
+						durationString = "/8";
 					}
 					else if (node.noteDuration.contains("16")) {
-						ret.append("/4");
+						durationString = "/4";
 					}
 					else if (node.noteDuration.contains("8")) {
-						ret.append("/2");
+						durationString = "/2";
 					}
 					else if (node.noteDuration.contains("/4")) {
-						ret.append("1");
+						durationString = "1";
 					}
 					else if (node.noteDuration.contains("/2")) {
-						ret.append("2");
+						durationString = "2";
 					}
 					else {
-						ret.append("4");
+						durationString = "4";
 					}
+					
+
+					ret.append(durationString);
+					
+					if (lastDuration != "") 
+					{
+						if (lastDuration == "placeholder") {
+							lastDurationCount = 0;
+							lastDuration = durationString;
+						}
+						else if (!durationString.equals(lastDuration)) {
+							lastDurationCount = 0;
+							lastDuration = durationString;
+						}		
+						else {
+							lastDurationCount++;
+							if (lastDurationCount == 3) {
+								lastDuration = "placeholder";
+								lastDurationCount = 0;
+								ret.append(" ");
+							}
+						}
+					}
+					
 				}
 			}
 			ret.append("|");
