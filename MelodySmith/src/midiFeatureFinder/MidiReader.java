@@ -46,7 +46,6 @@ public class MidiReader {
 	private long[] lastTickOfChannel;
 	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
-	public ArrayList<Node> lastOutputComposition = new ArrayList<Node>();
 	
 	public ArrayList<Integer> lowestTonicOctave = new ArrayList<Integer>();
 
@@ -221,6 +220,18 @@ public class MidiReader {
 			return getOrderedNotes();
 		else
 			return getOrderedNotesWithoutRests();
+	}
+	
+	public String readSequenceForABCJS(File midiFile, int markovLength, boolean withRests, int scaleDegreeSize) {
+		ArrayList<ArrayList<Node>> temp = this.readSequence(midiFile, markovLength, withRests, scaleDegreeSize);
+		String ret = "";
+		for (ArrayList<Node> channel : temp) {
+			if (!channel.isEmpty()) {
+				ret = compositionToABCJS(channel);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -652,7 +663,7 @@ public class MidiReader {
 		return ret;
 	}
 	
-	public ArrayList<Phrase> stitchOutputByBar() {
+	public ArrayList<Phrase> stitchOutputByBar(ArrayList<Node> lastOutputComposition) {
 		ArrayList<Phrase> ret = new ArrayList<Phrase>();
 
 		
@@ -691,15 +702,14 @@ public class MidiReader {
 		 
 	}
 	
-	// Need to add triplet logic and work on notes across bars
-	public String compositionToABCJS() {
+	public String compositionToABCJS(ArrayList<Node> lastOutputComposition) {
 		StringBuilder ret = new StringBuilder();
 		int barCount = 0;
 		String lastDuration = "placeholder";
 		int lastDurationCount = 0;
 		
 		if (lastOutputComposition.size() != 0) {
-			ArrayList<Phrase> temp = stitchOutputByBar();
+			ArrayList<Phrase> temp = stitchOutputByBar(lastOutputComposition);
 			ret.append("X: " + temp.size() + '\n');
 			ret.append("T: Composition\n");
 			ret.append("M: 4/4\n");
@@ -733,11 +743,21 @@ public class MidiReader {
 					{
 						ret.append(node.noteName.substring(0, 1));
 						if (node.octave > 4) {
-							for (int k = 0; k < node.octave - 4; k++) {
+							int octaveDiff = 2;
+							if ((node.octave - 4) < octaveDiff) {
+								octaveDiff = node.octave - 4;
+							}
+							
+							for (int k = 0; k < octaveDiff; k++) {
 								ret.append("'");
 							}
 						}
 						else if (node.octave < 4) {
+							int octaveDiff = 2;
+							if ((4 - node.octave) < octaveDiff) {
+								octaveDiff = 4 - node.octave;
+							}
+							
 							for (int k = 0; k < 4 - node.octave; k++) {
 								ret.append(",");
 							}
@@ -797,6 +817,8 @@ public class MidiReader {
 		}
 		return ret.toString();
 	}
+	
+	
 
 	
 //	public ArrayList<ArrayList<Phrase>> stitchPhraseByRythmicCadence(ArrayList<ArrayList<Node>> input) {

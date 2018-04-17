@@ -10,17 +10,13 @@ public class Main {
 		// TODO Auto-generated method stub
 		CorpusAnalyzer c = new CorpusAnalyzer();
 		MidiReader r = new MidiReader(c);
-		r.readSequenceRaw(new File("output(1).mid"));
-		ArrayList<ArrayList<Node>> test = r.readSequence(new File("output(1).mid"), 5, true, 8);
+		r.readSequenceRaw(new File("output(2).mid"));
+		ArrayList<ArrayList<Node>> test = r.readSequence(new File("output(2).mid"), 5, true, 8);
 		ArrayList<ArrayList<Phrase>> temp = r.stitchPhraseByRests(test, "1/4");
 		ArrayList<ArrayList<Phrase>> temp1 = r.stitchPhraseByTonic(test);
-		for (ArrayList<Node> channel : test) {
-			if (!channel.isEmpty()) {
-				r.lastOutputComposition = channel;
-			}
-		}
+
 		
-		System.out.print(r.compositionToABCJS());
+		System.out.print(r.readSequenceForABCJS(new File("output(2).mid"), 5, true, 8));
 		
 		System.out.println();
 	}
