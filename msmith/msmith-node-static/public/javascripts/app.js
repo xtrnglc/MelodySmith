@@ -23,13 +23,7 @@ var bigrams;
 var corpus = 'corpus1';
 var width;
 var created = false;
-var abcString = 'X: 8\n' +
-    'T: Composition\n' +
-    'M: 4/4\n' +
-    'L: 1/4\n' +
-    'Q: 1/4=120\n' +
-    'K: C\n' +
-    '|D\'/4|C\'/4D\'/4|C\'/4D\'/4C\'/4D\'/4|C\'/4D\'/4C\'/4D\'/4|C\'/4D\'/4C\'/4D\'/4|C\'/4D\'/4E\'/4D\'/4E\'/4D\'/4E\'/4D\'/4E\'/4D\'/4E,/4D\'/4E,/4D\'/4^G,/4D\'/4^G,/4D\'/4^G,/4D\'/4^G,/4D\'/4D/4C/4^G/4F/4^G/4F/4^G/4D/4C/4^G/4C/4D\'/4C/4D\'/4^C\'/4D\'/4^C\'/4|D\'/4^C\'/2|D\'/4^C\'/2D\'/2^C\'/2D\'/2^C\'/2D\'/2^C\'/2D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4^C\'/4D\'/4E\'/4D\'/4E\'/4D\'/4E\'/4D\'/4|\n';
+var abcString = '';
 var cooleys = 'X:1\nT: Cooley\'s\nM: 4/4\nL: 1/8\nR: reel\nK: Emin\nD2|:"Em"EB{c}BA B2 EB|~B2 AB dBAG|"D"FDAD BDAD|FDAD dAFD|\n"Em"EBBA B2 EB|B2 AB defg|"D"afe^c dBAF|1"Em"DEFD E2 D2:|2"Em"DEFD E2 gf||\n|:"Em"eB B2 efge|eB B2 gedB|"D"A2 FA DAFA|A2 FA defg|\n"Em"eB B2 eBgB|eB B2 defg|"D"afe^c dBAF|1"Em"DEFD E2 gf:|2"Em"DEFD E4|]\n';
 
 
@@ -108,6 +102,7 @@ var changeNumComparisons = function(newVal) {
 
 var toggleMusicSheet = function(val) {
     if(val) {
+        ABCJS.renderAbc('notation', abcString, { add_classes: true });
         document.getElementById('vis-content4').style.display = 'block';
         document.getElementById('outputblock').style.display = 'none';
         document.getElementById('bigramvisualization').style.display = 'none';
@@ -117,6 +112,7 @@ var toggleMusicSheet = function(val) {
         document.getElementById('vis-content4').style.height = h;
         document.getElementById('vis-content4').style.width = w;
         document.getElementById('vis-content4').style.backgroundColor = '#FFFFFF';
+        document.getElementById('vis-content4').style.borderRadius = '5px';
 
         // var line0 = document.getElementById('notation').getElementsByClassName('abcjs-l0');
         // document.getElementById('notation').getElementsByClassName('abcjs-title')[0].setAttribute("fill", "#FFFFFF");
@@ -421,6 +417,7 @@ var initiatePlayer = function(data, instrumentVal) {
         //$scope.updateTransitionMatrix(bigrams);
         //angular.injector(['ng', 'myApp']).get("utils").setHash(bigrams);
         fillBiGrams(bigrams);
+        toggleMusicSheet(false);
     });
 }
 
@@ -810,27 +807,24 @@ myApp.directive('stDiagram', function($compile) {
                         return 'translate(' + p.array() + ') scale(' + s(t) + ')';
                     };
                 })
-                .transition().duration(+scope.duration * 0.5)
-                .ease('linear')
                 .attrTween('transform', function() {
-                    var l = path.getTotalLength();
+                    //var l = path.getTotalLength();
                     return function(t) {
-                        var p = path.getPointAtLength(t * l);
-                        return 'translate(' + [p.x, p.y] + ') scale(1)';
+                        // var p = path.getPointAtLength(t * l);
+                        // return 'translate(' + [p.x, p.y] + ') scale(1)';
                     };
                 })
                 .transition().duration(+scope.duration * 0.25)
-                .ease('bounce-in')
                 .attrTween('transform', function() {
-                    var m = d3.transform(d3.select(this).attr('transform'));
-                    var translation = vector.apply(null, m.translate);
-                    var scale = m.scale;
-                    var s = d3.interpolateArray(scale, [2, 2]);
-                    return function(t) {
-                        var end = vector(next.x, next.y);
-                        var p = translation.add(end.sub(translation).scale(t));
-                        return 'translate(' + p.array() + ') scale(' + s(t) + ')';
-                    };
+                    // var m = d3.transform(d3.select(this).attr('transform'));
+                    // var translation = vector.apply(null, m.translate);
+                    // var scale = m.scale;
+                    // var s = d3.interpolateArray(scale, [2, 2]);
+                    // return function(t) {
+                    //     var end = vector(next.x, next.y);
+                    //     var p = translation.add(end.sub(translation).scale(t));
+                    //     return 'translate(' + p.array() + ') scale(' + s(t) + ')';
+                    // };
                 })
                 .each('end', function() {
                     loop();

@@ -350,7 +350,7 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
             <input id="vis-tab3" type="radio" name="vistabs" onclick="toggleMusicSheet(false);">
             <label for="vis-tab3">Piano Roll Static</label>
 
-            <input id="vis-tab4" type="radio" name="vistabs" onclick="if(!created) {ABCJS.renderAbc('notation', abcString, { add_classes: true }); created = true;}; toggleMusicSheet(true);return false;">
+            <input id="vis-tab4" type="radio" name="vistabs" onclick="if(!created) { created = true;}; toggleMusicSheet(true);return false;">
             <label for="vis-tab4">Music Sheet</label>
 
 
@@ -368,7 +368,6 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
 
             <section  style="margin-top: 0%;" id="vis-content3">
                 <div id="outputblock">
-                    <h6 style="color: whitesmoke;">Output</h6>
                     <div style=" width: 960px; overflow: auto;">
 
                         <div id="canvasblock">

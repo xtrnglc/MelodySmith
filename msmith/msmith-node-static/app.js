@@ -124,7 +124,6 @@ app.get('/getmidi', function(req, res) {
         }
         if(data.toString().includes('JS') && !data.toString().startsWith('{')){
             var abcString = data.toString();
-            console.log(abcString);
             var filename = 'output.mid';
 
             const Datauri = require('datauri').sync;
@@ -134,6 +133,8 @@ app.get('/getmidi', function(req, res) {
                 datauri: Datauri(filename),
                 abcString: abcString.substr(3)
             };
+            console.log(abcString);
+
 
             console.log('sending');
             res.send(response);
