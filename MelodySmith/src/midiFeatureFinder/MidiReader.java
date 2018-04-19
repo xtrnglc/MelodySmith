@@ -43,7 +43,8 @@ public class MidiReader {
 	private String trackName;
 	private int ticksPerQuarterNote = 0;
 	private int ticksPerBar = 0;
-	private long[] lastTickOfChannel;
+	private long[] lastTickPlayedInChannelForRest;
+	private long[] highestTickOfChannel;
 	public boolean isPPQ = false;	
 	public CorpusAnalyzer analyzer;
 	
@@ -159,8 +160,9 @@ public class MidiReader {
 	public ArrayList<ArrayList<Node>> readSequence(File midiFile, int markovLength, boolean withRests, int scaleDegreeSize) {
 		try {
 			// Rest Logic
-			lastTickOfChannel = new long[maxChannels];
+			lastTickPlayedInChannelForRest = new long[maxChannels];
 			Hashtable<Integer, ArrayList<Node>> currentNotes = getCurrentNotes();
+			highestTickOfChannel = new long[maxChannels];
 			
 			
 			// Reset the fields
@@ -206,7 +208,7 @@ public class MidiReader {
 			if (markovLength > 0) {
 				recordIntervals(markovLength, withRests, scaleDegreeSize);
 			}
-
+			
 		} catch (InvalidMidiDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -291,32 +293,45 @@ public class MidiReader {
 		MidiEvent event = track.get(i);
 		long currentTick = -1;
 		MidiMessage message = event.getMessage();
+		
 		if (message instanceof ShortMessage) {
 			ShortMessage sMessage = (ShortMessage) message;
 
 			LinkedHashMap<Long, ArrayList<Node>> notes = unorderedNotes.get(sMessage.getChannel());
 
 			int key = sMessage.getData1();
+		
 			int velocity = sMessage.getData2();
+			
+			if (event.getTick() < highestTickOfChannel[sMessage.getChannel()]) {
+				return currentNotes;
+			}
+			else {
+				highestTickOfChannel[sMessage.getChannel()] = event.getTick();
+			}
+			
+			if (key==255) {
+				return currentNotes;
+			}
 
 			if (sMessage.getCommand() == NOTE_ON && velocity != 0) {
 				// Rest Logic
-				if (lastTickOfChannel[sMessage.getChannel()] == event.getTick()) {
-					lastTickOfChannel[sMessage.getChannel()] = -1;
+				if (lastTickPlayedInChannelForRest[sMessage.getChannel()] == event.getTick()) {
+					lastTickPlayedInChannelForRest[sMessage.getChannel()] = -1;
 				}
-				else if (lastTickOfChannel[sMessage.getChannel()] != -1 && lastTickOfChannel[sMessage.getChannel()] != event.getTick() ) {
-					Node n = new Node(sMessage.getChannel(), lastTickOfChannel[sMessage.getChannel()], trackName,
+				else if (lastTickPlayedInChannelForRest[sMessage.getChannel()] != -1 && lastTickPlayedInChannelForRest[sMessage.getChannel()] != event.getTick() ) {
+					Node n = new Node(sMessage.getChannel(), lastTickPlayedInChannelForRest[sMessage.getChannel()], trackName,
 							currentInstrument, currentKey, currentTime, currentBPM);
 					n.turnOff(event.getTick(), ticksPerQuarterNote);
 					
-					if (notes.get(lastTickOfChannel[sMessage.getChannel()]) == null) {
-						notes.put(lastTickOfChannel[sMessage.getChannel()], new ArrayList<Node>());
+					if (notes.get(lastTickPlayedInChannelForRest[sMessage.getChannel()]) == null) {
+						notes.put(lastTickPlayedInChannelForRest[sMessage.getChannel()], new ArrayList<Node>());
 					}
 					
 					if (n.tickDuration >= 5) {
-						notes.get(lastTickOfChannel[sMessage.getChannel()]).add(n);
+						notes.get(lastTickPlayedInChannelForRest[sMessage.getChannel()]).add(n);
 					}
-					lastTickOfChannel[sMessage.getChannel()] = -1;
+					lastTickPlayedInChannelForRest[sMessage.getChannel()] = -1;
 				}
 				
 				Node n = new Node(key, velocity, sMessage.getChannel(), event.getTick(), trackName,
@@ -349,8 +364,8 @@ public class MidiReader {
 						n = channelNotes.remove(k);
 						
 						// Rest Logic
-						if (channelNotes.size() == 0 && lastTickOfChannel[sMessage.getChannel()] == -1) {
-							lastTickOfChannel[sMessage.getChannel()] = event.getTick();
+						if (channelNotes.size() == 0 && lastTickPlayedInChannelForRest[sMessage.getChannel()] == -1) {
+							lastTickPlayedInChannelForRest[sMessage.getChannel()] = event.getTick();
 						}
 
 						break;
@@ -386,14 +401,13 @@ public class MidiReader {
 				System.out.println("Track Number: " + trackNum + " size: " + track.size());
 				for (int i = 0; i < track.size(); i++) {
 					MidiEvent event = track.get(i);
+					
 					System.out.print(event.getTick() + ", ");
 					MidiMessage message = event.getMessage();
 
 					if (message instanceof ShortMessage) {
 						processShortMessage((ShortMessage) message);
 					} else if (message instanceof MetaMessage) {
-						// writer.println(processMetaMessage((MetaMessage)
-						// message, microToTickRatio));
 						processMetaMessage((MetaMessage) message);
 					}
 				}

@@ -10,8 +10,8 @@ public class Main {
 		// TODO Auto-generated method stub
 		CorpusAnalyzer c = new CorpusAnalyzer();
 		MidiReader r = new MidiReader(c);
-		r.readSequenceRaw(new File("output(2).mid"));
-		ArrayList<ArrayList<Node>> test = r.readSequence(new File("output(2).mid"), 5, true, 8);
+		r.readSequenceRaw(new File("IWantItThatWay.mid"));
+		ArrayList<ArrayList<Node>> test = r.readSequence(new File("IWantItThatWay.mid"), 5, true, 8);
 		ArrayList<ArrayList<Phrase>> temp = r.stitchPhraseByRests(test, "1/4");
 		ArrayList<ArrayList<Phrase>> temp1 = r.stitchPhraseByTonic(test);
 
