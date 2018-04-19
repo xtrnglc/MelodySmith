@@ -728,7 +728,7 @@ public class MidiReader {
 			ret.append("T: Composition\n");
 			ret.append("M: 4/4\n");
 			ret.append("L: 1/4\n");
-			ret.append("Q: 1/4=120\n");
+			//ret.append("Q: 1/4=120\n");
 			ret.append("K: C\n");
 			for (int i = 0; i < temp.size(); i++) {
 				Phrase phrase = temp.get(i);

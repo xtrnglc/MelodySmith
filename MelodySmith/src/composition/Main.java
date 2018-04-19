@@ -17,23 +17,29 @@ public class Main {
 		String corpusFolder = args[0];
 		String outputFileName = args[1];
 		String keySig = args[2];
-		double intervalWeight = Double.parseDouble(args[3])/10000;
-		double durationWeight = Double.parseDouble(args[4])/1000;
+		double intervalWeight = Double.parseDouble(args[3])/100;
+		double durationWeight = Double.parseDouble(args[4])/100;
 		String restType = args[5];
-		int restAmount = 21 - Integer.parseInt(args[6]);
+		int restAmount = 20 - Integer.parseInt(args[6]);
 		int syncopation = Integer.parseInt(args[7]);
 		int phraseLength = Integer.parseInt(args[8]);
 		int creativity = Integer.parseInt(args[9]);
-		int speed = Integer.parseInt(args[10]);
+		int speed = 20-Integer.parseInt(args[10]);
+		boolean extractPhrase = false;
 		String algorithm = args[11];
 
 		
 		HashMap<String, Double> artistWeights = initializeArtists(args, 12);
 		
-		Composer composer = new Composer(corpusFolder, keySig, intervalWeight, durationWeight, restType, restAmount, syncopation, phraseLength, creativity, speed, artistWeights);
+		if(algorithm.toUpperCase().equals("EXTRACT"))
+			extractPhrase = true;
+		
+		Composer composer = new Composer(corpusFolder, keySig, intervalWeight, durationWeight, restType, restAmount, syncopation, phraseLength, creativity, speed, extractPhrase, artistWeights);
 		
 		if(algorithm.toUpperCase().equals("PHRASED"))
 			composer.composeNBars(outputFileName, 16);
+		else if(algorithm.toUpperCase().equals("EXTRACT"))
+			composer.composeWithPhrases(outputFileName, 50);
 		else
 			composer.composeMelody(outputFileName, 500);
 		
@@ -54,7 +60,7 @@ public class Main {
 		HashMap<String, Double> artistWeights = new HashMap<String, Double>();
 		artistWeights.put("bach", 1.0);
 		artistWeights.put("beatles", 92.0);
-		artistWeights.put("blackburn", 5.0);
+		artistWeights.put("blackburn", 1.0);
 		artistWeights.put("beiber", 1.5);
 		artistWeights.put("bass", 7.0);
 		artistWeights.put("lead", 2.0);
@@ -63,12 +69,15 @@ public class Main {
 		artistWeights.put("folkSongs", 2.0);
 		artistWeights.put("fourBarLoops", 1.0);
 		artistWeights.put("folkMelodies", 1.0);
-		Composer composer = new Composer("corpus4", "cMajor", 0.001, 0.01, "CONSTRUCTIVE", 5, 100, 25, 20, 10, artistWeights);
+		artistWeights.put("boys", 2.0);
+		Composer composer = new Composer("corpus5", "cMajor", 0.1, 0.1, "CONSTRUCTIVE", 0, 10, 10, 20, 100, false, artistWeights);
 		
-		composer.composeMelody("output.mid", 100);
-		composer.composeNBars("fourBars.mid", 4);
-		composer.composeNBars("sixteenBars.mid", 16);
-		composer.composeNBars("sixtyFourBars.mid", 64);
+		
+		//composer.composeWithPhrases("phrase1.mid", 50);
+		// composer.composeMelody("output.mid", 100);
+		composer.composeNBars("fourBars.mid", 8);
+		//composer.composeNBars("sixteenBars.mid", 16);
+		//composer.composeNBars("sixtyFourBars.mid", 64);
 	}
 	
 	private static HashMap<String, Double> initializeArtists(String[] args, int currentPosition){

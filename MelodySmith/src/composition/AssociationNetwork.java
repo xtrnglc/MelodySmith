@@ -2,9 +2,11 @@ package composition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class AssociationNetwork {
 	ArrayList<Node> allNodes = new ArrayList<Node>();
+	ArrayList<Phrase> allPhrases = new ArrayList<Phrase>();
 	
 	Link[][] matrix;
 	
@@ -48,6 +50,24 @@ public class AssociationNetwork {
 		}
 	}
 	
+	public void linkPhraseNetwork() {
+		matrix = new Link[allPhrases.size()][allPhrases.size()];
+		ArrayList<Phrase> alreadyLinked = new ArrayList<Phrase>();
+		int count = 0;
+		for(Phrase phrase : allPhrases) {
+			phrase.nodes.get(0).index = count;
+			//printProgress(count);
+			count++;
+			alreadyLinked.add(phrase);
+			for(Phrase phrase2 : alreadyLinked) {
+				Link forwardLink = weightPhrases(phrase, phrase2);
+				Link backwardLink = weightPhrases(phrase2, phrase);
+				matrix[phrase.nodes.get(0).index][phrase2.nodes.get(0).index] = forwardLink;
+				matrix[phrase2.nodes.get(0).index][phrase.nodes.get(0).index] = backwardLink;
+			}
+		}
+	}
+	
 	private void printProgress(int count) {
 		if((count % (allNodes.size()/10)) == 0) {
 			int progress = roundUp(((double)count/allNodes.size())*100);
@@ -87,8 +107,10 @@ public class AssociationNetwork {
 		return new Link(start, end, weight);
 	}
 	
-	
-	
+	Link weightPhrases(Phrase start, Phrase end) {
+		return weightNodes(start.nodes.get(start.nodes.size()-1), end.nodes.get(0));
+	}
+		
 	Node getTonic() {
 		for(Node node : allNodes) {
 			if(node.scaleDegree == 0) {
@@ -107,6 +129,39 @@ public class AssociationNetwork {
 			}
 		}
 		return null;
+	}
+	
+	ArrayList<Phrase> deduceBestNextPhrases(Phrase currentPhrase, int numberToCollect){
+		ArrayList<Phrase> bestPhrases = new ArrayList<>();
+		for(int i = 0; i < numberToCollect; i++) {
+			bestPhrases.add(deduceNextPhrase(currentPhrase, bestPhrases));
+		}
+		return bestPhrases;
+	}
+	
+	Phrase deduceNextPhrase(Phrase currentPhrase, ArrayList<Phrase> alreadyChosen) {
+		Link mostLikelyLink = null;
+		Random r = new Random();
+		for(int i = 0; i < allPhrases.size(); i++) {
+			Link currentLink = matrix[currentPhrase.nodes.get(0).index][i];
+			for(Phrase phrase : alreadyChosen) {
+				if(currentLink.endNode.index == phrase.nodes.get(0).index) {
+					currentLink = null;
+					break;
+				}
+			}
+			if(currentLink == null)
+				continue;
+			if(mostLikelyLink == null || mostLikelyLink.weight < currentLink.weight) {
+				mostLikelyLink = currentLink;
+			}
+		}
+		if (mostLikelyLink == null) {
+			return allPhrases.get(r.nextInt(allPhrases.size()));
+		}
+		else {
+			return allPhrases.get(mostLikelyLink.endNode.index);
+		}
 	}
 	
 	ArrayList<Node> deduceBestNextNodes(Node currentNode, int numberToCollect){
