@@ -24,6 +24,7 @@ var corpus = 'corpus1';
 var width;
 var created = false;
 var abcString = '';
+var tempo = 120;
 var cooleys = 'X:1\nT: Cooley\'s\nM: 4/4\nL: 1/8\nR: reel\nK: Emin\nD2|:"Em"EB{c}BA B2 EB|~B2 AB dBAG|"D"FDAD BDAD|FDAD dAFD|\n"Em"EBBA B2 EB|B2 AB defg|"D"afe^c dBAF|1"Em"DEFD E2 D2:|2"Em"DEFD E2 gf||\n|:"Em"eB B2 efge|eB B2 gedB|"D"A2 FA DAFA|A2 FA defg|\n"Em"eB B2 eBgB|eB B2 defg|"D"afe^c dBAF|1"Em"DEFD E2 gf:|2"Em"DEFD E4|]\n';
 
 
@@ -87,13 +88,13 @@ const musicBox = 'javascripts/music_box-mp3.js';
 
 var instrument = grandPiano;
 
-var changeTempo = function(tempo) {
-	Player.tempo = tempo;
+var changeTempo = function(val) {
+    tempo = val;
 }
 
 var play = function() {
-	Player.play();
-	document.getElementById('play-button').innerHTML = '<i class="fa fa-pause"></i>';
+    Player.play();
+    document.getElementById('play-button').innerHTML = '<i class="fa fa-pause"></i>';
 }
 
 var changeNumComparisons = function(newVal) {
@@ -347,7 +348,7 @@ var initiatePlayer = function(data, instrumentVal) {
             Player = new MidiPlayer.Player(function(event) {
 
                 if(event.name == 'Note off') {
-                   // console.log(event);
+                    // console.log(event);
                     differenceInTicks = event.delta;
                     instrument.stop();
 
@@ -388,8 +389,8 @@ var initiatePlayer = function(data, instrumentVal) {
                 }
 
                 if(Player.tempo > 99) {
-                document.getElementById('tempo-display').innerHTML = Player.tempo;
-                   // document.getElementById('play-button').style.marginLeft = '29%';
+                    document.getElementById('tempo-display').innerHTML = Player.tempo;
+                    // document.getElementById('play-button').style.marginLeft = '29%';
                 } else  {
                     document.getElementById('tempo-display').innerHTML = ' ' +Player.tempo;
                     //document.getElementById('play-button').style.marginLeft = '29.75%'
@@ -413,11 +414,13 @@ var initiatePlayer = function(data, instrumentVal) {
 
         loadDataUri(songDataURI);
 
-       // document.getElementById('text-area').innerText = '{{' + [[0,1],[1,0]] +'| json}}';
+        // document.getElementById('text-area').innerText = '{{' + [[0,1],[1,0]] +'| json}}';
         //$scope.updateTransitionMatrix(bigrams);
         //angular.injector(['ng', 'myApp']).get("utils").setHash(bigrams);
         fillBiGrams(bigrams);
         toggleMusicSheet(false);
+        Player.tempo = tempo;
+       // if(Player.isPlaying()) { Player.pause();Player.setTempo(tempo);Player.play()} else {Player.setTempo(tempo)}
     });
 }
 
@@ -432,13 +435,13 @@ var changeInstrument = function(instrumentval) {
 }
 
 var pause = function() {
-	Player.pause();
-	document.getElementById('play-button').innerHTML = '<i class="fa fa-play"></i>';
+    Player.pause();
+    document.getElementById('play-button').innerHTML = '<i class="fa fa-play"></i>';
 }
 
 var stop = function() {
-	Player.stop();
-	document.getElementById('play-button').innerHTML = '<i class="fa fa-pause"></i>';
+    Player.stop();
+    document.getElementById('play-button').innerHTML = '<i class="fa fa-pause"></i>';
 }
 
 var buildTracksHtml = function() {
@@ -463,7 +466,7 @@ var buildTracksHtml = function() {
             //http://localhost/gist/audio/jesu/
             // var elLength = 40*(event.delta<=1?1:event.delta);
 
-            var elLength = 6 * event.delta;
+            var elLength = 12 * event.delta;
             var element = svgBlock.append("g");
 
             element.attr("transform","translate("+(-1*elLength)+" 0)");
@@ -481,7 +484,7 @@ var buildTracksHtml = function() {
                 .attr("y", 15 + (event.noteNumber - 45)*12)
                 .text(event.noteName)
                 .style('fill', 'white');
-            offset += event.delta + 20;
+            offset += event.delta + 30;
 
 
         }

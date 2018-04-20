@@ -92,10 +92,10 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
                 <p style="margin-left: 30%">Artists Influences</p>
                 <main style="font-size: 12px">
 
-                    <input id="tab1" type="radio" name="tabs" onclick="switchCorpus('corpus1')" >
+                    <input id="tab1" type="radio" name="tabs" onclick="switchCorpus('corpus1')" checked>
                     <label for="tab1">Corpus 1</label>
 
-                    <input id="tab2" type="radio" name="tabs" onclick="switchCorpus('corpus2')"checked>
+                    <input id="tab2" type="radio" name="tabs" onclick="switchCorpus('corpus2')">
                     <label for="tab2">Corpus 2</label>
 
                     <input id="tab3" type="radio" name="tabs" onclick="switchCorpus('corpus3')">
@@ -103,13 +103,13 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
 
 
                     <section id="content1">
-                        <p  style=" margin-left: 30%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Give this artist more influence in the composition">Beatles</p>
-                        <button id="beatles-sample-1" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 22%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('beatlesSample', 'beatles-sample-1')"><i class="fa fa-play"></i></button>
+                        <p  style=" margin-left: 30%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Give this artist more influence in the composition">Backstreet Boys</p>
+                        <button id="beatles-sample-1" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 6.5%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('bboys', 'beatles-sample-1')"><i class="fa fa-play"></i></button>
 
                         <input  style=" display: block; margin-left: 30%; font-size:12px" type="range" id="beatles-slider-1" min="0" max="100">
 
                         <p style=" margin-left: 30%; display: inline-block; font-size:12px">House mix</p>
-                        <button id="house-sample-1" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 16%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('houseSample', 'house-sample-1')"><i class="fa fa-play"></i></button>
+                        <button id="house-sample-1" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 16%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('blackburn2', 'house-sample-1')"><i class="fa fa-play"></i></button>
 
                         <input  style="display: block; margin-left: 30%" type="range" id="house-slider-1" min="0" max="100">
                     </section>
@@ -153,7 +153,7 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
             <p style="margin-left: 35%">Melody-type Controls</p>
             <div class="three columns"  >
                 <!--<h6 style="margin-left: 43%; font-size:12px">Speed</h6>-->
-                <h6 style=" white-space: pre; margin-left: 0%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Should shorter or longer notes be preferred?">                      Speed</h6>
+                <h6 style=" white-space: pre; margin-left: 0%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Should shorter or longer notes be preferred?">           Average Note Length</h6>
                 <div class="dial" id="speed-dial" style="margin-left: 0% ; z-index: 1">
                     <ul class="numset">
                         <li class="rot0 on" onclick="setSpeed(1)">1</li>
@@ -322,8 +322,8 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
                         <span class="c-button c-button--dropdown js-dropdown__current">Phrased</span>
                         <ul class="c-dropdown__list">
                             <li class="c-dropdown__item" data-dropdown-value="WANDERING">Wandering</li>
-                            <li class="c-dropdown__item" data-dropdown-value="EXACT">Exact</li>
-                            <li class="c-dropdown__item" data-dropdown-value="PHRASED">Phrased</li>
+                            <li class="c-dropdown__item" data-dropdown-value="EXTRACT">Phrased</li>
+                            <li class="c-dropdown__item" data-dropdown-value="PHRASED">Structured</li>
                         </ul>
                     </div>
                 </div>
@@ -469,7 +469,7 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
 
     <div id="tempo-div" style="display: none; margin-left: 5%; float: left; color: #484C4B; margin-top: 0.5%">
 
-        <input type="range" id="tempo-slider" style="display: none;" onchange="if(Player.isPlaying()) { Player.pause();Player.setTempo(this.value);Player.play()} else {Player.setTempo(this.value)}" min="50" max="200">
+        <input type="range" id="tempo-slider" style="display: none;" onchange="changeTempo(this.value);if(Player.isPlaying()) { Player.pause();Player.setTempo(tempo);Player.play()} else {Player.setTempo(tempo)}" min="50" max="200">
         Tempo: <span id="tempo-display"></span> bpm
     </div>
 
