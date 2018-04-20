@@ -22,7 +22,9 @@
     <script src="javascripts/d3.v3.js"></script>
     <script src="javascripts/angular.min.js"></script>
     <script src="javascripts/vector.js"></script>
-<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>-->
+    <script src="javascripts/abcjs_midi_4.0.1-min.js"></script>
+
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>-->
     <!--<script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>-->
 
     <style>
@@ -78,7 +80,7 @@
 </head>
 <body>
 
-<div class="container" style="padding-top:12px;">
+<div class="container" id="containerid" style="padding-top:12px;">
     <div class="row">
         <div class="four columns" style="background-color:#346991; color: whitesmoke;border: 0.5px solid whitesmoke;border-radius: 5px;background-size: 100% 100%;-moz-box-shadow: 0 0 3px #ccc;
 -webkit-box-shadow: 0 0 3px #ccc;
@@ -87,13 +89,13 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
                 <!--<p style="margin-left: 42%">Artists</p>-->
 
 
-                <p style="margin-left: 42%">Artists</p>
+                <p style="margin-left: 30%">Artists Influences</p>
                 <main style="font-size: 12px">
 
-                    <input id="tab1" type="radio" name="tabs" onclick="switchCorpus('corpus1')" >
+                    <input id="tab1" type="radio" name="tabs" onclick="switchCorpus('corpus1')" checked>
                     <label for="tab1">Corpus 1</label>
 
-                    <input id="tab2" type="radio" name="tabs" onclick="switchCorpus('corpus2')"checked>
+                    <input id="tab2" type="radio" name="tabs" onclick="switchCorpus('corpus2')">
                     <label for="tab2">Corpus 2</label>
 
                     <input id="tab3" type="radio" name="tabs" onclick="switchCorpus('corpus3')">
@@ -101,13 +103,13 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
 
 
                     <section id="content1">
-                        <p  style=" margin-left: 30%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Give this artist more influence in the composition">Beatles</p>
-                        <button id="beatles-sample-1" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 22%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('beatlesSample', 'beatles-sample-1')"><i class="fa fa-play"></i></button>
+                        <p  style=" margin-left: 30%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Give this artist more influence in the composition">Backstreet Boys</p>
+                        <button id="beatles-sample-1" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 6.5%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('bboys', 'beatles-sample-1')"><i class="fa fa-play"></i></button>
 
                         <input  style=" display: block; margin-left: 30%; font-size:12px" type="range" id="beatles-slider-1" min="0" max="100">
 
                         <p style=" margin-left: 30%; display: inline-block; font-size:12px">House mix</p>
-                        <button id="house-sample-1" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 16%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('houseSample', 'house-sample-1')"><i class="fa fa-play"></i></button>
+                        <button id="house-sample-1" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 16%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('blackburn2', 'house-sample-1')"><i class="fa fa-play"></i></button>
 
                         <input  style="display: block; margin-left: 30%" type="range" id="house-slider-1" min="0" max="100">
                     </section>
@@ -124,7 +126,7 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
                         <input  style="display: block; margin-left: 30%" type="range" id="prosonic-slider-2" min="0" max="100">
                     </section>
 
-                    <section id="content3" style="height: 117px; overflow: scroll">
+                    <section id="content3" style="height: 117px; overflow-y: scroll;overflow-x: hidden;">
                         <p  style=" margin-left: 30%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Give this artist more influence in the composition">Folk Songs</p>
                         <button id="folks-sample-3" style="margin: 0 auto; font-size: 5px; color: whitesmoke; margin-left: 16%;padding: 0;border: none;background: none;display:inline-block; font-size: large;" onclick="playSound('folkSample', 'folks-sample-3')"><i class="fa fa-play"></i></button>
                         <input  style=" display: block; margin-left: 30%; font-size:12px" type="range" id="folks-slider-3" min="0" max="100">
@@ -151,8 +153,8 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
             <p style="margin-left: 35%">Melody-type Controls</p>
             <div class="three columns"  >
                 <!--<h6 style="margin-left: 43%; font-size:12px">Speed</h6>-->
-                <h6 style=" margin-left: 28%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Should shorter or longer notes be preferred?">Speed</h6>
-                <div class="dial" id="speed-dial" style="margin-left: -20% ; z-index: 1">
+                <h6 style=" white-space: pre; margin-left: 0%; font-size:12px; z-index: 12" class="tooltip expand" data-title="Should shorter or longer notes be preferred?">           Average Note Length</h6>
+                <div class="dial" id="speed-dial" style="margin-left: 0% ; z-index: 1">
                     <ul class="numset">
                         <li class="rot0 on" onclick="setSpeed(1)">1</li>
                         <li class="rot1" onclick="setSpeed(2)">2</li>
@@ -170,8 +172,8 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
             </div>
 
             <div class="three columns">
-                <h6 style=" margin-left: 0%; font-size:12px; z-index: 12" class="tooltip expand" data-title="How many notes should one phrase last?">Phrase Length</h6>
-                <div class="dial" id="phrase-length-dial" style="margin-left: -35%; z-index: 1">
+                <h6 style=" white-space: pre; margin-left: 0%; font-size:12px; z-index: 12" class="tooltip expand" data-title="How many notes should one phrase last?">                Phrase Length</h6>
+                <div class="dial" id="phrase-length-dial" style="margin-left: 0%; z-index: 1">
                     <ul class="numset">
                         <li class="rot0 on" onclick="setPhraseLength(1)">1</li>
                         <li class="rot1" onclick="setPhraseLength(2)">2</li>
@@ -189,8 +191,8 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
             </div>
 
             <div class="three columns">
-                <h6 style=" margin-left: 0%; font-size:12px; z-index: 12" class="tooltip expand" data-title="How often can less conventional notes be played?">Creativity</h6>
-                <div class="dial" id="creativity-dial"style="margin-left: -43%; z-index: 1">
+                <h6 style=" white-space: pre; margin-left: 0%; font-size:12px; z-index: 12" class="tooltip expand" data-title="How often can less conventional notes be played?">                    Creativity</h6>
+                <div class="dial" id="creativity-dial"style="margin-left: 0%; z-index: 1">
                     <ul class="numset">
                         <li class="rot0 on" onclick="setCreativity(1)">1</li>
                         <li class="rot1" onclick="setCreativity(2)">2</li>
@@ -268,8 +270,8 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
         <div class="eight columns"  style="background-color:#346991; color: whitesmoke;border: 0.5px solid whitesmoke;border-radius: 5px;background-size: 100% 100%;-moz-box-shadow: 0 0 3px #ccc;-webkit-box-shadow: 0 0 3px #ccc;box-shadow: 0 0 3px #ccc;; background-image: url('divbg-rect.png') " >
             <p style="margin-left: 35%">Rest-type Controls</p>
             <div class="three columns">
-                <h6 style="margin-left: 32% ;font-size:12px; z-index: 12" class="tooltip expand" data-title="How syncopated should the rhythm be?">Syncopation</h6>
-                <div class="dial" id="syncopation-dial" style="margin-left: -5%">
+                <h6 style=" white-space: pre ;font-size:12px; z-index: 12" class="tooltip expand" data-title="How syncopated should the rhythm be?">                  Syncopation</h6>
+                <div class="dial" id="syncopation-dial" style="margin-left: 0%">
                     <ul class="numset">
                         <li class="rot0 on" onclick="setSyncopation(1)">1</li>
                         <li class="rot1" onclick="setSyncopation(1)">2</li>
@@ -287,8 +289,8 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
             </div>
 
             <div class="three columns">
-                <h6 style="margin-left: 47% ;font-size:12px; z-index: 12" class="tooltip expand" data-title="How often should rests be played?">Rest Amount</h6>
-                <div class="dial" id="rest-amount-dial" style="margin-left: 10%">
+                <h6 style="white-space: pre;font-size:12px; z-index: 12" class="tooltip expand" data-title="How often should rests be played?">                 Rest Amount</h6>
+                <div class="dial" id="rest-amount-dial" style="margin-left: 0%">
                     <ul class="numset">
                         <li class="rot0 on" onclick="setRestAmount(1)">1</li>
                         <li class="rot1" onclick="setRestAmount(2)">2</li>
@@ -306,33 +308,129 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
             </div>
 
             <div class="three columns">
-                <h6 style="margin-left: 47% ;font-size:12px; z-index: 12" class="tooltip expand" data-title="How should rests be added to the melody?">Rest Type</h6>
+                <h6 style="margin-left: 40% ;font-size:12px; z-index: 12" class="tooltip expand" data-title="How should rests be added to the melody??">Rest Type</h6>
                 <div class="can-toggle demo-rebrand-1" style="margin-top: 10%; margin-left: 10%">
                     <input id="d" type="checkbox">
                     <label for="d">
                         <div class="can-toggle__switch" onclick="toggleRestType()" data-checked="Constructive" data-unchecked="Destructive"></div>
                     </label>
                 </div>
+                <div style="display: inline-block; margin-top: 0.8%; margin-left: 40%">
+                    <h6 style=" font-size: 12px">Algorithm Type</h6>
+                    <div class="c-dropdown js-dropdown" style="margin-top: 10%;  ">
+                        <input type="hidden" name="Framework" id="algorithmdropdown" class="js-dropdown__input">
+                        <span class="c-button c-button--dropdown js-dropdown__current">Phrased</span>
+                        <ul class="c-dropdown__list">
+                            <li class="c-dropdown__item" data-dropdown-value="WANDERING">Wandering</li>
+                            <li class="c-dropdown__item" data-dropdown-value="EXTRACT">Phrased</li>
+                            <li class="c-dropdown__item" data-dropdown-value="PHRASED">Structured</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <button style="margin-top: 2%; margin-left: 45%" class="button button-primary tooltip expand" data-title="Hit forge when you are ready to listen to some new music!"  onClick="forge()" id="forge-button">Forge</button>
-
+    <!--<p>-->
+        <!--<a href="#" onclick="ABCJS.renderAbc('notation', cooleys); return false;" >Cooley's</a> |-->
+        <!--<a href="#" onclick="ABCJS.renderAbc('notation', abcString); return false;" >Chorus</a> |-->
+    <!--</p>-->
     <div id="events" class="well"></div>
 
-
-    <hr/>
+    <hr id="hr"/>
     <div id="visualization" style="display: none; z-index: 1; height: 400px; width: 960px;">
+        <main style="font-size: 12px">
 
-        <div class="tab-pane active" id="one"><div id="canvas" style="display: none"></div>
-            <div class="tab-pane" id="two">
+            <input id="vis-tab1" type="radio" name="vistabs" checked onclick="toggleMusicSheet(false);">
+            <label for="vis-tab1">Piano Roll</label>
+
+            <input id="vis-tab2" type="radio" name="vistabs" onclick="toggleMusicSheet(false);">
+            <label for="vis-tab2">Notes Bigram Visualization</label>
+
+            <input id="vis-tab3" type="radio" name="vistabs" onclick="toggleMusicSheet(false);">
+            <label for="vis-tab3">Piano Roll Static</label>
+
+            <input id="vis-tab4" type="radio" name="vistabs" onclick="if(!created) { created = true;}; toggleMusicSheet(true);return false;">
+            <label for="vis-tab4">Music Sheet</label>
+
+
+            <section id="vis-content1">
+                <div id="canvasstatic" style="display: none"></div>
+            </section>
+
+            <section  style="margin-top: 0%" id="vis-content2">
                 <div ng-controller="MainCtrl" id="bigramvisualization" ng-app="myApp" >
                     <st-diagram id = "bigrams" center="diagramCenter" states="states"
                                 transition-matrix="transitionMatrix" duration="duration"
                                 selected-transition="selectedTransition"></st-diagram>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            <section  style="margin-top: 0%;" id="vis-content3">
+                <div id="outputblock">
+                    <div style=" width: 960px; overflow: auto;">
+
+                        <div id="canvasblock">
+
+                        </div>
+                    </div>
+                </div>
+
+                <!--<div id="inputblock1">-->
+                    <!--<h6 id="inputblock1label" style="color: whitesmoke;">Input 1</h6>-->
+                    <!--<div style=" width: 960px; overflow: auto;">-->
+
+                        <!--<div id="canvasblock1">-->
+
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div id="inputblock2">-->
+                    <!--<h6 id="inputblock2label" style="color: whitesmoke;">Input 2</h6>-->
+                    <!--<div style=" width: 960px; overflow: auto;">-->
+
+                        <!--<div id="canvasblock2">-->
+
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div id="inputblock3">-->
+                    <!--<h6 id="inputblock3label" style="color: whitesmoke;">Input 3</h6>-->
+                    <!--<div style=" width: 960px; overflow: auto;">-->
+
+                        <!--<div id="canvasblock3">-->
+
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div id="inputblock4">-->
+                    <!--<h6 id="inputblock4label" style="color: whitesmoke;">Input 4</h6>-->
+                    <!--<div style=" width: 960px; overflow: auto;">-->
+
+                        <!--<div id="canvasblock4">-->
+
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+
+            </section>
+
+            <section style="margin-bottom: 50%; display: none;" id="vis-content4">
+                <div id="notation"></div>
+
+            </section>
+
+        </main>
+
+
+
+
+
+
     </div>
 
 </div>
@@ -359,18 +457,21 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
     <span></span>
     <span></span>
     <span></span>
+    <span></span>
+
 </div>
 
 <div id="play-bar" style="height:5px;background:#33C3F0;width:0%;position: fixed; bottom: 41px; z-index: 10; "></div>
 
 <div id="play-bar-button" style="display: block; height: 40px; width: 100%; border:1px solid #ccc;z-index: 10;position: fixed; bottom: 0;background:#e6eaf2; ">
+    <button style=" display:none; margin: 0 auto; position: fixed; margin-left:1%;padding: 0;border: none;background: none; font-size: large; background-color: #e6eaf2" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled"><i class="fa fa-play"></i></button>
+    <button style=" display:none; margin: 0 auto; position: fixed; margin-left:3%;padding: 0;border: none;background: none; font-size: large; background-color: #e6eaf2" id="restart-button" onclick="if(Player) {stop(); play();} console.log('adsf');" ><i class="fa fa-undo"></i></button>
 
-    <div id="tempo-div" style="display: none; float: left; color: #484C4B; margin-top: 0.5%">
+    <div id="tempo-div" style="display: none; margin-left: 5%; float: left; color: #484C4B; margin-top: 0.5%">
+
+        <input type="range" id="tempo-slider" style="display: none;" onchange="changeTempo(this.value);if(Player.isPlaying()) { Player.pause();Player.setTempo(tempo);Player.play()} else {Player.setTempo(tempo)}" min="50" max="200">
         Tempo: <span id="tempo-display"></span> bpm
-        <input type="range" id="tempo-slider" style="display: none;" onchange="Player.pause();Player.setTempo(this.value);Player.play()" min="50" max="200">
-
     </div>
-    <button style=" display:none; margin: 0 auto; position: fixed; margin-left: 50%;padding: 0;border: none;background: none; font-size: large; background-color: #e6eaf2" id="play-button" onclick="Player.isPlaying() ? pause() : play();" disabled="disabled"><i class="fa fa-play"></i></button>
 
     <div id='instrument-menu-div' style="float: right; display: none; margin-right: 0.5%; margin-top: 0.24%"  >
         <ul id='instrument-menu' class='menu-main'>
@@ -386,17 +487,6 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
         </ul>
     </div>
 
-    <!--<div style="float: right" class="c-dropdown js-dropdown">-->
-    <!--<input type="hidden" name="Framework" id="instrument-dropdown" class="js-dropdown__input">-->
-    <!--<span class="c-button c-button&#45;&#45;dropdown js-dropdown__current">Grand Piano</span>-->
-    <!--<ul class="c-dropdown__list">-->
-    <!--<li class="c-dropdown__item" data-dropdown-value="acousticGuitar" onClick="changeInstrument('acousticGuitar')">Acoustic Guitar</li>-->
-    <!--<li class="c-dropdown__item" data-dropdown-value="churchOrgan" onClick="changeInstrument('musicBox')">Music Box</li>-->
-    <!--<li class="c-dropdown__item" data-dropdown-value="flute" onClick="changeInstrument('flute')">Flute</li>-->
-    <!--<li class="c-dropdown__item" data-dropdown-value="grandPiano" onClick="changeInstrument('grandPiano')">Grand Piano</li>-->
-    <!--<li class="c-dropdown__item" data-dropdown-value="electricGuitar" onClick="changeInstrument('electricGuitar')">Electric Guitar</li>-->
-    <!--</ul>-->
-    <!--</div>-->
 
 </div>
 
@@ -407,7 +497,7 @@ box-shadow: 0 0 3px #ccc;; background-image: url('divbg.png') " >
 <script src="javascripts/browser/midiplayer.min.js"></script>
 <script src="javascripts/soundfont-player.min.js"></script>
 
+
 <script src="javascripts/app.js"></script>
 <script src="javascripts/styles.js"></script>
-<script src="javascripts/common.js" charset="utf-8"></script>
 </html>

@@ -102,12 +102,6 @@ class Dashboard extends Component {
 
                     <Canvas ref='canvas1' style={{display:'none'}}/>
 
-                    <div id="loadingcube" ref='loadingCube' className="sk-folding-cube" style={{display:'none'}}>
-                        <div className="sk-cube1 sk-cube"></div>
-                        <div className="sk-cube2 sk-cube"></div>
-                        <div className="sk-cube4 sk-cube"></div>
-                        <div className="sk-cube3 sk-cube"></div>
-                    </div>
 
                     <div id="play-bar-button" ref='playBarButton' style={{display: 'none', border:'1px solid #ccc', marginBottom:'12px',background:'#f7f7f7'}}>
                         <div id="play-bar" ref='playBar' style={{height:'20px',background:'#33C3F0',width:'0%'}}></div>

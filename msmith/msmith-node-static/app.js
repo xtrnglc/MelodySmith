@@ -15,7 +15,7 @@ app.get('/forge', function(req, res){
 });
 
 app.get('/getmidi', function(req, res) {
-    //console.log(req.query);
+    console.log(req.query);
 
     // var formData = {
     //     bieber: artistslider1,
@@ -45,8 +45,7 @@ app.get('/getmidi', function(req, res) {
     // creativity
     // speed
     // artistValues
-
-
+    
     // /corpus output.mid cMajor 1 1 Constructive 1 1 1 1 1 beatles:1 bach:2 bieber:50
 
     switch(req.query.corpus) {
@@ -64,6 +63,7 @@ app.get('/getmidi', function(req, res) {
                     req.query.phraseLength,
                     req.query.creativity,
                     req.query.speed,
+                    req.query.algorithmChoice,
                     'beatles:'+req.query.corpora.beatles,
                     'house:'+req.query.corpora.house,
                 ]
@@ -83,6 +83,7 @@ app.get('/getmidi', function(req, res) {
                     req.query.phraseLength,
                     req.query.creativity,
                     req.query.speed,
+                    req.query.algorithmChoice,
                     'prosonic:'+req.query.corpora.prosonic,
                     'folk:'+req.query.corpora.folk
                 ]
@@ -102,6 +103,7 @@ app.get('/getmidi', function(req, res) {
                     req.query.phraseLength,
                     req.query.creativity,
                     req.query.speed,
+                    req.query.algorithmChoice,
                     'beatles:'+req.query.corpora.beatles,
                     'house:'+req.query.corpora.house,
                     'prosonic:'+req.query.corpora.prosonic,
@@ -113,23 +115,26 @@ app.get('/getmidi', function(req, res) {
     var encoded = 'test';
     var bigrams;
     child.stdout.on('data', function(data) {
-        //console.log(data.toString());
+        //console.log(data.toString();
         if(data.toString().startsWith('{')) {
-            console.log('parsing');
-            bigrams = JSON.parse(data.toString().replace(/'/g, "\""));
+            //console.log('parsing');
+            data.toString().replace(/'/g, "\"").replace('NaN/g', "0")
+            bigrams = JSON.parse(data.toString().replace(/'/g, "\"").replace(/NaN/g, "0"));
             //console.log(bigrams);
         }
-        if(data.toString().includes('100') && !data.toString().startsWith('{')){
-
+        if(data.toString().includes('JS') && !data.toString().startsWith('{')){
+            var abcString = data.toString();
             var filename = 'output.mid';
 
             const Datauri = require('datauri').sync;
             //encoded = "\"datauri\":" + Datauri(filename);
             var response = {
                 bigrams: bigrams,
-                datauri: Datauri(filename)
+                datauri: Datauri(filename),
+                abcString: abcString.substr(3)
             };
-            console.log(response);
+            console.log(abcString);
+
 
             console.log('sending');
             res.send(response);

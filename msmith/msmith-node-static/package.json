@@ -10,6 +10,7 @@
   "author": "audioMIDIum",
   "license": "MIT",
   "dependencies": {
+    "abcjs": "^4.0.1",
     "axios": "^0.17.1",
     "d3": "^4.13.0",
     "datauri": "^1.0.5",

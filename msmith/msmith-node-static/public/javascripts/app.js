@@ -1,5 +1,6 @@
 var MidiPlayer = MidiPlayer;
-var loadFile, loadDataUri, Player;
+var ABCJS = ABCJS;
+var loadFile, loadDataUri, loadDataUriPlay, Player, PlayerHolder1,PlayerHolder2,PlayerHolder3,PlayerHolder4;
 var AudioContext = window.AudioContext || window.webkitAudioContext || false;
 var ac = new AudioContext || new webkitAudioContext;
 var eventsDiv = document.getElementById('events');
@@ -7,7 +8,8 @@ var songDataURI = '';
 var width = 960;
 var height = 400;
 var numComparisons = 6;
-var restType = 'Destructive';
+var restType = 'Constructive';
+var algorithmChoice = 'PHRASED';
 var rhythmicImportance = '1';
 var melodicImportance = '1';
 var syncopation = '1';
@@ -19,6 +21,12 @@ var instrumentText = 'grandPiano';
 var keySignature = 'cMajor';
 var bigrams;
 var corpus = 'corpus1';
+var width;
+var created = false;
+var abcString = '';
+var tempo = 120;
+var cooleys = 'X:1\nT: Cooley\'s\nM: 4/4\nL: 1/8\nR: reel\nK: Emin\nD2|:"Em"EB{c}BA B2 EB|~B2 AB dBAG|"D"FDAD BDAD|FDAD dAFD|\n"Em"EBBA B2 EB|B2 AB defg|"D"afe^c dBAF|1"Em"DEFD E2 D2:|2"Em"DEFD E2 gf||\n|:"Em"eB B2 efge|eB B2 gedB|"D"A2 FA DAFA|A2 FA defg|\n"Em"eB B2 eBgB|eB B2 defg|"D"afe^c dBAF|1"Em"DEFD E2 gf:|2"Em"DEFD E4|]\n';
+
 
 // Rhythmic importance (Int 0-100)  "How closely should rhythmic details be analyzed?" (edited)
 // Melodic importance (Int 0-100)  "How closely should intervalic details be analyzed?" (edited)
@@ -65,41 +73,100 @@ var setPhraseLength = function(val) {
 }
 
 var setCreativity = function(val) {
-    creativity = val;
+    creativity = val * 2;
 }
 
 var setSpeed = function(val) {
     speed = val * 10;
 }
 
-const grandPiano = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_grand_piano-mp3.js';
-const acousticGuitar = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_guitar_nylon-mp3.js';
-const flute = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/flute-mp3.js';
-const electricGuitar = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/electric_guitar_clean-mp3.js';
-const musicBox = 'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/music_box-mp3.js';
+const grandPiano = 'javascripts/acoustic_grand_piano-mp3.js';
+const acousticGuitar = 'javascripts/acoustic_guitar_nylon-mp3.js';
+const flute = 'javascripts/flute-mp3.js';
+const electricGuitar = 'javascripts/electric_guitar_clean-mp3.js';
+const musicBox = 'javascripts/music_box-mp3.js';
 
 var instrument = grandPiano;
 
-var changeTempo = function(tempo) {
-	Player.tempo = tempo;
+var changeTempo = function(val) {
+    tempo = val;
 }
 
 var play = function() {
-	Player.play();
-	document.getElementById('play-button').innerHTML = '<i class="fa fa-pause"></i>';
+    Player.play();
+    document.getElementById('play-button').innerHTML = '<i class="fa fa-pause"></i>';
 }
 
 var changeNumComparisons = function(newVal) {
     numComparisons = newVal;
 }
 
+var toggleMusicSheet = function(val) {
+    if(val) {
+        ABCJS.renderAbc('notation', abcString, { add_classes: true });
+        document.getElementById('vis-content4').style.display = 'block';
+        document.getElementById('outputblock').style.display = 'none';
+        document.getElementById('bigramvisualization').style.display = 'none';
+        document.getElementById('canvasstatic').style.display = 'none';
+        var h = document.getElementById('notation').style.height;
+        var w = document.getElementById('notation').style.width;
+        document.getElementById('vis-content4').style.height = h;
+        document.getElementById('vis-content4').style.width = w;
+        document.getElementById('vis-content4').style.backgroundColor = '#FFFFFF';
+        document.getElementById('vis-content4').style.borderRadius = '5px';
+
+        // var line0 = document.getElementById('notation').getElementsByClassName('abcjs-l0');
+        // document.getElementById('notation').getElementsByClassName('abcjs-title')[0].setAttribute("fill", "#FFFFFF");
+        // for (var i = 0; i < line0.length; i++) {
+        //     line0[i].setAttribute("fill", "#FFFFFF");
+        // }
+
+        // document.getElementById('notation').querySelectorAll('.abcjs-m0').forEach((el) => {
+        //     if (el.getAttribute("fill"))
+        //         el.setAttribute("fill", "#3D9AFC");
+        //     if (el.getAttribute("stroke"))
+        //         el.setAttribute("stroke", "#3D9AFC");
+        // });
+    } else {
+        document.getElementById('vis-content4').style.display = 'none';
+        document.getElementById('outputblock').style.display = 'block';
+        document.getElementById('bigramvisualization').style.display = 'block';
+        document.getElementById('canvasstatic').style.display = 'block';
+    }
+}
+
 var changeNgrams = function(newVal) {
     nGramVal = newVal;
 }
 
-var svg = d3.select("#canvas")
+var svgStatic = d3.select("#canvasstatic")
     .append("svg")
     .attr("width", width)
+    .attr("height", height);
+
+var svgBlock = d3.select("#canvasblock")
+    .append("svg")
+    .attr("width", '500%')
+    .attr("height", height);
+
+var svgBlock1 = d3.select("#canvasblock1")
+    .append("svg")
+    .attr("width", '500%')
+    .attr("height", height);
+
+var svgBlock2 = d3.select("#canvasblock2")
+    .append("svg")
+    .attr("width", '500%')
+    .attr("height", height);
+
+var svgBlock3 = d3.select("#canvasblock3")
+    .append("svg")
+    .attr("width", '500%')
+    .attr("height", height);
+
+var svgBlock4 = d3.select("#canvasblock4")
+    .append("svg")
+    .attr("width", '500%')
     .attr("height", height);
 
 var color = d3.scale.linear().domain([45,75])
@@ -107,6 +174,7 @@ var color = d3.scale.linear().domain([45,75])
     .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]);
 
 var forge = function() {
+    width = document.getElementById('containerid').offsetHeight;
 
     if(Player) {
         stop();
@@ -119,6 +187,12 @@ var forge = function() {
 
     } else {
         keySignature = document.getElementById('keysigdropdown').value;
+    }
+
+    if(document.getElementById('algorithmdropdown').value === '') {
+
+    } else {
+        algorithmChoice = document.getElementById('algorithmdropdown').value;
     }
 
     switch(corpus) {
@@ -143,9 +217,6 @@ var forge = function() {
             };
     }
 
-
-
-
     var formData = {
         corpus: corpus,
         corpora: corpora,
@@ -157,7 +228,8 @@ var forge = function() {
         restAmount : restAmount,
         creativity : creativity,
         restType : restType,
-        keySignature : keySignature
+        keySignature : keySignature,
+        algorithmChoice : algorithmChoice
     };
 
     console.log(formData);
@@ -241,13 +313,14 @@ function playSound(sample, id) {
 var showControls = function() {
     document.getElementById('play-bar').style.display = 'block';
     document.getElementById('loadingcube').style.display = 'none';
-    document.getElementById('canvas').style.display = 'block';
+    document.getElementById('canvasstatic').style.display = 'block';
     document.getElementById('tempo-div').style.display = 'inline-block';
     document.getElementById('tempo-slider').style.display = 'inline-block';
     document.getElementById('play-bar-button').style.display = 'block';
     document.getElementById('visualization').style.display = 'block';
-    document.getElementById('play-button').style.marginLeft = '32%';
+    //document.getElementById('play-button').style.marginLeft = '32%';
     document.getElementById('play-button').style.display = 'inline-block';
+    document.getElementById('restart-button').style.display = 'inline-block';
     document.getElementById('instrument-menu-div').style.display = 'inline-block';
 
 }
@@ -265,6 +338,8 @@ var initiatePlayer = function(data, instrumentVal) {
 
     switchInstrument(instrumentVal);
 
+    svgBlock.selectAll("*").remove();
+
     Soundfont.instrument(ac, instrument).then(function (instrument) {
 
         loadDataUri = function(dataUri) {
@@ -273,14 +348,14 @@ var initiatePlayer = function(data, instrumentVal) {
             Player = new MidiPlayer.Player(function(event) {
 
                 if(event.name == 'Note off') {
-                   // console.log(event);
+                    // console.log(event);
                     differenceInTicks = event.delta;
                     instrument.stop();
 
                     //http://localhost/gist/audio/jesu/
                     // var elLength = 40*(event.delta<=1?1:event.delta);
                     var elLength = 6 * differenceInTicks;
-                    var element = svg.append("g");
+                    var element = svgStatic.append("g");
 
                     element.attr("transform","translate("+(-1*elLength)+" 0)");
                     element.append("rect")
@@ -314,37 +389,38 @@ var initiatePlayer = function(data, instrumentVal) {
                 }
 
                 if(Player.tempo > 99) {
-                document.getElementById('tempo-display').innerHTML = Player.tempo;
-                    document.getElementById('play-button').style.marginLeft = '29%';
+                    document.getElementById('tempo-display').innerHTML = Player.tempo;
+                    // document.getElementById('play-button').style.marginLeft = '29%';
                 } else  {
                     document.getElementById('tempo-display').innerHTML = ' ' +Player.tempo;
-                    document.getElementById('play-button').style.marginLeft = '29.75%'
+                    //document.getElementById('play-button').style.marginLeft = '29.75%'
                 }
                 document.getElementById('play-bar').style.width = 100 - Player.getSongPercentRemaining() + '%';
             });
 
-
-
             Player.loadDataUri(dataUri);
-
 
             document.getElementById('play-button').removeAttribute('disabled');
 
-            //buildTracksHtml();
+
+            buildTracksHtml();
             play();
         }
         if(data.datauri) {
             songDataURI = data.datauri;
             bigrams = data.bigrams;
+            abcString = data.abcString;
         }
-
 
         loadDataUri(songDataURI);
 
-       // document.getElementById('text-area').innerText = '{{' + [[0,1],[1,0]] +'| json}}';
+        // document.getElementById('text-area').innerText = '{{' + [[0,1],[1,0]] +'| json}}';
         //$scope.updateTransitionMatrix(bigrams);
         //angular.injector(['ng', 'myApp']).get("utils").setHash(bigrams);
         fillBiGrams(bigrams);
+        toggleMusicSheet(false);
+        Player.tempo = tempo;
+       // if(Player.isPlaying()) { Player.pause();Player.setTempo(tempo);Player.play()} else {Player.setTempo(tempo)}
     });
 }
 
@@ -359,31 +435,72 @@ var changeInstrument = function(instrumentval) {
 }
 
 var pause = function() {
-	Player.pause();
-	document.getElementById('play-button').innerHTML = '<i class="fa fa-play"></i>';
+    Player.pause();
+    document.getElementById('play-button').innerHTML = '<i class="fa fa-play"></i>';
 }
 
 var stop = function() {
-	Player.stop();
-	document.getElementById('play-button').innerHTML = '<i class="fa fa-pause"></i>';
+    Player.stop();
+    document.getElementById('play-button').innerHTML = '<i class="fa fa-pause"></i>';
 }
 
 var buildTracksHtml = function() {
-     console.log(Player.tracks[0].events);
-	// Player.tracks[0].events.forEach(function(item, index) {
-	//     console.log(item);
-	// 	var trackDiv = document.createElement('div');
-	// 	trackDiv.id = 'track-' + (index+1);
-	// 	var h5 = document.createElement('h5');
-	// 	h5.innerHTML = 'Track ' + (index+1);
-	// 	var code = document.createElement('code');
-	// 	trackDiv.appendChild(h5);
-	// 	trackDiv.appendChild(code);
-	// 	eventsDiv.appendChild(trackDiv);
-	// });
+    var offset = 0;
+    var offset1 = 0;
+    var offset2 = 0;
+    var offset3 = 0;
+    var offset4 = 0;
+
+    Player.tracks[0].events.forEach(function(event, index) {
+        //console.log(event);
+        if(event.name.includes('Note off')) {
+            // var trackDiv = document.createElement('div');
+            // trackDiv.id = 'track-' + (index+1);
+            // var h5 = document.createElement('h5');
+            // h5.innerHTML = event.noteName + " " + event.delta;
+            // trackDiv.appendChild(h5);
+            // trackDiv.style.color = '#fffff';
+            // eventsDiv.appendChild(trackDiv);
+
+
+            //http://localhost/gist/audio/jesu/
+            // var elLength = 40*(event.delta<=1?1:event.delta);
+
+            var elLength = 12 * event.delta;
+            var element = svgBlock.append("g");
+
+            element.attr("transform","translate("+(-1*elLength)+" 0)");
+            element.append("rect")
+                .attr("width", elLength * width / 960)
+                .attr("height", 20)
+                .attr("rx", 5)
+                .attr("ry", 5)
+                .attr("x", event.delta + 60 + offset)
+                .attr("y", (event.noteNumber - 45)*12)
+                .attr("fill", color(event.noteNumber));
+
+            element.append("text")
+                .attr("x", event.delta + 60 + offset)
+                .attr("y", 15 + (event.noteNumber - 45)*12)
+                .text(event.noteName)
+                .style('fill', 'white');
+            offset += event.delta + 30;
+
+
+        }
+
+    });
+
+    if(corpus == 'corpus1') {
+
+    } else if(corpus == 'corpus2') {
+
+    } else {
+
+    }
+
 }
 
-var scope11;
 var myApp = angular.module('myApp', []);
 
 myApp.controller('MainCtrl', function($scope, utils, $window) {
@@ -502,8 +619,6 @@ myApp.factory('utils', function() {
     };
     return utils;
 });
-
-
 
 myApp.directive('stDiagram', function($compile) {
     function link(scope, el, attr) {
@@ -695,27 +810,24 @@ myApp.directive('stDiagram', function($compile) {
                         return 'translate(' + p.array() + ') scale(' + s(t) + ')';
                     };
                 })
-                .transition().duration(+scope.duration * 0.5)
-                .ease('linear')
                 .attrTween('transform', function() {
-                    var l = path.getTotalLength();
+                    //var l = path.getTotalLength();
                     return function(t) {
-                        var p = path.getPointAtLength(t * l);
-                        return 'translate(' + [p.x, p.y] + ') scale(1)';
+                        // var p = path.getPointAtLength(t * l);
+                        // return 'translate(' + [p.x, p.y] + ') scale(1)';
                     };
                 })
                 .transition().duration(+scope.duration * 0.25)
-                .ease('bounce-in')
                 .attrTween('transform', function() {
-                    var m = d3.transform(d3.select(this).attr('transform'));
-                    var translation = vector.apply(null, m.translate);
-                    var scale = m.scale;
-                    var s = d3.interpolateArray(scale, [2, 2]);
-                    return function(t) {
-                        var end = vector(next.x, next.y);
-                        var p = translation.add(end.sub(translation).scale(t));
-                        return 'translate(' + p.array() + ') scale(' + s(t) + ')';
-                    };
+                    // var m = d3.transform(d3.select(this).attr('transform'));
+                    // var translation = vector.apply(null, m.translate);
+                    // var scale = m.scale;
+                    // var s = d3.interpolateArray(scale, [2, 2]);
+                    // return function(t) {
+                    //     var end = vector(next.x, next.y);
+                    //     var p = translation.add(end.sub(translation).scale(t));
+                    //     return 'translate(' + p.array() + ') scale(' + s(t) + ')';
+                    // };
                 })
                 .each('end', function() {
                     loop();
