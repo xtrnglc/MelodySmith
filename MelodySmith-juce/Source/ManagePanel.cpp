@@ -12,7 +12,7 @@
 #include "ManagePanel.h"
 
 //==============================================================================
-ManagePanel::ManagePanel(Array<std::tuple<String, String>>& artist_filename_tuples)
+ManagePanel::ManagePanel(Array<std::tuple<String, String>>& artist_filename_tuples, InfluencesPanel& influencesPanelc)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -35,7 +35,7 @@ ManagePanel::ManagePanel(Array<std::tuple<String, String>>& artist_filename_tupl
 	corpusListBox.setCurrArtistFilenameTuples(curr_artist_filename_tuples);
 
 	//File
-
+	influencesPanel = &influencesPanelc;
 	
 }
 
@@ -110,6 +110,7 @@ void ManagePanel::buttonClicked(Button* button)
 			Array<File> midi_files = myChooser.getResults();
 			corpusListBox.addSongs(midi_files);
 			corpusListBox.updateContent();
+			influencesPanel->visibilityChanged();
 		}
 	}
 	else if (button == &saveSongsBtn)

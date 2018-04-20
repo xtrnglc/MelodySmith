@@ -49,7 +49,7 @@ void InfluencesListBoxModel::generateArtistFileMap()
 	if (curr_artist_filename_tuples == nullptr)
 		return;
 
-	artists_to_influences->clear();
+	//artists_to_influences->clear();
 
 	for (int i = 0; i < curr_artist_filename_tuples->size(); i++)
 	{
@@ -76,6 +76,23 @@ void InfluencesListBoxModel::generateArtistFileMap()
 				artists_to_influences->add(std::make_tuple(artistName, 0));
 			}
 		}
+	}
+
+	//Clear out any extra mappings
+	for (int i = 0; i < artists_to_influences->size(); i++) {
+		std::tuple<String, String> currFileArtist((*artists_to_influences)[i]);
+		String artistInfluence = std::get<1>(currFileArtist);
+		String artistName = std::get<0>(currFileArtist);
+
+		bool isArtistNameInManageTuples = false;
+		for (int j = 0; j < curr_artist_filename_tuples->size(); j++) {
+			std::tuple<String, String> currFileArtist2((*curr_artist_filename_tuples)[j]);
+			String currartistName = std::get<1>(currFileArtist2);
+			String currfileName = std::get<0>(currFileArtist2);
+			if (currartistName == artistName) isArtistNameInManageTuples = true;
+		}
+		
+		if (!isArtistNameInManageTuples) artists_to_influences->remove(i);
 	}
 }
 

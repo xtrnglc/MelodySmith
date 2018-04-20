@@ -13,14 +13,17 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "ManageListBoxModel.h"
 #include "ManageListBoxRow.h"
+#include "InfluencesPanel.h"
 
 //==============================================================================
 /*
 */
+class InfluencesPanel;
 class ManagePanel    : public Component, public Button::Listener, public FileDragAndDropTarget
 {
 public:
-    ManagePanel(Array<std::tuple<String, String>>& artist_filename_tuples);
+	//class InfluencesPanel;
+    ManagePanel(Array<std::tuple<String, String>>& artist_filename_tuples, InfluencesPanel& influencesPanelc);
     ~ManagePanel();
 
     void paint (Graphics&) override;
@@ -29,6 +32,8 @@ public:
 	TextButton addSongsBtn;
 	TextButton saveSongsBtn;
 	Array<std::tuple<String, String>> *curr_artist_filename_tuples;
+	InfluencesPanel* influencesPanel;
+
 
 	void buttonClicked(Button* button) override;
 	bool isInterestedInFileDrag(const StringArray & files) override;

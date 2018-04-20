@@ -22,7 +22,7 @@ BasicParamsPanel::BasicParamsPanel()
 	melodyControls.setFont(Font("Avenir", 16.0f, Font::bold));
 	melodyControls.setJustificationType(Justification::centred);
 
-	intervalWeightLabel.setText("Speed", NotificationType::dontSendNotification);
+	intervalWeightLabel.setText("Average Note Length", NotificationType::dontSendNotification);
 	intervalWeightLabel.setJustificationType(Justification::centred);
 	addAndMakeVisible(intervalWeightLabel);
 
@@ -32,7 +32,7 @@ BasicParamsPanel::BasicParamsPanel()
 	invervalWeightSlider.setRange(1, 10, 1.0);
 	invervalWeightSlider.setTextBoxStyle(Slider::NoTextBox, false, 50, 20);
 
-	durationWeightLabel.setText("Phrase Length", NotificationType::dontSendNotification);
+	durationWeightLabel.setText("N-Gram Length", NotificationType::dontSendNotification);
 	durationWeightLabel.setJustificationType(Justification::centred);
 	addAndMakeVisible(durationWeightLabel);
 

@@ -16,13 +16,17 @@
 #include <thread>
 #include "ForgeTask.h"
 
+// basic file operations
+#include <iostream>
+#include <fstream>
+
 
 
 
 
 //==============================================================================
 MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySmithVSTAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), tabbedCorpusComponent(TabbedButtonBar::Orientation::TabsAtLeft), managePanel(curr_artist_filename_tuples),
+    : AudioProcessorEditor (&p), processor (p), tabbedCorpusComponent(TabbedButtonBar::Orientation::TabsAtLeft), managePanel(curr_artist_filename_tuples, influencesPanel),
 	influencesPanel(curr_artist_filename_tuples, artists_to_influences, managePanel), progressBar(progressDouble)
 {
 	audioProcessor = &p;
@@ -46,7 +50,7 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	setSizesAndColors();
 	setSize(700, 550);
     //setSize (pluginHeight, pluginWidth);
-	setResizable(true, true);
+	setResizable(false, false);
 	setResizeLimits(100, 100, 1800, 3200);
 
 	corpusHeader.setColour(Label::textColourId, header1Colour);
@@ -97,11 +101,24 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	addAndMakeVisible(basicParamsPanel);
 	addAndMakeVisible(scaleParamsPanel);
 
-	exportBtn.setButtonText("Choose Save Folder");
+	exportBtn.setButtonText("Choose Forge Folder");
 	exportBtn.setColour(TextButton::buttonColourId, Colours::red);
 	exportBtn.setColour(TextButton::textColourOffId, Colours::white);
 	exportBtn.addListener(this);
 	addAndMakeVisible(exportBtn);
+
+	//Load/save presets btns
+	savePresetsBtn.setButtonText("Save Presets");
+	savePresetsBtn.setColour(TextButton::buttonColourId, Colours::deepskyblue.darker(2.0f));
+	savePresetsBtn.setColour(TextButton::textColourOffId, Colours::white);
+	savePresetsBtn.addListener(this);
+	addAndMakeVisible(savePresetsBtn);
+
+	loadPresetsBtn.setButtonText("Load Presets");
+	loadPresetsBtn.setColour(TextButton::buttonColourId, Colours::deepskyblue.darker(2.0f));
+	loadPresetsBtn.setColour(TextButton::textColourOffId, Colours::white);
+	loadPresetsBtn.addListener(this);
+	addAndMakeVisible(loadPresetsBtn);
 
 	tabbedCorpusComponent.setOrientation(TabbedButtonBar::Orientation::TabsAtTop);
 	tabbedCorpusComponent.addTab("Manage", Colours::deepskyblue, &managePanel, false);
@@ -113,6 +130,26 @@ MelodySmithVSTAudioProcessorEditor::MelodySmithVSTAudioProcessorEditor (MelodySm
 	addAndMakeVisible(tabbedCorpusComponent);
 
 	exportFolder = File(melodysmithDirPath);
+
+	//Algorithm Type select
+	algorithmTypeLabel.setText("Algorithm Type", NotificationType::dontSendNotification);
+	algorithmTypeLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(algorithmTypeLabel);
+
+	algorithmTypeSelect.addItem("Wandering", 1);
+	algorithmTypeSelect.addItem("Phrased", 2);
+	algorithmTypeSelect.addItem("Structured", 3);
+	algorithmTypeSelect.setSelectedId(2);
+	addAndMakeVisible(algorithmTypeSelect);
+
+	//Output filename
+	outputFilenameLabel.setText("Output Name", NotificationType::dontSendNotification);
+	outputFilenameLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(outputFilenameLabel);
+
+	outputFilenameTextbox.setTextToShowWhenEmpty("melodysmith", Colours::lightgrey);
+	//outputFilenameTextbox.setText(aName, false);
+	addAndMakeVisible(outputFilenameTextbox);
 }
 
 MelodySmithVSTAudioProcessorEditor::~MelodySmithVSTAudioProcessorEditor()
@@ -167,11 +204,31 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 	basicParamsPanel.setBounds(firstRow.removeFromLeft(firstRow.getWidth() - 10).reduced(0, 10));
 	scaleParamsPanel.setBounds(secondRow.removeFromLeft(secondRow.getWidth() - 10).reduced(0, 10));
 	advancedParamsPanel.setBounds(thirdRow.removeFromLeft(thirdRow.getWidth() - 10).reduced(0, 10));
+	
+	//Final Row
+	juce::Rectangle<int> fourthRowDivided = fourthRow.removeFromTop(fourthRow.getHeight() / 2);
+	int rowWidth = fourthRowDivided.getWidth();
 
-	//rightCol.removeFromTop(rightColHeight / 12);
-	reforgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
-	forgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
-	exportBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 2.5));
+	//Algorithm Type Select
+	juce::Rectangle<int> finalPanel1 = fourthRowDivided.removeFromLeft(rowWidth / 3).reduced(4, 0);
+	algorithmTypeLabel.setBounds(finalPanel1.removeFromTop(finalPanel1.getHeight() / 2));
+	algorithmTypeSelect.setBounds(finalPanel1);
+
+	//Output filename
+	juce::Rectangle<int> finalPanel2 = fourthRowDivided.removeFromLeft(rowWidth / 3).reduced(4, 0);
+	outputFilenameLabel.setBounds(finalPanel2.removeFromTop(finalPanel2.getHeight() / 2));
+	outputFilenameTextbox.setBounds(finalPanel2);
+
+	//Save/load presets
+	juce::Rectangle<int> finalPanel3 = fourthRowDivided.removeFromLeft(rowWidth / 3).reduced(4, 0);
+	savePresetsBtn.setBounds(finalPanel3.removeFromTop(finalPanel3.getHeight() / 2).reduced(0, 4));
+	loadPresetsBtn.setBounds(finalPanel3.reduced(0, 4));
+
+
+
+	reforgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 4));
+	forgeImageBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 4));
+	exportBtn.setBounds(fourthRow.removeFromLeft(rightCol.getWidth() / 3).reduced(10, fourthRow.getHeight() / 4));
 
 	//progressBar.setBounds(rightCol);
 	//txbtn.setBounds(rightCol);
@@ -183,11 +240,7 @@ void MelodySmithVSTAudioProcessorEditor::resized()
 
 void MelodySmithVSTAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
-	//processor.noteOnVel = midiVolume.getValue();
-	//if (slider == &keyKnob)
-	//{
 
-	//}
 }
 
 void MelodySmithVSTAudioProcessorEditor::updateProgressBar()
@@ -258,9 +311,16 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		double phraseLength = basicParamsPanel.durationWeightSlider.getValue() * 2;
 		double creativity = basicParamsPanel.creativityWeightSlider.getValue();
 		double speed = basicParamsPanel.invervalWeightSlider.getValue() * 10;
+
+		String baseAlgorithmType = algorithmTypeSelect.getText(), algorithmType = "";
+		if (baseAlgorithmType == "Phrased") algorithmType = "extract";
+		else if (baseAlgorithmType == "Structured") algorithmType = "phrased";
+		else algorithmType = "wandering";
+		algorithmType = algorithmType.toStdString();
+
 		String clParamsStr = "\"" + keyValue + "\" " + String(rhythmicImportance) + " " + String(melodicImportance) +
 			" " + "\"" + restType + "\" " + String(restAmount) + " " + String(syncopation) + " " +  String(phraseLength) + " "
-			+ String(creativity) + " " + String(speed) + " phrased " ;
+			+ String(creativity) + " " + String(speed) + " " + algorithmType + " ";
 		
 		//Create master directory
 		File f(melodysmithDirPath + "artists");
@@ -304,7 +364,10 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 
 		String melodySmithJarStr = melodysmithDirPath + "MelodySmith.jar";
 		String artistsStr = melodysmithDirPath + "artists";
-		String outputFilename = melodysmithDirPath + "melodysmith" + String(countOfOutputFiles++) + ".mid";
+		String currOutputFilename = outputFilenameTextbox.getText();
+		if (currOutputFilename.isEmpty())
+			currOutputFilename = "melodysmith";
+		String outputFilename = melodysmithDirPath + currOutputFilename + String(countOfOutputFiles++) + ".mid";
 
 		String clStr = " -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
 
@@ -378,6 +441,27 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		//i = system(clStr.toStdString().c_str());
 
 	}
+	else if (btn == &savePresetsBtn) {
+		FileChooser myChooser("Save presets to a file...",
+			File::getSpecialLocation(File::userHomeDirectory), "*.mssf");
+		//myChooser.
+		if (myChooser.browseForFileToSave(true))
+		{
+			juce::File saveFile = myChooser.getResult();
+			writeToFile(saveFile);
+		}
+	}
+	else if (btn == &loadPresetsBtn) {
+		FileChooser myChooser("Load presets from a file...",
+			File::getSpecialLocation(File::userHomeDirectory), "*.mssf");
+		//myChooser.
+		if (myChooser.browseForFileToOpen())
+		{
+			juce::File loadFile = myChooser.getResult();
+			loadFromFile(loadFile);
+		}
+	}
+
 } 
 
 void MelodySmithVSTAudioProcessorEditor::setSizesAndColors()
@@ -404,5 +488,129 @@ void MelodySmithVSTAudioProcessorEditor::createCorpusPanel()
 
 void MelodySmithVSTAudioProcessorEditor::createControlsPanel()
 {
+
+}
+
+void MelodySmithVSTAudioProcessorEditor::writeToFile(juce::File saveFile)
+{
+	String savePresetsStr = "";
+	String outputFilenameValue = outputFilenameTextbox.getText();
+	int keyValue = scaleParamsPanel.keySelect.getSelectedId();
+	double rhythmicImportance = advancedParamsPanel.nGramLengthSlider.getValue();
+	double melodicImportance = advancedParamsPanel.numberOfComparisonsSlider.getValue();
+	int restValue = scaleParamsPanel.restTypeSelect.getSelectedId();
+	double restAmount = scaleParamsPanel.restAmntSlider.getValue();
+	double syncopation = scaleParamsPanel.syncopationSlider.getValue();
+	double phraseLength = basicParamsPanel.durationWeightSlider.getValue();
+	double creativity = basicParamsPanel.creativityWeightSlider.getValue();
+	double speed = basicParamsPanel.invervalWeightSlider.getValue();
+	int algorithmValue = algorithmTypeSelect.getSelectedId();
+
+	savePresetsStr = outputFilenameValue + "\n" + String(keyValue) + "\n" + String(rhythmicImportance) + "\n" + String(melodicImportance) + "\n"
+		+ String(restValue) + "\n" + String(restAmount) + "\n" + String(syncopation) + "\n" + String(phraseLength) + "\n"
+		+ String(creativity) + "\n" + String(speed) + "\n" + String(algorithmValue) + "\n";
+
+	for (int i = 0; i < artists_to_influences.size(); i++)
+	{
+		//Get artist name and influence
+		std::tuple<String, double> currArtistToInfluence(artists_to_influences[i]);
+		String artistName = std::get<0>(currArtistToInfluence);
+		double inf = std::get<1>(currArtistToInfluence);
+
+		//add to presets string
+		savePresetsStr +=  "///" + artistName + ":" + String(inf) + "\n";
+
+		//populate with artist files
+		for (int j = 0; j < curr_artist_filename_tuples.size(); j++)
+		{
+			std::tuple<String, String> currFileArtist(curr_artist_filename_tuples[j]);
+			String currArtistName = std::get<1>(currFileArtist);
+			String fileName = std::get<0>(currFileArtist);
+
+			if (currArtistName == artistName)
+			{
+				//Newline for filepath
+				savePresetsStr += fileName + "\n";
+			}
+		}
+	}
+
+	saveFile.replaceWithText(savePresetsStr);
+	
+}
+
+void MelodySmithVSTAudioProcessorEditor::loadFromFile(juce::File loadFile)
+{
+	String loadFileStr = loadFile.loadFileAsString();
+
+	int indexOf = loadFileStr.indexOf("\r\n");
+	outputFilenameTextbox.setText(loadFileStr.substring(0, indexOf));
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	int newVal = loadFileStr.substring(0, indexOf).getIntValue();
+	scaleParamsPanel.keySelect.setSelectedId(newVal);
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	advancedParamsPanel.nGramLengthSlider.setValue(loadFileStr.substring(0, indexOf).getDoubleValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	advancedParamsPanel.numberOfComparisonsSlider.setValue(loadFileStr.substring(0, indexOf).getDoubleValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	scaleParamsPanel.restTypeSelect.setSelectedId(loadFileStr.substring(0, indexOf).getIntValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	scaleParamsPanel.restAmntSlider.setValue(loadFileStr.substring(0, indexOf).getDoubleValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	scaleParamsPanel.syncopationSlider.setValue(loadFileStr.substring(0, indexOf).getDoubleValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	basicParamsPanel.durationWeightSlider.setValue(loadFileStr.substring(0, indexOf).getDoubleValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	basicParamsPanel.creativityWeightSlider.setValue(loadFileStr.substring(0, indexOf).getDoubleValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	basicParamsPanel.invervalWeightSlider.setValue(loadFileStr.substring(0, indexOf).getDoubleValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	indexOf = loadFileStr.indexOf("\r\n");
+	algorithmTypeSelect.setSelectedId(loadFileStr.substring(0, indexOf).getIntValue());
+	loadFileStr = loadFileStr.substring(indexOf + 2);
+
+	while (true) {
+		indexOf = loadFileStr.indexOf("\r\n");
+		if (indexOf == -1) break;
+		String artistInfStr = loadFileStr.substring(3, indexOf);
+
+		String artistName = artistInfStr.substring(0, artistInfStr.indexOf(":"));
+		double artistInfluence = artistInfStr.substring(artistInfStr.indexOf(":") + 1).getDoubleValue();
+		artists_to_influences.add(std::make_tuple(artistName, artistInfluence));
+
+		loadFileStr = loadFileStr.substring(indexOf + 2);
+
+		while (!loadFileStr.substring(0, loadFileStr.indexOf("\r\n")).contains("///")) {
+			if (loadFileStr.isEmpty()) break;
+			String currfilePath = loadFileStr.substring(0, loadFileStr.indexOf("\r\n"));
+			std::tuple<String, String> s(currfilePath, artistName);
+			curr_artist_filename_tuples.add(s);
+			managePanel.corpusListBox.fileNames.add(File(currfilePath));
+			loadFileStr = loadFileStr.substring(loadFileStr.indexOf("\r\n") + 2);
+		}
+		
+	}
+	managePanel.corpusListBox.updateContent();
+	this->repaint();
 
 }

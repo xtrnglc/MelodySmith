@@ -18,6 +18,7 @@
 //==============================================================================
 /*
 */
+class ManagePanel;
 class InfluencesPanel    : public Component
 {
 public:

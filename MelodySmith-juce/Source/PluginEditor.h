@@ -16,6 +16,8 @@
 #include "BasicParamsPanel.h";
 #include "AdvancedParamsPanel.h"
 #include "CorpusPanel.h"
+#include "ManagePanel.h"
+#include "InfluencesPanel.h"
 
 //==============================================================================
 /**
@@ -29,6 +31,8 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+	void writeToFile(juce::File saveFile);
+	void loadFromFile(juce::File loadFile);
 
 private:
 	//Functions to setup the GUI in the constructor
@@ -80,6 +84,8 @@ private:
 
 	TextButton exportBtn;
 	File exportFolder;
+	TextButton savePresetsBtn;
+	TextButton loadPresetsBtn;
 
 	double progressDouble = 2.0;
 	ProgressBar progressBar;
@@ -89,6 +95,13 @@ private:
 	int countOfOutputFiles;
 
 	String platform;
+
+
+	Label algorithmTypeLabel;
+	ComboBox algorithmTypeSelect;
+
+	Label outputFilenameLabel;
+	TextEditor outputFilenameTextbox;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MelodySmithVSTAudioProcessorEditor)
