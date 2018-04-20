@@ -56,7 +56,11 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * This is a good method for testing the composition logic. Just choose a corpus, and construct a corpus
+	 */
 	public static void composeLocalCorpus() {
+		boolean extractPhrases = false;
 		HashMap<String, Double> artistWeights = new HashMap<String, Double>();
 		artistWeights.put("bach", 1.0);
 		artistWeights.put("beatles", 92.0);
@@ -70,14 +74,13 @@ public class Main {
 		artistWeights.put("fourBarLoops", 1.0);
 		artistWeights.put("folkMelodies", 1.0);
 		artistWeights.put("boys", 2.0);
-		Composer composer = new Composer("corpus5", "cMajor", 0.1, 0.1, "CONSTRUCTIVE", 0, 10, 10, 20, 100, false, artistWeights);
 		
+		Composer composer = new Composer("corpus5", "cMajor", 0.1, 0.1, "CONSTRUCTIVE", 0, 10, 10, 20, 100, extractPhrases, artistWeights);
 		
-		//composer.composeWithPhrases("phrase1.mid", 50);
-		// composer.composeMelody("output.mid", 100);
-		composer.composeNBars("fourBars.mid", 8);
-		//composer.composeNBars("sixteenBars.mid", 16);
-		//composer.composeNBars("sixtyFourBars.mid", 64);
+		if(extractPhrases)
+			composer.composeWithPhrases("phrased.mid", 50);
+		else
+			composer.composeNBars("eightBars.mid", 8);
 	}
 	
 	private static HashMap<String, Double> initializeArtists(String[] args, int currentPosition){

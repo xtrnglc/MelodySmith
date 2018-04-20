@@ -725,7 +725,7 @@ public class MidiReader {
 		if (lastOutputComposition.size() != 0) {
 			ArrayList<Phrase> temp = stitchOutputByBar(lastOutputComposition);
 			ret.append("X: " + temp.size() + '\n');
-			ret.append("T: Composition\n");
+			//ret.append("T: Composition\n");
 			ret.append("M: 4/4\n");
 			ret.append("L: 1/4\n");
 			//ret.append("Q: 1/4=120\n");

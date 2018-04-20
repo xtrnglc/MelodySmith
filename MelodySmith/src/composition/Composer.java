@@ -52,7 +52,7 @@ public class Composer {
 		this.nGramLength = nGramLength;
 		this.speedWeight = speed;
 		this.syncopationWeight = 100/syncopation;
-		this.constructiveRests = true;//(restType.toUpperCase().trim().equals("CONSTRUCTIVE"));
+		this.constructiveRests = (restType.toUpperCase().trim().equals("CONSTRUCTIVE"));
 		this.restAmount = restAmount;
 		this.repetitionPenalty = 1.5;
 		this.extractPhrases = phrases;
@@ -97,7 +97,7 @@ public class Composer {
 			currentPhrase = bestPhrase;
 			recentPhrases.add(bestPhrase);
 		}		
-		writeMidi(mw, reader, outputFilename);
+		writeMidiFile(mw, reader, outputFilename);
 	}
 	
 	private boolean samePhrase(Phrase phrase1, Phrase phrase2) {
@@ -171,7 +171,7 @@ public class Composer {
 			distanceToEndOfBar = (distanceToEndOfBar - decodeDuration(currentNode.noteDuration))%64;
 			composition.add(bestNode);
 		}
-		writeMidi(mw, reader, outputFilename);
+		writeMidiFile(mw, reader, outputFilename);
 	}
 	
 	public void composeMelody(String outputFilename, int lengthInNotes) {
@@ -218,7 +218,7 @@ public class Composer {
 			currentNode = nextNode;
 		}
 		composition.add(currentNode);
-		writeMidi(mw, reader, outputFilename);
+		writeMidiFile(mw, reader, outputFilename);
 	}
 	
 	/**
@@ -274,7 +274,7 @@ public class Composer {
 		return nGram;
 	}
 	
-	private void writeMidi(MidiWriter mw, MidiReader mr, String fileName) {
+	private void writeMidiFile(MidiWriter mw, MidiReader mr, String fileName) {
 		try {
 			mw.writeToFile(fileName);
 			System.out.println("100");
