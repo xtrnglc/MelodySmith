@@ -372,8 +372,8 @@ void MelodySmithVSTAudioProcessorEditor::buttonClicked(Button* btn)
 		String clStr = " -jar \"" + melodySmithJarStr + "\" \"" + artistsStr + "\" \"" + outputFilename + "\" " + clParamsStr;
 
 		//String javaExePath = "\"" + melodysmithDirPath + "java.exe" + "\"";
-		//String javaExePath = "java";
-		String javaExePath = "C:\\jre1.8.0_121\\bin\\java.exe";
+		String javaExePath = "java";
+		//String javaExePath = "C:\\jre1.8.0_121\\bin\\java.exe";
 
 		//system(String(javaExePath + clStr + "& pause").toStdString().c_str());
 
