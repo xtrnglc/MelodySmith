@@ -37,16 +37,16 @@ public class Node {
 	public String timeSignature = "4/4";
 
 	public int index = 0;
+	public int timesPlayed = 0;
 	
 	public String pattern = "";
 	public String artist = "";
 	
 	ArrayList<Node> concurrentNodes = new ArrayList<Node>();
 	ArrayList<Link> linkedNodes = new ArrayList<Link>();
-	
-	// Code from Note
+
 	/**
-	 * A Node with no key is a rest
+	 * A Node constructed with no key is a rest (key is set to -1)
 	 * 
 	 * @param channel
 	 * @param startTick
@@ -76,7 +76,7 @@ public class Node {
 		if (bpm != 0) {
 			this.bpm = bpm;
 		}
-		scaleDegree = getScaleDegree();
+		scaleDegree = -1;
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class Node {
 		if (bpm != 0) {
 			this.bpm = bpm;
 		}
-		scaleDegree = getScaleDegree();
+		distanceFromTonic = getDistanceFromTonic();
 	}
 	
 	/**
@@ -163,7 +163,7 @@ public class Node {
 	 * 
 	 * @return
 	 */
-	private int getScaleDegree() {
+	private int getDistanceFromTonic() {
 		String note = noteName.substring(0, 1);
 		String start = keySignature.substring(0, 1);
 
@@ -182,6 +182,30 @@ public class Node {
 
 		return 0;
 	}
+	
+	/**
+	 * Returns whether or not other node encodes the same type of musical event
+	 * @param otherNode
+	 */
+	public boolean equivalentNodes(Node otherNode) {
+		return (this.noteDuration == otherNode.noteDuration && this.scaleDegree == otherNode.scaleDegree && this.noteName == otherNode.noteName);
+	}
+
+	/**
+	 * Helper method to process the scale degree from the note name and Key
+	 * Signature
+	 * 
+	 * @return
+	 */
+	public void setScaleDegree(int lowestTonicOctave, int scaleDegreeSize) {
+
+		int temp = 8 * (octave - lowestTonicOctave) + distanceFromTonic;
+		if (temp >= 0) {
+			temp = temp  % (scaleDegreeSize - 1);
+		}
+		
+		scaleDegree = temp;
+	}
 	// end from Note
 	
 	void addConcurrentNode(Node concurrentNode) {
@@ -196,4 +220,9 @@ public class Node {
 		otherNode.linkedNodes.add(otherLink);
 	}
 	
+	@Override
+	public String toString() {
+		String result = this.noteName + " " + this.scaleDegree + " " + this.noteDuration + " " + this.timesPlayed;
+		return result;
+	}
 }

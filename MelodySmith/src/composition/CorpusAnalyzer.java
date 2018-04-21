@@ -2,7 +2,7 @@ package composition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Set;
 
 public class CorpusAnalyzer {
 	
@@ -20,9 +20,36 @@ public class CorpusAnalyzer {
 	
 	
 	private HashMap<String,Integer> intervalVocab = new HashMap<String,Integer>();
+	private String totalIntervalCount;
+	
 	private HashMap<String,Integer> scaleDegreeVocab = new HashMap<String,Integer>();
 	private HashMap<String,Integer> noteNameVocab = new HashMap<String,Integer>();
 	private HashMap<String,Integer> durationVocab = new HashMap<String,Integer>();
+	
+	public HashMap<String,Double> getNoteNameBigramProbabilities(){
+		HashMap<String,Double> bigramProbabilities = new HashMap<>();
+		for(String noteName : noteNameVocab.keySet()) {
+			int total = 0;
+			for(String note2Name : noteNameVocab.keySet()) {
+				String key = noteName+","+note2Name;
+				int count = getNoteNameNGramCount(key);
+				total += count;
+				bigramProbabilities.put(key, (double)count);
+			}
+			for(String note2Name : noteNameVocab.keySet()) {
+				String key = noteName+","+note2Name;
+				if(total == 0)
+					bigramProbabilities.put(key, 0.0);
+				else
+					bigramProbabilities.put(key, bigramProbabilities.get(key)/total);
+			}
+		}
+		return bigramProbabilities;
+	}
+	
+	public Set<String> getNoteNameVocab() {
+		return noteNameVocab.keySet();
+	}
 	
 	public void addToIntervalCount(int interval) {
 		collectNewVocabulary(Integer.toString(interval) ,intervalVocab);
@@ -123,23 +150,26 @@ public class CorpusAnalyzer {
 		String subKey = constructSubkey(key);
 		if(subKey.length() == 1)
 			return 1.0 * (getNoteNameNGramCount(key)+1) / (noteNameVocab.get(subKey)+noteNameVocab.size());
-		return 1.0 * getNoteNameNGramCount(key) / sumAllCounts(noteNameNGramCounts);
+		return 1.0 * (getNoteNameNGramCount(key)+1) / (getNoteNameNGramCount(subKey)+noteNameVocab.size());
 	}
 	
 	public double getDurationNGramProbability(String key) {
 		String subKey = constructSubkey(key);
 		if(subKey.length() == 1)
 			return 1.0 * (getDurationNGramCount(key)+1) / (durationVocab.get(subKey)+durationVocab.size());
-		return 1.0 * getDurationNGramCount(key) / sumAllCounts(durationNGramCounts);
+		return 1.0 * (getDurationNGramCount(key)+1) / (getDurationNGramCount(subKey)+durationVocab.size());
 	}
 	
 	private int sumAllCounts(HashMap map) {
+		if(totalIntervalCount != null)
+			return Integer.parseInt(totalIntervalCount);
 		int total = 0;
 		for(Object value : map.values()) {
 			if(value instanceof Integer) {
 				total += ((Integer) value).intValue();
 			}
 		}
+		totalIntervalCount = Integer.toString(total);
 		return total;
 	}
 	
