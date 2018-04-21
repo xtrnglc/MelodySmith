@@ -168,7 +168,6 @@ public class MidiReader {
 			Hashtable<Integer, ArrayList<Node>> currentNotes = getCurrentNotes();
 			highestTickOfChannel = new long[maxChannels];
 			
-			
 			// Reset the fields
 			currentSequence = MidiSystem.getSequence(midiFile);
 			
@@ -183,7 +182,6 @@ public class MidiReader {
 			for (int i = 0; i < maxChannels; i++) {
 				lowestTonicOctave.add(Integer.MAX_VALUE);
 			}
-
 
 			// Currently the logic will only handle MIDI with PPQ division type
 			// This should not be a problem for the prototype as the SMPTE is
@@ -362,8 +360,6 @@ public class MidiReader {
 				
 				if (currentTick != -1)
 					notes.get(currentTick).add(n);
-				
-
 				
 			} else if (sMessage.getCommand() == NOTE_OFF || velocity == 0) {
 				ArrayList<Node> channelNotes = currentNotes.get(sMessage.getChannel());
@@ -548,7 +544,6 @@ public class MidiReader {
 	 */
 	public int[] predictMelodyChannel() {
 		
-		
 		ArrayList<ArrayList<Node>> orderedNotes = getOrderedNotes();
 		int[] predictions = new int[orderedNotes.size()];
 		int longestRepeat = 0;
@@ -557,7 +552,6 @@ public class MidiReader {
 		int currentRepeat = 0;
 		int currentKey = -1;
 		int restCount = 0;
-		
 		
 		for (int i = 0; i < orderedNotes.size(); i++) {
 			predictions[i] = 100;
@@ -636,9 +630,7 @@ public class MidiReader {
 				ret.get(ret.size()-1).add(temp);
 		}
 		
-		return ret;
-		 
-		 
+		return ret; 
 	}
 	
 	/**
@@ -712,7 +704,6 @@ public class MidiReader {
 	private ArrayList<Phrase> stitchOutputByBar(ArrayList<Node> lastOutputComposition) {
 		ArrayList<Phrase> ret = new ArrayList<Phrase>();
 
-		
 		Phrase temp = new Phrase();
 		int bar = 1;
 		for (int i = 0; i < lastOutputComposition.size(); i++) {
@@ -787,7 +778,7 @@ public class MidiReader {
 						ret.append("_");
 					}
 					
-					
+					// Handle notes
 					if (node.key != -1) 
 					{
 						ret.append(node.noteName.substring(0, 1));
@@ -818,6 +809,7 @@ public class MidiReader {
 					
 					String durationString = "";
 					
+					//Handle note duration
 					if (node.noteDuration.contains("32")) {
 						durationString = "/8";
 					}
@@ -837,7 +829,6 @@ public class MidiReader {
 						durationString = "4";
 					}
 					
-
 					ret.append(durationString);
 					
 					if (lastDuration != "") 
@@ -866,26 +857,4 @@ public class MidiReader {
 		}
 		return ret.toString();
 	}
-	
-	
-
-	
-//	public ArrayList<ArrayList<Phrase>> stitchPhraseByRythmicCadence(ArrayList<ArrayList<Node>> input) {
-//		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
-//		
-//		for (ArrayList<Node> channel : input) {
-//			ret.add(new ArrayList<Phrase>());
-//			Phrase temp = new Phrase();
-//			for (Node node : channel) {
-//				temp.nodes.add(node);
-//				if (node.key == -1 && (!node.noteDuration.contains("/") || Integer.parseInt(node.noteDuration.split("/")[1]) <= Integer.parseInt(minRestSize.split("/")[1]))) {
-//					ret.get(ret.size()-1).add(temp);
-//					temp = new Phrase();
-//				}
-//			}
-//		}
-//		
-//		return ret;
-//	}
-	
 }
