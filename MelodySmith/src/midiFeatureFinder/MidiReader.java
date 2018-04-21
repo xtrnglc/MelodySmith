@@ -133,7 +133,11 @@ public class MidiReader {
 		return ret;
 	}
 	
-	public Hashtable<Integer, ArrayList<Node>> getCurrentNotes() {
+	/**
+	 * Private function to return current notes.
+	 * @return List of current notes
+	 */
+	private Hashtable<Integer, ArrayList<Node>> getCurrentNotes() {
 		// CurrentNotes is used to keep track of all ongoing notes. This is
 		// of the form channel -> active notes
 		unorderedNotes = new ArrayList<LinkedHashMap<Long, ArrayList<Node>>>();
@@ -224,6 +228,14 @@ public class MidiReader {
 			return getOrderedNotesWithoutRests();
 	}
 	
+	/**
+	 * Wrapper function which converts a MIDI file into a ABCJS output string.
+	 * @param midiFile
+	 * @param markovLength
+	 * @param withRests
+	 * @param scaleDegreeSize
+	 * @return ABCJS output string
+	 */
 	public String readSequenceForABCJS(File midiFile, int markovLength, boolean withRests, int scaleDegreeSize) {
 		ArrayList<ArrayList<Node>> temp = this.readSequence(midiFile, markovLength, withRests, scaleDegreeSize);
 		String ret = "";
@@ -601,6 +613,12 @@ public class MidiReader {
 		return predictions;
 	}
 	
+	/**
+	 * Stitches together Nodes into Phrases when encountering a rest larger than minRestSize.
+	 * @param input
+	 * @param minRestSize
+	 * @return [channel[phrase]] stitched by rests
+	 */
 	public ArrayList<ArrayList<Phrase>> stitchPhraseByRests(ArrayList<ArrayList<Node>> input, String minRestSize) {
 		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
 		
@@ -623,6 +641,11 @@ public class MidiReader {
 		 
 	}
 	
+	/**
+	 * Stitches together phrases from the input of Nodes by Tonics
+	 * @param input
+	 * @return [channel[phrase]] stitched by Tonics
+	 */
 	public ArrayList<ArrayList<Phrase>> stitchPhraseByTonic(ArrayList<ArrayList<Node>> input) {
 		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
 		
@@ -646,10 +669,14 @@ public class MidiReader {
 		}
 		
 		return ret;
-		 
-		 
 	}
 	
+	/**
+	 * Stitches together phrases from the input Nodes by bars.
+	 * @param input
+	 * @param barSize
+	 * @return [channel[phrase]] stitched by sets of bars of size barSize
+	 */
 	public ArrayList<ArrayList<Phrase>> stitchPhraseByBar(ArrayList<ArrayList<Node>> input, double barSize) {
 		ArrayList<ArrayList<Phrase>> ret = new ArrayList<ArrayList<Phrase>>();
 		
@@ -677,7 +704,12 @@ public class MidiReader {
 		return ret;
 	}
 	
-	public ArrayList<Phrase> stitchOutputByBar(ArrayList<Node> lastOutputComposition) {
+	/**
+	 * Helper function for stitching of output by Bar for ABCJS.
+	 * @param lastOutputComposition
+	 * @return Output Node array stitched by bar
+	 */
+	private ArrayList<Phrase> stitchOutputByBar(ArrayList<Node> lastOutputComposition) {
 		ArrayList<Phrase> ret = new ArrayList<Phrase>();
 
 		
@@ -712,11 +744,14 @@ public class MidiReader {
 			ret.add(temp);
 		
 		return ret;
-		 
-		 
 	}
 	
-	public String compositionToABCJS(ArrayList<Node> lastOutputComposition) {
+	/**
+	 * Private helper function which converts a composition into an abcjs string
+	 * @param lastOutputComposition
+	 * @return ABCJS string
+	 */
+	private String compositionToABCJS(ArrayList<Node> lastOutputComposition) {
 		StringBuilder ret = new StringBuilder();
 		int barCount = 0;
 		String lastDuration = "placeholder";
